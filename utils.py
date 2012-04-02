@@ -1,10 +1,5 @@
 import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config
 
-def adminify(*args):
-    for a in args:
-        a.display_name=a.__name__.replace('my','')
-        a.allow_tags=True
-
 def chunkify(l,n):
     """chunkify(range(10), 2) ==> [[0,1],[2,3],...[8,9]]"""
     res=[]
@@ -95,14 +90,13 @@ def format_exception(maxTBlevel=10):
     res='%s\n%s\n%s\n%s'%(excName, str(exc)[:100]+'...', excArgs, ''.join(excTb))
     return res
 
-import sqlalchemy
-import sqlalchemy.interfaces
-import _mysql_exceptions
-
 class ConnectionRefresher(sqlalchemy.interfaces.PoolListener):
     def __init__(self):
         self.retried = False
     def checkout(self, dbapi_con, con_record, con_proxy):
+        import sqlalchemy
+        import sqlalchemy.interfaces
+        import _mysql_exceptions        
         try:
             dbapi_con.cursor().execute('select now()')
         except mysql_exceptions.OperationalError:
