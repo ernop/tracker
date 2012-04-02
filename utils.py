@@ -1,5 +1,10 @@
 import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config
 
+def adminify(*args):
+    for a in args:
+        a.display_name=a.__name__.replace('my','')
+        a.allow_tags=True
+
 def chunkify(l,n):
     """chunkify(range(10), 2) ==> [[0,1],[2,3],...[8,9]]"""
     res=[]
