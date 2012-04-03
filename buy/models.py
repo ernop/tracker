@@ -55,7 +55,7 @@ class Purchase(models.Model):
         db_table='purchase'    
     
     def __unicode__(self):
-        return '%s %d for %0.02f%s each, total %f'%(self.product, self.quantity, float(self.cost)/self.quantity, self.currency.symbol, self.cost)
+        return '%s %d for %0.02f%s each, total %0.2f'%(self.product, self.quantity, float(self.cost)/self.quantity, self.currency.symbol, self.cost)
     
 class Person(models.Model):
     first_name=models.CharField(max_length=100)
