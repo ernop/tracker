@@ -1,5 +1,6 @@
 from django.contrib import admin
 from buy.models import *
+from workout.models import *
 from utils import adminify
 
 class ProductAdmin(admin.ModelAdmin):
