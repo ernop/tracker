@@ -1,5 +1,5 @@
 from django.contrib import admin
-from workout.models import *
+from models import *
 from utils import adminify
 
 class PMuscleInline(admin.StackedInline):
