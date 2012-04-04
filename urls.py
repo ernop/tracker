@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.http import HttpResponseRedirect
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -9,5 +10,6 @@ urlpatterns = patterns('',
     # (r'^tracker/', include('tracker.foo.urls')),
 
     # Uncomment the next line to enable the admin:
-    (r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls),),
+    #url(r'.*', lambda x:HttpResponseRedirect('/admin/'), name='redir'),
 )

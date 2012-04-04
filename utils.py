@@ -1,5 +1,7 @@
 import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config
 
+DATE='%Y-%m-%d'
+
 def adminify(*args):
     for func in args:
         name=None

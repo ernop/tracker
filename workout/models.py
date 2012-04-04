@@ -1,7 +1,8 @@
 from django.db import models
 
+from utils import *
 def lnk(nodel, id, obj):
-    return '<a href="/admin/workout/%s/%d">%s</a>'%(nodel, id, str(obj))
+    return '<a href="/admin/workout/%s/%d/">%s</a>'%(nodel, id, str(obj))
 
 # Create your models here.
 class Exercise(models.Model):
@@ -55,8 +56,8 @@ class Set(models.Model):
 
 class ExWeight(models.Model):
     exercise=models.ForeignKey(Exercise, related_name='exsets')
-    weight=models.IntegerField(blank=True)
-    side=models.IntegerField(blank=True)
+    weight=models.IntegerField(blank=True, unique=True)
+    side=models.IntegerField(blank=True, unique=True)
     
     def save(self, *args, **kwargs):
         if self.side and self.exercise.barbell:
@@ -69,7 +70,10 @@ class ExWeight(models.Model):
         super(ExWeight, self).save(*args, **kwargs)
         
     def __unicode__(self):
-        return '%s %s'%(self.exercise, self.weight)        
+        res='%s %s'%(self.exercise, self.weight)        
+        if self.exercise.barbell:
+            res+=' (%0.1f)'%self.side
+        return res
 
     class Meta:
         db_table='exweight'
@@ -80,13 +84,14 @@ class ExWeight(models.Model):
         
 class Workout(models.Model):
     exweights=models.ManyToManyField(ExWeight, through=Set, related_name='workout')
-    date=models.DateTimeField()
+    date=models.DateTimeField(blank=True)
     
     def __unicode__(self):
-        return '%s'%(self.date, )#','.join([str(s) for s in self.sets.all()]),)
+        return '%s'%(self.date.strftime(DATE), )#','.join([str(s) for s in self.sets.all()]),)
     
     class Meta:
         db_table='workout'
+        ordering=['-date',]
         
     def adm(self):
         return lnk('workout',self.id, self)
