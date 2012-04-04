@@ -1,8 +1,8 @@
 import datetime
 from django.contrib import admin
-from buy.models import *
-from workout.models import *
-from utils import adminify, DATE
+from tracker.buy.models import *
+from tracker.workout.models import *
+from tracker.utils import adminify, DATE
 
 class ProductAdmin(admin.ModelAdmin):
     list_display='name domain'.split()
