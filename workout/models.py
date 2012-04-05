@@ -13,6 +13,7 @@ class Exercise(models.Model):
     note=models.CharField(max_length=500, blank=True)
     class Meta:
         db_table='exercise'    
+        ordering=['name',]
 
     def __unicode__(self):
         return self.name

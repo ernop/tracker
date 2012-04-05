@@ -11,7 +11,7 @@ class PurchaseAdmin(admin.ModelAdmin):
     list_display='id myproduct quantity cost mycost_per currency source mywho_with created'.split()
     
     list_filter='source currency'.split()
-    date_hierarchy=['created',]
+    date_hierarchy='created'
     
     def mycost_per(self, obj):
         return '%0.2f'%(float(obj.cost)/obj.quantity)
