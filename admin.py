@@ -24,20 +24,20 @@ class PurchaseAdmin(admin.ModelAdmin):
     
     adminify(mycost_per, myproduct, mywho_with)
 
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        #import ipdb;ipdb.set_trace()
-        if db_field.name=='quantity':
-            kwargs['initial']=1
-            kwargs.pop('request')
-            return db_field.formfield(**kwargs)
-        return super(PurchaseAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+    #def formfield_for_dbfield(self, db_field, **kwargs):
+        ##import ipdb;ipdb.set_trace()
+        #if db_field.name=='quantity':
+            #kwargs['initial']=1
+            #kwargs.pop('request')
+            #return db_field.formfield(**kwargs)
+        #return super(PurchaseAdmin, self).formfield_for_dbfield(db_field, **kwargs)
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        print 'ff for ',db_field.name
-        if db_field.name == 'currency':
-            kwargs['initial'] = 1
-            return db_field.formfield(**kwargs)
-        return super(PurchaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    #def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        #print 'ff for ',db_field.name
+        #if db_field.name == 'currency':
+            #kwargs['initial'] = 1
+            #return db_field.formfield(**kwargs)
+        #return super(PurchaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 class DomainAdmin(admin.ModelAdmin):
     list_display='id name myproducts'.split()
