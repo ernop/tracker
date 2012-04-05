@@ -1,6 +1,6 @@
 from django.db import models
 
-from tracker.utils import *
+from tracker.utils import DATE
 def lnk(nodel, id, obj):
     return '<a href="/admin/workout/%s/%d/">%s</a>'%(nodel, id, str(obj))
 
