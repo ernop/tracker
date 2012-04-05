@@ -29,7 +29,7 @@ class Product(models.Model):
     domain=models.ForeignKey(Domain, related_name='products')
     class Meta:
         db_table='product'
-        
+        ordering=['name',]
     def __unicode__(self):
         return self.name            
 
@@ -53,6 +53,7 @@ class Purchase(models.Model):
     who_with=models.ManyToManyField('Person', related_name='purchases', blank=True, null=True)
     class Meta:
         db_table='purchase'    
+        ordering=['product__name',]
     
     def __unicode__(self):
         return '%s %d for %0.02f%s each, total %0.2f'%(self.product, self.quantity, float(self.cost)/self.quantity, self.currency.symbol, self.cost)
