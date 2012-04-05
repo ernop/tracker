@@ -8,9 +8,10 @@ class ProductAdmin(admin.ModelAdmin):
     list_display='name domain'.split()
 
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display='id myproduct quantity cost mycost_per currency source mywho_with'.split()
+    list_display='id myproduct quantity cost mycost_per currency source mywho_with created'.split()
     
     list_filter='source currency'.split()
+    date_hierarchy=['created',]
     
     def mycost_per(self, obj):
         return '%0.2f'%(float(obj.cost)/obj.quantity)
@@ -61,7 +62,7 @@ class SMuscleInline(admin.StackedInline):
 
 class SetInline(admin.StackedInline):
     model=Workout.exweights.through
-    extra=5
+    extra=12
 
 class ExerciseAdmin(admin.ModelAdmin):
     list_display='id name mymuscles myhistory barbell '.split()
