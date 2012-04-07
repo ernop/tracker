@@ -8,9 +8,11 @@ from tracker.workout.models import *
 from tracker.utils import adminify, DATE
 
 def savetmp(self):
-    out=tempfile.NamedTemporaryFile()
+    out=tempfile.NamedTemporaryFile(dir=settings.SPARKLINES_DIR, delete=False)
     self.save(out,'png')
-    return out     
+    print 'created',out.name
+    os.chmod(out.name, 0644)
+    return out
 
 class ProductAdmin(admin.ModelAdmin):
     list_display='name domain mylastmonth'.split()
@@ -37,7 +39,6 @@ class ProductAdmin(admin.ModelAdmin):
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2)
         tmp=savetmp(im)
-        shutil.copy(tmp.name, settings.SPARKLINES_DIR)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
     
     adminify(mylastmonth)
@@ -103,9 +104,6 @@ class DomainAdmin(admin.ModelAdmin):
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2)
         tmp=savetmp(im)
-        sd=settings.SPARKLINES_DIR
-        shutil.copy(tmp.name, settings.SPARKLINES_DIR)
-        
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
     
     adminify(myproducts, myspent)
