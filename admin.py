@@ -1,11 +1,49 @@
-import datetime
+import datetime, tempfile, shutil, os
+
 from django.contrib import admin
+from django.conf import settings
+
 from tracker.buy.models import *
 from tracker.workout.models import *
 from tracker.utils import adminify, DATE
 
+def savetmp(self):
+    out=tempfile.NamedTemporaryFile()
+    self.save(out,'png')
+    return out     
+
 class ProductAdmin(admin.ModelAdmin):
-    list_display='name domain'.split()
+    list_display='name domain mylastmonth'.split()
+    
+    def mylastmonth(self, obj):
+        from spark import sparkline_discrete
+        purch=Purchase.objects.filter(product=obj)
+        if not purch:
+            return
+        
+        mindate=None
+        res={}
+        import ipdb;ipdb.set_trace()
+        for pu in purch:
+            date=pu.created.strftime(DATE)
+            res[date]=res.get(date, 0)+1
+            if not mindate or date<mindate:
+                mindate=date
+        first=datetime.datetime.strptime(mindate, DATE)
+        now=datetime.datetime.now()
+        trying=first
+        res2=[]
+        while trying<now:
+            res2.append((res.get(trying.strftime(DATE), 0)))
+            trying=datetime.timedelta(days=1)+trying
+        #import ipdb;ipdb.set_trace()
+        im=sparkline_discrete(results=res2)
+        tmp=savetmp(im)
+        dest=os.path.join(settings.STATICFILES_DIRS[0], 'sparklines')
+        shutil.copy(tmp.name, dest)
+        return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
+    
+    adminify(mylastmonth)
 
 class PurchaseAdmin(admin.ModelAdmin):
     list_display='id myproduct quantity cost mycost_per currency source mywho_with created'.split()
@@ -25,7 +63,6 @@ class PurchaseAdmin(admin.ModelAdmin):
     adminify(mycost_per, myproduct, mywho_with)
 
     def formfield_for_dbfield(self, db_field, **kwargs):
-        #import ipdb;ipdb.set_trace()
         if db_field.name=='quantity':
             kwargs['initial']=1
             kwargs.pop('request')
@@ -33,19 +70,47 @@ class PurchaseAdmin(admin.ModelAdmin):
         return super(PurchaseAdmin, self).formfield_for_dbfield(db_field, **kwargs)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        print 'ff for ',db_field.name
         if db_field.name == 'currency':
             kwargs['initial'] = 1
             return db_field.formfield(**kwargs)
         return super(PurchaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 class DomainAdmin(admin.ModelAdmin):
-    list_display='id name myproducts'.split()
+    list_display='id name myproducts myspent'.split()
     list_filter=['name',]
     def myproducts(self, obj):
-        return '%d products'%obj.products.count()
+        return '%d products <br>%s'%(obj.products.count(),'<br>'.join([str(oo) for oo in obj.products.all()]))
     
-    adminify(myproducts)
+    
+    
+    def myspent(self, obj):
+        from spark import sparkline_discrete
+        purch=Purchase.objects.filter(product__domain=obj)
+        if not purch:
+            return
+        
+        mindate=None
+        res={}
+        for pu in purch:
+            date=pu.created.strftime(DATE)
+            res[date]=res.get(date, 0)+pu.cost
+            if not mindate or date<mindate:
+                mindate=date
+        first=datetime.datetime.strptime(mindate, DATE)
+        now=datetime.datetime.now()
+        trying=first
+        res2=[]
+        while trying<now:
+            res2.append((res.get(trying.strftime(DATE), 0)))
+            trying=datetime.timedelta(days=1)+trying
+        #import ipdb;ipdb.set_trace()
+        im=sparkline_discrete(results=res2)
+        tmp=savetmp(im)
+        dest=os.path.join(settings.STATICFILES_DIRS[0], 'sparklines')
+        shutil.copy(tmp.name, dest)
+        return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
+    
+    adminify(myproducts, myspent)
     
 class PersonAdmin(admin.ModelAdmin):
     list_display='id first_name last_name birthday mymet_through'.split()
