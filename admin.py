@@ -38,7 +38,7 @@ class ProductAdmin(admin.ModelAdmin):
         while trying<now:
             res2.append((res.get(trying.strftime(DATE), 0)))
             trying=datetime.timedelta(days=1)+trying
-        im=sparkline_discrete(results=res2, width=3, height=200)
+        im=sparkline_discrete(results=res2, width=5, height=200)
         tmp=savetmp(im)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
 
@@ -104,7 +104,7 @@ class DomainAdmin(admin.ModelAdmin):
         while trying<now:
             res2.append((res.get(trying.strftime(DATE), 0)))
             trying=datetime.timedelta(days=1)+trying
-        im=sparkline_discrete(results=res2, width=3, height=200)
+        im=sparkline_discrete(results=res2, width=5, height=200)
         tmp=savetmp(im)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
     
@@ -112,10 +112,10 @@ class DomainAdmin(admin.ModelAdmin):
         """in the last month"""
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
         
-        purch=Purchase.objects.filter(product__domain=obj).filter(created__gte=monthago).aggregate(Sum('cost'))
+        purch=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).filter(created__gte=monthago).aggregate(Sum('cost'))
         #import ipdb;ipdb.set_trace()
         if purch['cost__sum']:
-            return '%0.2f'%purch['cost__sum']
+            return '%0.2f'%(purch['cost__sum']/30.0)
         
     adminify(myproducts, myspent, myperday)
     
