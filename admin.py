@@ -2,6 +2,7 @@ import datetime, tempfile, shutil, os
 
 from django.contrib import admin
 from django.conf import settings
+from django.db.models import Sum
 
 from tracker.buy.models import *
 from tracker.workout.models import *
@@ -37,9 +38,10 @@ class ProductAdmin(admin.ModelAdmin):
         while trying<now:
             res2.append((res.get(trying.strftime(DATE), 0)))
             trying=datetime.timedelta(days=1)+trying
-        im=sparkline_discrete(results=res2)
+        im=sparkline_discrete(results=res2, width=3, height=200)
         tmp=savetmp(im)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
+
     
     adminify(mylastmonth)
 
@@ -74,7 +76,7 @@ class PurchaseAdmin(admin.ModelAdmin):
         return super(PurchaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 class DomainAdmin(admin.ModelAdmin):
-    list_display='id name myproducts myspent'.split()
+    list_display='id name myproducts myperday myspent'.split()
     list_filter=['name',]
     list_editable=['name',]
     def myproducts(self, obj):
@@ -102,11 +104,20 @@ class DomainAdmin(admin.ModelAdmin):
         while trying<now:
             res2.append((res.get(trying.strftime(DATE), 0)))
             trying=datetime.timedelta(days=1)+trying
-        im=sparkline_discrete(results=res2)
+        im=sparkline_discrete(results=res2, width=3, height=200)
         tmp=savetmp(im)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
     
-    adminify(myproducts, myspent)
+    def myperday(self, obj):
+        """in the last month"""
+        monthago=datetime.datetime.now()-datetime.timedelta(days=30)
+        
+        purch=Purchase.objects.filter(product__domain=obj).filter(created__gte=monthago).aggregate(Sum('cost'))
+        #import ipdb;ipdb.set_trace()
+        if purch['cost__sum']:
+            return '%0.2f'%purch['cost__sum']
+        
+    adminify(myproducts, myspent, myperday)
     
 class PersonAdmin(admin.ModelAdmin):
     list_display='id first_name last_name birthday mymet_through'.split()

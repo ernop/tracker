@@ -18,6 +18,7 @@ import tempfile
 import Image, ImageDraw
 
 
+
         
 def sparkline_discrete(results, output=None, dmin=None, dmax=None, upper=None, width=2, height=14, \
                             below_color='gray', above_color='red', longlines=False):
