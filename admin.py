@@ -37,8 +37,7 @@ class ProductAdmin(admin.ModelAdmin):
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2)
         tmp=savetmp(im)
-        dest=os.path.join(settings.STATICFILES_DIRS[0], 'sparklines')
-        shutil.copy(tmp.name, dest)
+        shutil.copy(tmp.name, settings.SPARKLINES_DIR)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
     
     adminify(mylastmonth)
@@ -76,6 +75,7 @@ class PurchaseAdmin(admin.ModelAdmin):
 class DomainAdmin(admin.ModelAdmin):
     list_display='id name myproducts myspent'.split()
     list_filter=['name',]
+    list_editable=['name',]
     def myproducts(self, obj):
         return '%d products <br>%s'%(obj.products.count(),'<br>'.join([str(oo) for oo in obj.products.all()]))
     
@@ -103,8 +103,7 @@ class DomainAdmin(admin.ModelAdmin):
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2)
         tmp=savetmp(im)
-        dest=os.path.join(settings.STATICFILES_DIRS[0], 'sparklines')
-        shutil.copy(tmp.name, dest)
+        shutil.copy(tmp.name, settings.SPARKLINES_DIR)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
     
     adminify(myproducts, myspent)
