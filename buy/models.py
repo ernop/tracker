@@ -24,7 +24,6 @@ class Source(models.Model):
 
 class Product(models.Model):
     name=models.CharField(max_length=100, unique=True)
-    
     created=models.DateField(auto_now_add=True)
     domain=models.ForeignKey(Domain, related_name='products')
     class Meta:
