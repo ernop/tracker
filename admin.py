@@ -103,7 +103,9 @@ class DomainAdmin(admin.ModelAdmin):
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2)
         tmp=savetmp(im)
+        sd=settings.SPARKLINES_DIR
         shutil.copy(tmp.name, settings.SPARKLINES_DIR)
+        
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
     
     adminify(myproducts, myspent)
