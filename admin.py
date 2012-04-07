@@ -23,7 +23,6 @@ class ProductAdmin(admin.ModelAdmin):
         
         mindate=None
         res={}
-        import ipdb;ipdb.set_trace()
         for pu in purch:
             date=pu.created.strftime(DATE)
             res[date]=res.get(date, 0)+1
@@ -36,7 +35,6 @@ class ProductAdmin(admin.ModelAdmin):
         while trying<now:
             res2.append((res.get(trying.strftime(DATE), 0)))
             trying=datetime.timedelta(days=1)+trying
-        #import ipdb;ipdb.set_trace()
         im=sparkline_discrete(results=res2)
         tmp=savetmp(im)
         dest=os.path.join(settings.STATICFILES_DIRS[0], 'sparklines')
@@ -103,7 +101,6 @@ class DomainAdmin(admin.ModelAdmin):
         while trying<now:
             res2.append((res.get(trying.strftime(DATE), 0)))
             trying=datetime.timedelta(days=1)+trying
-        #import ipdb;ipdb.set_trace()
         im=sparkline_discrete(results=res2)
         tmp=savetmp(im)
         dest=os.path.join(settings.STATICFILES_DIRS[0], 'sparklines')
@@ -160,7 +157,6 @@ class ExerciseAdmin(admin.ModelAdmin):
         return super(ApplicantAdmin, self).get_changelist_form(request, **kwargs)    
     
     def myhistory(self, obj):
-        #import ipdb;ipdb.set_trace()
         past=[]
         for zet in Set.objects.filter(exweight__exercise=obj).order_by('-workout__date'):
             past.append((zet.workout.date, zet.count, zet.exweight.weight))
@@ -211,7 +207,6 @@ class WorkoutForm(forms.ModelForm):
         model=Workout
     
     def __init__(self, *args, **kwgs):
-        #import ipdb;ipdb.set_trace() 
         super(WorkoutForm, self).__init__(*args, **kwgs)
     
     def clean_date(self):
@@ -244,7 +239,6 @@ class WorkoutAdmin(admin.ModelAdmin):
         res2={}
         for exercise,zets in res.items():
             weights={}
-            #import ipdb;ipdb.set_trace()
             if exercise.barbell:
                 for zet in zets:weights[(zet.exweight.weight, zet.exweight.side,)]=[]
                 for zet in zets:weights[(zet.exweight.weight, zet.exweight.side,)].append(zet.count)
@@ -255,7 +249,6 @@ class WorkoutAdmin(admin.ModelAdmin):
             res2[exercise]=weights
             
         res3=''
-        #import ipdb;ipdb.set_trace()
         for exercise, summary in sorted(res2.items(), key=lambda x:x[1]['sets'][0].id):
             #order by set id, so the order you do them in the workout is right.
             res3+='%s '%exercise
