@@ -311,7 +311,7 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
     adminify(mymeasurements, myhistory)
     
 class MeasurementAdmin(admin.ModelAdmin):
-    list_display='place date mm'.split()
+    list_display='place date amount'.split()
     
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name=='date':
