@@ -284,7 +284,7 @@ class WorkoutAdmin(admin.ModelAdmin):
 class MeasuringSpotAdmin(admin.ModelAdmin):
     list_display='name mymeasurements myhistory'.split()
     def mymeasurements(self, obj):
-        return '<br>'.join([str(m) for m in self.measurements.all()])
+        return '<br>'.join([m.adm() for m in obj.measurements.all()])
     
     def myhistory(self, obj):
         mes=obj.measurements.all()
