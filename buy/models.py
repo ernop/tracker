@@ -1,5 +1,8 @@
 from django.db import models
 
+def lnk(nodel, id, obj):
+    return '<a href="/admin/workout/%s/%d/">%s</a>'%(nodel, id, str(obj))
+
 # Create your models here.
 class Domain(models.Model):
     """
@@ -32,6 +35,9 @@ class Product(models.Model):
     def __unicode__(self):
         return self.name            
 
+    def adm(self):
+        return lnk('product',self.id, self)    
+
 class Currency(models.Model):
     name=models.CharField(max_length=100, unique=True)
     symbol=models.CharField(max_length=10)
@@ -40,6 +46,8 @@ class Currency(models.Model):
             
     def __unicode__(self):
         return self.name            
+    def adm(self):
+        return lnk('currency',self.id, self)    
 
 class Purchase(models.Model):
     product=models.ForeignKey(Product, related_name='purchases')
@@ -55,7 +63,14 @@ class Purchase(models.Model):
         ordering=['product__name',]
     
     def __unicode__(self):
-        return '%s %d for %0.02f%s each, total %0.2f'%(self.product, self.quantity, float(self.cost)/self.quantity, self.currency.symbol, self.cost)
+        res='%s'%self.product
+        if not self.quantity==1:
+            res+='(%d)'%self.quantity
+        res+=' for %s%0.2f'%(self.currency.symbol, self.cost)
+        return res
+    
+    def adm(self):
+        return lnk('purchase',self.id, self)    
     
 class Person(models.Model):
     first_name=models.CharField(max_length=100)
@@ -68,3 +83,7 @@ class Person(models.Model):
         
     def __unicode__(self):
         return '%s %s'%(self.first_name, self.last_name)
+
+    def adm(self):
+        return lnk('person',self.id, self)
+    

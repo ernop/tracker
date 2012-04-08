@@ -8,6 +8,8 @@ from tracker.buy.models import *
 from tracker.workout.models import *
 from tracker.utils import adminify, DATE
 
+from spark import sparkline_discrete
+
 def savetmp(self):
     out=tempfile.NamedTemporaryFile(dir=settings.SPARKLINES_DIR, delete=False)
     self.save(out,'png')
@@ -16,10 +18,14 @@ def savetmp(self):
     return out
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display='name domain mylastmonth'.split()
+    list_display='name domain mypurchases mylastmonth'.split()
+    
+    def mypurchases(self, obj):
+        import ipdb;ipdb.set_trace()
+        purch=Purchase.objects.filter(product=obj)
+        return ','.join([p.adm() for p in purch])
     
     def mylastmonth(self, obj):
-        from spark import sparkline_discrete
         purch=Purchase.objects.filter(product=obj)
         if not purch:
             return
@@ -38,12 +44,12 @@ class ProductAdmin(admin.ModelAdmin):
         while trying<now:
             res2.append((res.get(trying.strftime(DATE), 0)))
             trying=datetime.timedelta(days=1)+trying
-        im=sparkline_discrete(results=res2, width=5, height=200)
+        im=sparkline_discrete(results=res2, width=5, height=30)
         tmp=savetmp(im)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
 
     
-    adminify(mylastmonth)
+    adminify(mylastmonth, mypurchases)
 
 class PurchaseAdmin(admin.ModelAdmin):
     list_display='id myproduct quantity cost mycost_per currency source mywho_with created'.split()
@@ -82,14 +88,10 @@ class DomainAdmin(admin.ModelAdmin):
     def myproducts(self, obj):
         return '%d products <br>%s'%(obj.products.count(),'<br>'.join([str(oo) for oo in obj.products.all()]))
     
-    
-    
     def myspent(self, obj):
-        from spark import sparkline_discrete
         purch=Purchase.objects.filter(product__domain=obj)
         if not purch:
             return
-        
         mindate=None
         res={}
         for pu in purch:
@@ -279,9 +281,49 @@ class WorkoutAdmin(admin.ModelAdmin):
     adminify(mydate)
     adminify(mysets)
 
+class MeasuringSpotAdmin(admin.ModelAdmin):
+    list_display='name mymeasurements myhistory'.split()
+    def mymeasurements(self, obj):
+        return '<br>'.join([str(m) for m in self.measurements.all()])
+    
+    def myhistory(self, obj):
+        mes=obj.measurements.all()
+        if not mes:
+            return
+        mindate=None
+        res={}
+        for m in mes:
+            date=pu.date.strftime(DATE)
+            res[date]=res.get(date, 0)+1
+            if not mindate or date<mindate:
+                mindate=date
+        first=datetime.datetime.strptime(mindate, DATE)
+        now=datetime.datetime.now()
+        trying=first
+        res2=[]
+        while trying<now:
+            res2.append((res.get(trying.strftime(DATE), 0)))
+            trying=datetime.timedelta(days=1)+trying
+        im=sparkline_discrete(results=res2, width=5, height=100)
+        tmp=savetmp(im)
+        return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
+    
+    adminify(mymeasurements, myhistory)
+    
+class MeasurementAdmin(admin.ModelAdmin):
+    list_display='place date mm'.split()
+    
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name=='date':
+            kwargs['initial']=datetime.datetime.now()
+            kwargs.pop('request')
+            return db_field.formfield(**kwargs)
+        return super(MeasurementAdmin, self).formfield_for_dbfield(db_field, **kwargs)    
    
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Set, SetAdmin)
 admin.site.register(ExWeight, ExWeightAdmin)
 admin.site.register(Muscle, MuscleAdmin)
 admin.site.register(Workout, WorkoutAdmin)
+admin.site.register(Measurement, MeasurementAdmin)
+admin.site.register(MeasuringSpot, MeasuringSpotAdmin)
