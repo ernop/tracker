@@ -287,14 +287,15 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
         return '<br>'.join([str(m) for m in self.measurements.all()])
     
     def myhistory(self, obj):
+        import ipdb;ipdb.set_trace()
         mes=obj.measurements.all()
         if not mes:
             return
         mindate=None
         res={}
         for m in mes:
-            date=pu.date.strftime(DATE)
-            res[date]=res.get(date, 0)+1
+            date=m.date.strftime(DATE)
+            res[date]=m.amount
             if not mindate or date<mindate:
                 mindate=date
         first=datetime.datetime.strptime(mindate, DATE)
