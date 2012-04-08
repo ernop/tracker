@@ -99,28 +99,28 @@ class Workout(models.Model):
     
 class Measurement(models.Model):
     place=models.ForeignKey('MeasuringSpot', related_name='measurements')
-    date=models.DateTimeField()
+    date=models.DateField()
     amount=models.FloatField()
     
     def __unicode__(self):
-            return '%s %s:%0.2f'%(self.place, self.date.strftime(DATE), self.amount)#','.join([str(s) for s in self.sets.all()]),)
+            return '%s %s: <b>%0.2f</b>'%(self.place, self.date.strftime(DATE), self.amount)#','.join([str(s) for s in self.sets.all()]),)
     
     class Meta:
         db_table='measurement'
         ordering=['-date',]
         
     def adm(self):
-        return lnk('measurement',self.id, self)    
+        return lnk('measurement',self.id,  '%s: <b>%0.2f</b>'%(self.date.strftime(DATE), self.amount))
         
 class MeasuringSpot(models.Model):
     name=models.CharField(max_length=100, unique=True)
     
     def __unicode__(self):
-                return '%s'%(self.name, )#','.join([str(s) for s in self.sets.all()]),)
+        return '%s'%(self.name, )
         
     class Meta:
         db_table='measuringspot'
         ordering=['-name',]
         
     def adm(self):
-        return lnk('measuringspot',self.id, self)        
+        return lnk('measuringspot',self.id, self)
