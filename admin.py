@@ -287,7 +287,6 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
         return '<br>'.join([str(m) for m in self.measurements.all()])
     
     def myhistory(self, obj):
-        import ipdb;ipdb.set_trace()
         mes=obj.measurements.all()
         if not mes:
             return
