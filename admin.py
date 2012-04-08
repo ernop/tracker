@@ -311,7 +311,10 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
     adminify(mymeasurements, myhistory)
     
 class MeasurementAdmin(admin.ModelAdmin):
-    list_display='place date amount'.split()
+    list_display='place mydate amount'.split()
+    
+    def mydate(self, obj):
+        return obj.date.strftime(DATE)
     
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name=='date':
@@ -319,6 +322,8 @@ class MeasurementAdmin(admin.ModelAdmin):
             kwargs.pop('request')
             return db_field.formfield(**kwargs)
         return super(MeasurementAdmin, self).formfield_for_dbfield(db_field, **kwargs)    
+    
+    adminify(mydate)
    
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Set, SetAdmin)
