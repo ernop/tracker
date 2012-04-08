@@ -21,7 +21,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_display='name domain mypurchases mylastmonth'.split()
     
     def mypurchases(self, obj):
-        import ipdb;ipdb.set_trace()
         purch=Purchase.objects.filter(product=obj)
         return ','.join([p.adm() for p in purch])
     
@@ -115,7 +114,6 @@ class DomainAdmin(admin.ModelAdmin):
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
         
         purch=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).filter(created__gte=monthago).aggregate(Sum('cost'))
-        #import ipdb;ipdb.set_trace()
         if purch['cost__sum']:
             return '%0.2f'%(purch['cost__sum']/30.0)
         
@@ -254,7 +252,6 @@ class WorkoutForm(forms.ModelForm):
             if self.instance.date is None:
                 self.instance.date=datetime.datetime.now()
                 self.cleaned_data['date']=datetime.datetime.now()
-        import ipdb;ipdb.set_trace()
         super(WorkoutForm, self).clean()
         return self.cleaned_data
     
