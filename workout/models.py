@@ -103,7 +103,7 @@ class Measurement(models.Model):
     amount=models.FloatField()
     
     def __unicode__(self):
-            return '%s %s:%0.2f'%(self.place, self.date.strftime(DATE), self.mm)#','.join([str(s) for s in self.sets.all()]),)
+            return '%s %s:%0.2f'%(self.place, self.date.strftime(DATE), self.amount)#','.join([str(s) for s in self.sets.all()]),)
     
     class Meta:
         db_table='measurement'
