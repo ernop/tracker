@@ -96,3 +96,31 @@ class Workout(models.Model):
         
     def adm(self):
         return lnk('workout',self.id, self)
+    
+class Measurement(models.Model):
+    place=models.ForeignKey('MeasuringSpot', related_name='measurements')
+    date=models.DateTimeField()
+    amount=models.FloatField()
+    
+    def __unicode__(self):
+            return '%s %s:%0.2f'%(self.place, self.date.strftime(DATE), self.mm)#','.join([str(s) for s in self.sets.all()]),)
+    
+    class Meta:
+        db_table='measurement'
+        ordering=['-date',]
+        
+    def adm(self):
+        return lnk('measurement',self.id, self)    
+        
+class MeasuringSpot(models.Model):
+    name=models.CharField(max_length=100, unique=True)
+    
+    def __unicode__(self):
+                return '%s'%(self.name, )#','.join([str(s) for s in self.sets.all()]),)
+        
+    class Meta:
+        db_table='measuringspot'
+        ordering=['-name',]
+        
+    def adm(self):
+        return lnk('measuringspot',self.id, self)        
