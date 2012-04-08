@@ -154,7 +154,7 @@ class SetInline(admin.StackedInline):
     extra=12
 
 class ExerciseAdmin(admin.ModelAdmin):
-    list_display='id name mymuscles myhistory barbell '.split()
+    list_display='id name myhistory myspark barbell'.split()
     inlines=[
         PMuscleInline,
         SMuscleInline,
@@ -167,6 +167,31 @@ class ExerciseAdmin(admin.ModelAdmin):
     def get_changelist_form(self, request, **kwargs):
         kwargs.setdefault('form', ApplicantForm)
         return super(ApplicantAdmin, self).get_changelist_form(request, **kwargs)    
+    
+    def myspark(self, obj):
+        past=[]
+        res={}
+        mindate=None
+        zets=Set.objects.filter(exweight__exercise=obj).order_by('-workout__date')
+        if not zets:
+            return ''
+        for zet in zets:
+            #past.append((zet.workout.date, zet.count, zet.exweight.weight))        
+            date=zet.workout.date.strftime(DATE)
+            res[date]=max(res.get(date, 0), zet.exweight.weight)
+            if not mindate or date<mindate:
+                mindate=date
+        first=datetime.datetime.strptime(mindate, DATE)
+        now=datetime.datetime.now()
+        trying=first
+        res2=[]
+        while trying<now:
+            res2.append((res.get(trying.strftime(DATE), 0)))
+            trying=datetime.timedelta(days=1)+trying
+        im=sparkline_discrete(results=res2, width=5, height=200)
+        tmp=savetmp(im)
+        return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])                
+        
     
     def myhistory(self, obj):
         past=[]
@@ -184,7 +209,7 @@ class ExerciseAdmin(admin.ModelAdmin):
             res+='%d@<b>%d</b> '%(p[1], p[2])
         return res
             
-    adminify(mymuscles, myhistory)
+    adminify(mymuscles, myhistory, myspark)
 
 class SetAdmin(admin.ModelAdmin):
     list_display='exweight count workout note'.split()
