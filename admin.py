@@ -62,7 +62,7 @@ class PurchaseAdmin(admin.ModelAdmin):
         return obj.product.adm()
     
     def mywho_with(self, obj):
-        return '%s'%''.join([str(per) for per in obj.who_with.all()])    
+        return '%s'%''.join([per.adm() for per in obj.who_with.all()])    
     
     adminify(mycost_per, myproduct, mywho_with)
 

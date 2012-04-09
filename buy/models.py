@@ -83,7 +83,7 @@ class Person(models.Model):
     
     class Meta:
         db_table='person'
-        ordering=['name',]
+        ordering=['first_name','last_name',]
         
     def __unicode__(self):
         return '%s %s'%(self.first_name, self.last_name)
