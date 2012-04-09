@@ -1,7 +1,7 @@
 from django.db import models
 
 def lnk(nodel, id, obj):
-    return '<a href="/admin/workout/%s/%d/">%s</a>'%(nodel, id, str(obj))
+    return '<a href="/admin/buy/%s/%d/">%s</a>'%(nodel, id, str(obj))
 
 # Create your models here.
 class Domain(models.Model):
@@ -11,7 +11,8 @@ class Domain(models.Model):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
     class Meta:
-            db_table='domain'    
+        db_table='domain'    
+        ordering=['name',]
             
     def __unicode__(self):
         return self.name
@@ -20,7 +21,8 @@ class Source(models.Model):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
     class Meta:
-            db_table='source'    
+        db_table='source'    
+        ordering=['name',]
             
     def __unicode__(self):
             return self.name        
@@ -42,7 +44,8 @@ class Currency(models.Model):
     name=models.CharField(max_length=100, unique=True)
     symbol=models.CharField(max_length=10)
     class Meta:
-        db_table='currency'    
+        db_table='currency'  
+        ordering=['name',]
             
     def __unicode__(self):
         return self.name            
@@ -80,6 +83,7 @@ class Person(models.Model):
     
     class Meta:
         db_table='person'
+        ordering=['name',]
         
     def __unicode__(self):
         return '%s %s'%(self.first_name, self.last_name)
