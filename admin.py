@@ -21,8 +21,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display='name domain mypurchases mylastmonth'.split()
     
     def mypurchases(self, obj):
-        purch=Purchase.objects.filter(product=obj)
-        return ','.join([p.adm() for p in purch])
+        return ','.join([p.adm() for p in Purchase.objects.filter(product=obj)])
     
     def mylastmonth(self, obj):
         purch=Purchase.objects.filter(product=obj)
@@ -60,7 +59,7 @@ class PurchaseAdmin(admin.ModelAdmin):
         return '%0.2f'%(float(obj.cost)/obj.quantity)
     
     def myproduct(self, obj):
-        return '<a href="/admin/buy/product/%d">%s</a>'%(obj.id, obj.product.name)
+        return obj.product.adm()
     
     def mywho_with(self, obj):
         return '%s'%''.join([str(per) for per in obj.who_with.all()])    
