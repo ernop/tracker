@@ -1,8 +1,13 @@
 from django.db import models
 
 HOUR_CHOICES=zip(range(10), 'morning noon afternoon evening night midnight'.split())
-hour2name={a[1]:a[0] for a in HOUR_CHOICES}
-name2hour={a[0]:a[1] for a in HOUR_CHOICES}
+hour2name={}
+name2hour={}
+for a in HOUR_CHOICES:
+    hour2name[a[1]]=a[0]
+    name2hour[a[0]]=a[1]
+#hour2name={a[1]:a[0] for a in HOUR_CHOICES}
+#name2hour={a[0]:a[1] for a in HOUR_CHOICES}
 
 
 def lnk(nodel, id, obj):
