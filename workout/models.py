@@ -85,7 +85,7 @@ class ExWeight(models.Model):
         
 class Workout(models.Model):
     exweights=models.ManyToManyField(ExWeight, through=Set, related_name='workout')
-    date=models.DateTimeField(blank=True)
+    date=models.DateTimeField(auto_now_add=True)
     
     def __unicode__(self):
         return '%s'%(self.date.strftime(DATE), )#','.join([str(s) for s in self.sets.all()]),)
@@ -120,7 +120,7 @@ class MeasuringSpot(models.Model):
         
     class Meta:
         db_table='measuringspot'
-        ordering=['-name',]
+        ordering=['name',]
         
     def adm(self):
         return lnk('measuringspot',self.id, self)

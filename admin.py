@@ -9,6 +9,22 @@ from tracker.workout.models import *
 from tracker.utils import adminify, DATE
 
 from spark import sparkline_discrete
+from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
+def gethour():
+    hour=datetime.datetime.now().hour
+    if hour<2:
+        return 'midnight'
+    if hour<6:
+        return 'early morning'
+    if hour<11:
+        return 'morning'
+    elif hour<14:
+        return 'noon'
+    elif hour<20:
+        return 'evening'
+    elif hour<23:
+        return 'night'
+    return 'midnight'
 
 def savetmp(self):
     out=tempfile.NamedTemporaryFile(dir=settings.SPARKLINES_DIR, delete=False)
@@ -67,6 +83,11 @@ class PurchaseAdmin(admin.ModelAdmin):
     adminify(mycost_per, myproduct, mywho_with)
 
     def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name=='hour':
+            import ipdb;ipdb.set_trace()
+            kwargs['initial']=hour2name[gethour()]
+            kwargs.pop('request')
+            return db_field.formfield(**kwargs)
         if db_field.name=='quantity':
             kwargs['initial']=1
             kwargs.pop('request')

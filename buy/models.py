@@ -1,5 +1,10 @@
 from django.db import models
 
+HOUR_CHOICES=zip(range(10), 'morning noon afternoon evening night midnight'.split())
+hour2name={a[1]:a[0] for a in HOUR_CHOICES}
+name2hour={a[0]:a[1] for a in HOUR_CHOICES}
+
+
 def lnk(nodel, id, obj):
     return '<a href="/admin/buy/%s/%d/">%s</a>'%(nodel, id, str(obj))
 
@@ -61,6 +66,7 @@ class Purchase(models.Model):
     currency=models.ForeignKey('Currency')
     source=models.ForeignKey(Source, related_name='purchases')
     who_with=models.ManyToManyField('Person', related_name='purchases', blank=True, null=True)
+    hour=models.IntegerField(choices=HOUR_CHOICES)
     class Meta:
         db_table='purchase'    
         ordering=['product__name',]
