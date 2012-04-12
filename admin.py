@@ -84,7 +84,6 @@ class PurchaseAdmin(admin.ModelAdmin):
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name=='hour':
-            import ipdb;ipdb.set_trace()
             kwargs['initial']=hour2name[gethour()]
             kwargs.pop('request')
             return db_field.formfield(**kwargs)
