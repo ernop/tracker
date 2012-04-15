@@ -104,7 +104,10 @@ class DomainAdmin(admin.ModelAdmin):
     list_filter=['name',]
     list_editable=['name',]
     def myproducts(self, obj):
-        return '%d products <br>%s'%(obj.products.count(),'<br>'.join([str(oo) for oo in obj.products.all()]))
+        return '%d products <br>(%s)<br>%s <br> %s'%(obj.products.count(),
+                                                     obj.all_products_link(),
+                                 '<br>'.join([oo.adm() for oo in obj.products.all()]),
+                                 '<br>'.join([oo.clink() for oo in Purchase.objects.filter(product__domain=obj)]))
     
     def myspent(self, obj):
         purch=Purchase.objects.filter(product__domain=obj)
