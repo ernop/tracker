@@ -13,6 +13,12 @@ for a in HOUR_CHOICES:
 def lnk(nodel, id, obj):
     return '<a href="/admin/buy/%s/%d/">%s</a>'%(nodel, id, str(obj))
 
+def clink(nodel, id, obj):
+    return '<a href="/admin/buy/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
+
+def apl(nodel, id, obj):
+    return '<a href="/admin/buy/%s/?domain__id=%d">all</a>'%(nodel, id,)
+
 # Create your models here.
 class Domain(models.Model):
     """
@@ -26,6 +32,9 @@ class Domain(models.Model):
             
     def __unicode__(self):
         return self.name
+    
+    def all_products_link(self):
+        return apl('product', self.id, self)
     
 class Source(models.Model):
     name=models.CharField(max_length=100)
@@ -49,6 +58,9 @@ class Product(models.Model):
 
     def adm(self):
         return lnk('product',self.id, self)    
+    
+    def clink(self):
+        return clink('product', self.id, self)
 
 class Currency(models.Model):
     name=models.CharField(max_length=100, unique=True)
@@ -85,6 +97,9 @@ class Purchase(models.Model):
     
     def adm(self):
         return lnk('purchase',self.id, self)    
+    
+    def clink(self):
+        return clink('purchase', self.id, self)
     
 class Person(models.Model):
     first_name=models.CharField(max_length=100)
