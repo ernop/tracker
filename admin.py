@@ -133,8 +133,12 @@ class DomainAdmin(admin.ModelAdmin):
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
         
         purch=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).filter(created__gte=monthago).aggregate(Sum('cost'))
+        #import ipdb;ipdb.set_trace()
+        earliest=datetime.datetime.combine(Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).order_by('created')[0].created, datetime.time())
+        
         if purch['cost__sum']:
-            return '%0.2f'%(purch['cost__sum']/30.0)
+            now=datetime.datetime.now()
+            return '%0.2f'%(purch['cost__sum']/min(30.0,(abs((now-earliest).days))))
         
     adminify(myproducts, myspent, myperday)
     
