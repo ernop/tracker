@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum
 
 HOUR_CHOICES=zip(range(10), 'morning noon afternoon evening night midnight'.split())
 hour2name={}
@@ -16,8 +17,6 @@ def lnk(nodel, id, obj):
 def clink(nodel, id, obj):
     return '<a href="/admin/buy/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
 
-def apl(nodel, id, obj):
-    return '<a href="/admin/buy/%s/?domain__id=%d">all</a>'%(nodel, id,)
 
 # Create your models here.
 class Domain(models.Model):
@@ -34,7 +33,16 @@ class Domain(models.Model):
         return self.name
     
     def all_products_link(self):
-        return apl('product', self.id, self)
+        return '<a href="/admin/buy/product/?domain__id=%d">all prod</a>'%(self.id)
+    
+    def all_purchases_link(self):
+        return '<a href="/admin/buy/purchase/?product__domain__id=%d">all purch</a>'%(self.id)
+    
+    def summary(self):
+        return '%d products (%s) (%s)<br>%s'%(self.products.count(),
+                                                             self.all_products_link(),
+                                                             self.all_purchases_link(),
+                                         '<br>'.join([oo.summary() for oo in self.products.all() if oo.summary()]),)        
     
 class Source(models.Model):
     name=models.CharField(max_length=100)
@@ -62,6 +70,14 @@ class Product(models.Model):
     def clink(self):
         return clink('product', self.id, self)
 
+    def summary(self):
+        """summary of all purchases of this product."""
+        count=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('quantity'))['quantity__sum']
+        if not count:
+            return ''
+        cost=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('cost'))['cost__sum'] or 0
+        return '<a href="/admin/buy/purchase/?product__id=%d">%s</a> (%d) for %0.2f'%(self.id, str(self), count, cost)
+
 class Currency(models.Model):
     name=models.CharField(max_length=100, unique=True)
     symbol=models.CharField(max_length=10)
@@ -77,7 +93,7 @@ class Currency(models.Model):
 class Purchase(models.Model):
     product=models.ForeignKey(Product, related_name='purchases')
     #domain=models.ForeignKey(Domain, related_name='purchases')
-    created=models.DateField(auto_now_add=True)
+    created=models.DateField()
     quantity=models.FloatField()
     cost=models.FloatField()
     currency=models.ForeignKey('Currency')
