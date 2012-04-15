@@ -66,7 +66,7 @@ class Purchase(models.Model):
     product=models.ForeignKey(Product, related_name='purchases')
     #domain=models.ForeignKey(Domain, related_name='purchases')
     created=models.DateField(auto_now_add=True)
-    quantity=models.IntegerField()
+    quantity=models.FloatField()
     cost=models.FloatField()
     currency=models.ForeignKey('Currency')
     source=models.ForeignKey(Source, related_name='purchases')
