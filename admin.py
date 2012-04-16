@@ -251,7 +251,7 @@ class ExWeightAdmin(admin.ModelAdmin):
             date2workoutid[k]=v
         res={}
         for k in preres:res[k[0]]=res.get(k[0],0)+1
-        res2=', '.join(sorted(['%s:<b>%d</b>'%(Workout.objects.get(id=date2workoutid[kv[0]]).adm(),kv[1]) for kv in res.items()]))
+        res2=', '.join(sorted(['%s:<b>%d</b>'%(Workout.objects.get(id=date2workoutid[kv[0]]).clink(),kv[1]) for kv in res.items()]))
         return res2
     
     adminify(mysets)
@@ -314,7 +314,7 @@ class WorkoutAdmin(admin.ModelAdmin):
         res3=''
         for exercise, summary in sorted(res2.items(), key=lambda x:x[1]['sets'][0].id):
             #order by set id, so the order you do them in the workout is right.
-            res3+='%s '%exercise
+            res3+='%s '%exercise.clink()
             for weight, counts in summary.items():
                 if weight=='sets':continue
                 if type(weight) is tuple:
