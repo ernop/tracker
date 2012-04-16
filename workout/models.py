@@ -57,8 +57,8 @@ class Set(models.Model):
 
 class ExWeight(models.Model):
     exercise=models.ForeignKey(Exercise, related_name='exsets')
-    weight=models.IntegerField(blank=True)
-    side=models.IntegerField(blank=True)
+    weight=models.FloatField(blank=True)
+    side=models.FloatField(blank=True)
     
     def save(self, *args, **kwargs):
         if self.side and self.exercise.barbell:
