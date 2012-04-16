@@ -107,7 +107,7 @@ class PurchaseAdmin(admin.ModelAdmin):
         return super(PurchaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 class DomainAdmin(admin.ModelAdmin):
-    list_display='id name myproducts myperday myspent'.split()
+    list_display='id name myproducts mytotal myspent'.split()
     list_filter=['name',]
     list_editable=['name',]
     def myproducts(self, obj):
@@ -135,18 +135,18 @@ class DomainAdmin(admin.ModelAdmin):
         tmp=savetmp(im)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
     
-    def myperday(self, obj):
+    def mytotal(self, obj):
         """in the last month"""
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
-        purch=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).filter(created__gte=monthago).aggregate(Sum('cost'))
+        total=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).filter(created__gte=monthago).aggregate(Sum('cost'))['cost__sum']
         earliest=datetime.datetime.combine(Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).order_by('created')[0].created, datetime.time())
         
-        if purch['cost__sum']:
+        if total:
             now=datetime.datetime.now()
             dayrange=min(30.0,(abs((now-earliest).days)))
-            return '%0.2f (%d days)'%(purch['cost__sum']/dayrange, dayrange)
+            return '%0.0f<br>%0.2f /day<br>(%d days)'%(total, total/dayrange, dayrange)
         
-    adminify(myproducts, myspent, myperday)
+    adminify(myproducts, myspent, mytotal)
     
 class PersonAdmin(admin.ModelAdmin):
     list_display='id first_name last_name birthday mymet_through'.split()
