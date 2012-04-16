@@ -5,6 +5,9 @@ def lnk(nodel, id, obj):
     return '<a href="/admin/workout/%s/%d/">%s</a>'%(nodel, id, str(obj))
 
 # Create your models here.
+def clink(nodel, id, obj):
+    return '<a href="/admin/workout/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
+
 class Exercise(models.Model):
     name=models.CharField(max_length=100, unique=True)
     pmuscles=models.ManyToManyField('Muscle', related_name='primary_exercises')
@@ -20,6 +23,9 @@ class Exercise(models.Model):
     
     def adm(self):
         return lnk('exercise',self.id, self)
+
+    def clink(self):
+        return clink('exercise', self.id, self)
 
 class Muscle(models.Model):
     name=models.CharField(max_length=100)
