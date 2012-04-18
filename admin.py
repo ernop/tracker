@@ -143,7 +143,7 @@ class DomainAdmin(admin.ModelAdmin):
         
         if total:
             now=datetime.datetime.now()
-            dayrange=min(30.0,(abs((now-earliest).days)))
+            dayrange=min(30.0,(abs((now-earliest).days))+1)
             return '%0.0f<br>%0.2f /day<br>(%d days)'%(total, total/dayrange, dayrange)
         
     adminify(myproducts, myspent, mytotal)
@@ -333,7 +333,8 @@ class WorkoutAdmin(admin.ModelAdmin):
     adminify(mysets)
 
 class MeasuringSpotAdmin(admin.ModelAdmin):
-    list_display='name mymeasurements myhistory'.split()
+    list_display='name mymeasurements myhistory mydomain'.split()
+    list_filter=['domain',]
     def mymeasurements(self, obj):
         return '<br>'.join([m.adm() for m in obj.measurements.all()])
     
@@ -359,7 +360,11 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
         tmp=savetmp(im)
         return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
     
-    adminify(mymeasurements, myhistory)
+    
+    def mydomain(self, obj):
+        return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.domain.id, obj.domain)
+    
+    adminify(mymeasurements, myhistory, mydomain)
     
 class MeasurementAdmin(admin.ModelAdmin):
     list_display='place mydate amount'.split()

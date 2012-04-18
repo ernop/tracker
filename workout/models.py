@@ -1,5 +1,5 @@
 from django.db import models
-
+from buy.models import Domain
 from tracker.utils import DATE
 def lnk(nodel, id, obj):
     return '<a href="/admin/workout/%s/%d/">%s</a>'%(nodel, id, str(obj))
@@ -120,7 +120,7 @@ class Measurement(models.Model):
         
 class MeasuringSpot(models.Model):
     name=models.CharField(max_length=100, unique=True)
-    
+    domain=models.ForeignKey(Domain, related_name='measuring_spots')
     def __unicode__(self):
         return '%s'%(self.name, )
         
