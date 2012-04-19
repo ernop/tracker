@@ -36,7 +36,7 @@ class Domain(models.Model):
         return '<a href="/admin/buy/product/?domain__id=%d">all prod</a>'%(self.id)
     
     def all_purchases_link(self):
-        return '<a href="/admin/buy/purchase/?product__domain__id=%d">all purch</a>'%(self.id)
+        return '<a href="/admin/buy/purchase/?product__domain__id__exact=%d">all purch</a>'%(self.id)
     
     def summary(self):
         return '%d products (%s) (%s)<br>%s'%(self.products.count(),
@@ -58,7 +58,7 @@ class Source(models.Model):
     def summary(self):
         #import ipdb;ipdb.set_trace()
         if self.purchases.count():
-            return '%d purchases (%s)<br>%s'%(self.purchases.aggregate(Sum('quantity'))['quantity__sum'],
+            return '%d purchases (%s)<br>%s'%(self.purchases.exclude(currency__name__ne='rmb').aggregate(Sum('quantity'))['quantity__sum'],
                                                              #self.all_products_link(),
                                                              self.all_purchases_link(),
                                          '<br>'.join([oo.summary(source=self) for oo in Product.objects.filter(purchases__source=self).distinct()]),)
