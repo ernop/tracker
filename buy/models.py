@@ -53,7 +53,19 @@ class Source(models.Model):
             
     def __unicode__(self):
             return self.name        
-
+    def clink(self):
+        return clink('source', self.id, self)
+    def summary(self):
+        #import ipdb;ipdb.set_trace()
+        if self.purchases.count():
+            return '%d purchases (%s)<br>%s'%(self.purchases.aggregate(Sum('quantity'))['quantity__sum'],
+                                                             #self.all_products_link(),
+                                                             self.all_purchases_link(),
+                                         '<br>'.join([oo.summary(source=self) for oo in Product.objects.filter(purchases__source=self).distinct()]),)
+    
+    def all_purchases_link(self):
+        return '<a href="/admin/buy/purchase/?source__id=%d">all purch</a>'%(self.id)    
+    
 class Product(models.Model):
     name=models.CharField(max_length=100, unique=True)
     created=models.DateField(auto_now_add=True)
@@ -70,9 +82,12 @@ class Product(models.Model):
     def clink(self):
         return clink('product', self.id, self)
 
-    def summary(self):
+    def summary(self, source=None):
         """summary of all purchases of this product."""
-        count=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('quantity'))['quantity__sum']
+        if source:
+            count=Purchase.objects.filter(product=self, source=source).filter(currency__id=1).aggregate(Sum('quantity'))['quantity__sum']
+        else:
+            count=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('quantity'))['quantity__sum']
         if not count:
             return ''
         cost=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('cost'))['cost__sum'] or 0
