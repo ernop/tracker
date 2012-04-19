@@ -58,10 +58,10 @@ class Source(models.Model):
     def summary(self):
         #import ipdb;ipdb.set_trace()
         if self.purchases.count():
-            return '%d purchases (%s)<br>%s'%(self.purchases.exclude(currency__name__ne='rmb').aggregate(Sum('quantity'))['quantity__sum'],
-                                                             #self.all_products_link(),
-                                                             self.all_purchases_link(),
-                                         '<br>'.join([oo.summary(source=self) for oo in Product.objects.filter(purchases__source=self).distinct()]),)
+            return '%d purchases (%s)<br>%s'%(self.purchases.filter(currency__name='rmb').aggregate(Sum('quantity'))['quantity__sum'],
+                #self.all_products_link(),
+                self.all_purchases_link(),
+                '<br>'.join([oo.summary(source=self) for oo in Product.objects.filter(purchases__source=self).distinct()]),)
     
     def all_purchases_link(self):
         return '<a href="/admin/buy/purchase/?source__id=%d">all purch</a>'%(self.id)    
