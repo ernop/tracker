@@ -162,8 +162,11 @@ class CurrencyAdmin(admin.ModelAdmin):
     list_display='name symbol mytotal my3months'.split()
     def mytotal(self, obj):
         total=Purchase.objects.filter(currency__name='rmb').filter(source=obj).aggregate(Sum('cost'))['cost__sum']
-        earliest=datetime.datetime.combine(Purchase.objects.filter(currency__name='rmb').filter(source=obj).order_by('created')[0].created, datetime.time())
-        if total:
+        cre=Purchase.objects.filter(currency__name='rmb').filter(source=obj).order_by('created')
+        earliest=None
+        if cre:
+            earliest=datetime.datetime.combine(cre[0].created, datetime.time())
+        if total and cre:
             now=datetime.datetime.now()
             dayrange=(abs((now-earliest).days)+1)
             return '%0.0f<br>%0.2f /day<br>(%d days)'%(total, total/dayrange, dayrange)            
@@ -171,8 +174,11 @@ class CurrencyAdmin(admin.ModelAdmin):
     def my3months(self, obj):
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
         total=Purchase.objects.filter(currency__name='rmb').filter(source=obj).filter(created__gte=monthago).aggregate(Sum('cost'))['cost__sum']
-        earliest=datetime.datetime.combine(Purchase.objects.filter(currency__name='rmb').filter(source=obj).order_by('created')[0].created, datetime.time())
-        if total:
+        cre=Purchase.objects.filter(currency__name='rmb').filter(source=obj).order_by('created')
+        earliest=None
+        if cre:
+            earliest=datetime.datetime.combine(cre[0].created, datetime.time())
+        if total and earliest:
             now=datetime.datetime.now()
             dayrange=min(90.0,(abs((now-earliest).days))+1)
             return '%0.0f<br>%0.2f /day<br>(%d days)'%(total, total/dayrange, dayrange)                    
@@ -180,13 +186,13 @@ class CurrencyAdmin(admin.ModelAdmin):
     adminify(mytotal, my3months)
 
 class SourceAdmin(admin.ModelAdmin):
-    list_display='name mypurch mytotal mysummary'.split()
+    list_display='name mytotal mysummary'.split()
     
     def mysummary(self, obj):
         return obj.summary()
     
-    def mypurch(self, obj):
-        return '%s'%obj.all_purchases_link()
+    #def mypurch(self, obj):
+        #return '%s'%obj.all_purchases_link()
     
     def mytotal(self, obj):
         #import ipdb;ipdb.set_trace()
@@ -202,7 +208,7 @@ class SourceAdmin(admin.ModelAdmin):
             dayrange=min(30.0,(abs((now-earliest).days))+1)
             return '%0.0f<br>%0.2f /day<br>(%d days)'%(total, total/dayrange, dayrange)        
         
-    adminify(mypurch, mytotal, mysummary)
+    adminify(mytotal, mysummary)
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Domain, DomainAdmin)
