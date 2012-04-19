@@ -60,7 +60,7 @@ class ProductAdmin(admin.ModelAdmin):
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2, width=5, height=30)
         tmp=savetmp(im)
-        return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
+        return '<img style="border:2px solid grey;"  src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
 
     
     adminify(mylastmonth, mypurchases)
@@ -68,7 +68,7 @@ class ProductAdmin(admin.ModelAdmin):
 class PurchaseAdmin(admin.ModelAdmin):
     list_display='id myproduct mydomain quantity cost mycost_per currency source mywho_with created'.split()
     
-    list_filter='source currency'.split()
+    list_filter='source currency product__domain'.split()
     date_hierarchy='created'
     
     def mycost_per(self, obj):
@@ -133,15 +133,18 @@ class DomainAdmin(admin.ModelAdmin):
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2, width=5, height=100)
         tmp=savetmp(im)
-        return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
+        return '<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
     
     def mytotal(self, obj):
         """in the last month"""
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
         total=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).filter(created__gte=monthago).aggregate(Sum('cost'))['cost__sum']
-        earliest=datetime.datetime.combine(Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).order_by('created')[0].created, datetime.time())
+        ear=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).order_by('created')
+        earliest=None
+        if ear:
+            earliest=datetime.datetime.combine(ear[0].created, datetime.time())
         
-        if total:
+        if total and ear:
             now=datetime.datetime.now()
             dayrange=min(30.0,(abs((now-earliest).days))+1)
             return '%0.0f<br>%0.2f /day<br>(%d days)'%(total, total/dayrange, dayrange)
@@ -264,7 +267,7 @@ class ExerciseAdmin(admin.ModelAdmin):
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2, width=5, height=200)
         tmp=savetmp(im)
-        return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])                
+        return '<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])                
         
     
     def myhistory(self, obj):
@@ -405,7 +408,7 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2, width=5, height=100)
         tmp=savetmp(im)
-        return '<img src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
+        return '<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
     
     
     def mydomain(self, obj):
