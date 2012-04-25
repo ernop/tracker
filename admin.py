@@ -430,7 +430,15 @@ class MeasurementAdmin(admin.ModelAdmin):
         return super(MeasurementAdmin, self).formfield_for_dbfield(db_field, **kwargs)    
     
     adminify(mydate)
-   
+    class Meta:
+        fields='place amount date'.split()
+        
+    fieldsets = (
+          ('Main', {
+               'fields': ('place amount date'.split())
+           },),
+       )    
+        
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Set, SetAdmin)
 admin.site.register(ExWeight, ExWeightAdmin)
