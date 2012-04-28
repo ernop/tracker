@@ -1,3 +1,6 @@
 *.pyc
 local
 trackenv
+trackerenv
+trackenv
+backup
