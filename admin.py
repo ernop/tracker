@@ -130,7 +130,7 @@ class PurchaseAdmin(admin.ModelAdmin):
            )        
 
 class DomainAdmin(admin.ModelAdmin):
-    list_display='id name myproducts mytotal myspent'.split()
+    list_display='name myproducts mytotal myspent'.split()
     list_filter=['name',]
     def myproducts(self, obj):
         return obj.summary()
@@ -410,6 +410,7 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
     list_display='name mymeasurements myhistory mydomain'.split()
     list_filter=['domain',]
     def mymeasurements(self, obj):
+        import ipdb;ipdb.set_trace()
         return '<br>'.join([m.adm() for m in obj.measurements.all()])
     
     def myhistory(self, obj):
