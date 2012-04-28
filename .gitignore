@@ -1,5 +1,11 @@
 *.pyc
 local
 trackenv
+<<<<<<< HEAD
 soft
 static
+=======
+trackerenv
+trackenv
+backup
+>>>>>>> 24ab8dda9348466c9ebcf2ab23d642d7aff65029
