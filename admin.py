@@ -1,39 +1,36 @@
 import datetime, tempfile, shutil, os
 
+from django import forms
 from django.contrib import admin
 from django.conf import settings
 from django.db.models import Sum
+from django.forms import widgets
+from django.forms.models import BaseModelFormSet  
 
+#import djangoplus.widgets 
+from spark import sparkline_discrete
+
+from trackerutils import *
 from tracker.buy.models import *
 from tracker.workout.models import *
-from tracker.utils import adminify, DATE, mk_default_field, nowdate, rstripz
-
-from spark import sparkline_discrete
+from tracker.utils import adminify, DATE, mk_default_field, nowdate, rstripz, mk_default_fkfield
 from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
-def gethour():
-    hour=datetime.datetime.now().hour
-    if hour<2:
-        return 'midnight'
-    if hour<6:
-        return 'early morning'
-    if hour<11:
-        return 'morning'
-    elif hour<14:
-        return 'noon'
-    elif hour<20:
-        return 'evening'
-    elif hour<23:
-        return 'night'
-    return 'midnight'
 
-def savetmp(self):
-    out=tempfile.NamedTemporaryFile(dir=settings.SPARKLINES_DIR, delete=False)
-    self.save(out,'png')
-    print 'created',out.name
-    os.chmod(out.name, 0644)
-    return out
+class BetterDateWidget(admin.widgets.AdminDateWidget):
+    def render(self, name, value, attrs=None):
+        import ipdb;ipdb.set_trace()        
+        return super(BetterDateWidget, self).render(name, value)
+    
+class OverriddenModelAdmin(admin.ModelAdmin):
+    """normal, except overrides some widgets."""
+    formfield_overrides = {
+        #models.DateTimeField: {'widget': admin.widgets.AdminDateWidget,},
+        #models.DateField: { 'widget': admin.widgets.AdminDateWidget,},
+        models.DateTimeField: {'widget': BetterDateWidget,},
+        models.DateField: { 'widget': BetterDateWidget,},        
+    }
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(OverriddenModelAdmin):
     list_display='name mydomain mypurchases mylastmonth'.split()
     
     def mydomain(self, obj):
@@ -67,12 +64,8 @@ class ProductAdmin(admin.ModelAdmin):
     
     adminify(mylastmonth, mypurchases, mydomain)
 
-def get_named_hour():
-    return hour2name[gethour()]
-
-class PurchaseAdmin(admin.ModelAdmin):
+class PurchaseAdmin(OverriddenModelAdmin):
     list_display='id myproduct mydomain mycost mysource mywho_with mycreated'.split()
-    
     list_filter='source currency product__domain'.split()
     date_hierarchy='created'
     
@@ -102,35 +95,16 @@ class PurchaseAdmin(admin.ModelAdmin):
     adminify(mycost, myproduct, mywho_with, mydomain, mycreated, mysource)
     mywho_with.display_name='Who With'
     formfield_for_dbfield=mk_default_field({'hour':get_named_hour, 'quantity':1,'created':datetime.datetime.now})
-    #def formfield_for_dbfield(self, db_field, **kwargs):
-        #if db_field.name=='hour':
-            #kwargs['initial']=hour2name[gethour()]
-            #kwargs.pop('request')
-            #return db_field.formfield(**kwargs)
-        #if db_field.name=='quantity':
-            #kwargs['initial']=1
-            #kwargs.pop('request')
-            #return db_field.formfield(**kwargs)
-        #if db_field.name=='created':
-            #kwargs['initial']=datetime.datetime.now()
-            #kwargs.pop('request')
-            #return db_field.formfield(**kwargs)
-        #return super(PurchaseAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+    formfield_form_foreignkey=mk_default_fkfield({'currency':1,'hour':gethour,})
+    fields='product cost quantity source currency created hour'.split()
+    #formfield_overrides = {
+            #models.DateTimeField: {'widget': BetterDateWidget},
+            ##models.DateField: {'widget': widgets.Input,},
+            #models.DateField: { 'widget': BetterDateWidget,}
+        #}
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'currency':
-            kwargs['initial'] = 1
-            return db_field.formfield(**kwargs)
-        return super(PurchaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
-
-    fieldsets = (
-              ('Main', {
-                   'fields': ('product cost quantity source currency created hour'.split())
-               },),
-           )        
-
-class DomainAdmin(admin.ModelAdmin):
-    list_display='name myproducts mytotal myspent'.split()
+class DomainAdmin(OverriddenModelAdmin):
+    list_display='id name myproducts mytotal myspent mycreated'.split()
     list_filter=['name',]
     def myproducts(self, obj):
         return obj.summary()
@@ -170,11 +144,13 @@ class DomainAdmin(admin.ModelAdmin):
         if total and ear:
             now=datetime.datetime.now()
             dayrange=min(30.0,(abs((now-earliest).days))+1)
-            return '%0.0f%s<br>%0.2f%s /day<br>(%d days)'%(total, Currency.objects.get(id=1).symbol, total/dayrange, Currency.objects.get(id=1).symbol, dayrange)
+            return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
         
-    adminify(myproducts, myspent, mytotal)
+    def mycreated(self, obj):
+        return obj.created.strftime(DATE)
+    adminify(myproducts, myspent, mytotal, mycreated)
     
-class PersonAdmin(admin.ModelAdmin):
+class PersonAdmin(OverriddenModelAdmin):
     list_display='id first_name last_name birthday mymet_through'.split()
     list_filter=['met_through',]
     
@@ -184,7 +160,7 @@ class PersonAdmin(admin.ModelAdmin):
     adminify(mymet_through)
 
 
-class CurrencyAdmin(admin.ModelAdmin):
+class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name symbol mytotal my3months'.split()
     def mytotal(self, obj):
         total=Purchase.objects.filter(currency__name='rmb').filter(source=obj).aggregate(Sum('cost'))['cost__sum']
@@ -195,7 +171,7 @@ class CurrencyAdmin(admin.ModelAdmin):
         if total and cre:
             now=datetime.datetime.now()
             dayrange=(abs((now-earliest).days)+1)
-            return '%0.0f<br>%0.2f /day<br>(%d days)'%(total, total/dayrange, dayrange)            
+            return '%0.0f<br>%0.2f/day<br>(%d days)'%(total, total/dayrange, dayrange)            
 
     def my3months(self, obj):
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
@@ -211,7 +187,7 @@ class CurrencyAdmin(admin.ModelAdmin):
         
     adminify(mytotal, my3months)
 
-class SourceAdmin(admin.ModelAdmin):
+class SourceAdmin(OverriddenModelAdmin):
     list_display='name mytotal mysummary'.split()
     
     def mysummary(self, obj):
@@ -252,7 +228,7 @@ class SetInline(admin.StackedInline):
     model=Workout.exweights.through
     extra=12
 
-class ExerciseAdmin(admin.ModelAdmin):
+class ExerciseAdmin(OverriddenModelAdmin):
     list_display='id name myhistory myspark barbell'.split()
     inlines=[
         PMuscleInline,
@@ -310,11 +286,11 @@ class ExerciseAdmin(admin.ModelAdmin):
             
     adminify(mymuscles, myhistory, myspark)
 
-class SetAdmin(admin.ModelAdmin):
+class SetAdmin(OverriddenModelAdmin):
     list_display='exweight count workout note'.split()
     create_date=models.DateTimeField(auto_now_add=True)
     
-class ExWeightAdmin(admin.ModelAdmin):
+class ExWeightAdmin(OverriddenModelAdmin):
     list_display='exercise weight side mysets'.split()
     def mysets(self, obj):
         preres=[(s.workout.created.strftime(DATE), s.workout.id)  for s in obj.sets.all()]
@@ -328,7 +304,7 @@ class ExWeightAdmin(admin.ModelAdmin):
     
     adminify(mysets)
     
-class MuscleAdmin(admin.ModelAdmin):
+class MuscleAdmin(OverriddenModelAdmin):
     list_display='id name myexercises'.split()
     list_editable=['name',]
 
@@ -337,7 +313,6 @@ class MuscleAdmin(admin.ModelAdmin):
 
     adminify(myexercises)
 
-from django import forms
 class WorkoutForm(forms.ModelForm):
     class Meta:
         model=Workout
@@ -362,7 +337,7 @@ class WorkoutForm(forms.ModelForm):
         #super(WorkoutForm, self).save()
     
 
-class WorkoutAdmin(admin.ModelAdmin):
+class WorkoutAdmin(OverriddenModelAdmin):
     list_display='mycreated mysets'.split()
     inlines=[SetInline,]
     #form=WorkoutForm#unnecessary
@@ -401,11 +376,11 @@ class WorkoutAdmin(admin.ModelAdmin):
     
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
-    formfield_for_dbfield=mk_default_field({'created':datetime.datetime.now,})
+    formfield_for_dbfield=mk_default_field({'created':nowdate,})
     adminify(mycreated, mysets)
 
 
-class MeasuringSpotAdmin(admin.ModelAdmin):
+class MeasuringSpotAdmin(OverriddenModelAdmin):
     list_display='name mymeasurements myhistory mydomain'.split()
     list_filter=['domain',]
     def mymeasurements(self, obj):
@@ -439,23 +414,14 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
     
     adminify(mymeasurements, myhistory, mydomain)
 
-class MeasurementAdmin(admin.ModelAdmin):
+class MeasurementAdmin(OverriddenModelAdmin):
     list_display='place mycreated amount'.split()
-    
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
     
-    
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
     adminify(mycreated)
-    class Meta:
-        fields='place amount created'.split()
-        
-    fieldsets = (
-          ('Main', {
-               'fields': ('place amount created'.split())
-           },),
-       )    
+    fields='place amount created'.split()
         
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Set, SetAdmin)

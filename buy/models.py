@@ -1,15 +1,8 @@
 from django.db import models
+from django.conf import settings
 from django.db.models import Sum
-
-HOUR_CHOICES=zip(range(10), 'morning noon afternoon evening night midnight'.split())
-hour2name={}
-name2hour={}
-for a in HOUR_CHOICES:
-    hour2name[a[1]]=a[0]
-    name2hour[a[0]]=a[1]
-#hour2name={a[1]:a[0] for a in HOUR_CHOICES}
-#name2hour={a[0]:a[1] for a in HOUR_CHOICES}
-
+from utils import rstripz
+from trackerutils import *
 
 def lnk(nodel, id, obj):
     return '<a href="/admin/buy/%s/%d/">%s</a>'%(nodel, id, str(obj))
@@ -17,14 +10,17 @@ def lnk(nodel, id, obj):
 def clink(nodel, id, obj):
     return '<a href="/admin/buy/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
 
-
 # Create your models here.
-class Domain(models.Model):
+
+from trackerutils import MyJsReplacementBuy
+
+class Domain(MyJsReplacementBuy):
     """
     body, house, experiences, food, stuff, clothes, etc.
     """
     name=models.CharField(max_length=100)
-    created=models.DateField(auto_now_add=True)
+    created=models.DateField()
+            
     class Meta:
         db_table='domain'    
         ordering=['name',]
@@ -52,7 +48,7 @@ class Domain(models.Model):
     def clink(self):
         return clink('domain', self.id, self)            
     
-class Source(models.Model):
+class Source(MyJsReplacementBuy):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
     class Meta:
@@ -74,7 +70,7 @@ class Source(models.Model):
     def all_purchases_link(self):
         return '<a href="/admin/buy/purchase/?source__id=%d">all purch</a>'%(self.id)    
     
-class Product(models.Model):
+class Product(MyJsReplacementBuy):
     name=models.CharField(max_length=100, unique=True)
     created=models.DateField(auto_now_add=True)
     domain=models.ForeignKey(Domain, related_name='products')
@@ -107,7 +103,7 @@ class Product(models.Model):
         cost=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('cost'))['cost__sum'] or 0
         return '<a href="/admin/buy/purchase/?product__id=%d">%s</a> %s for %s%s'%(self.id, str(self), count, ('%f'%cost).rstrip('0').rstrip('.'), symbol)
 
-class Currency(models.Model):
+class Currency(MyJsReplacementBuy):
     name=models.CharField(max_length=100, unique=True)
     symbol=models.CharField(max_length=10)
     created=models.DateField(auto_now_add=True)
@@ -120,7 +116,7 @@ class Currency(models.Model):
     def adm(self):
         return lnk('currency',self.id, self)    
 
-class Purchase(models.Model):
+class Purchase(MyJsReplacementBuy):
     product=models.ForeignKey(Product, related_name='purchases')
     #domain=models.ForeignKey(Domain, related_name='purchases')
     created=models.DateField()
@@ -138,7 +134,7 @@ class Purchase(models.Model):
         res='%s'%self.product
         if not self.quantity==1:
             res+='(%d)'%self.quantity
-        res+=' for %s%0.2f'%(self.currency.symbol, self.cost)
+        res+=' for %s%s'%(self.currency.symbol, rstripz(self.cost))
         return res
     
     def adm(self):
@@ -147,7 +143,7 @@ class Purchase(models.Model):
     def clink(self):
         return clink('purchase', self.id, self)
     
-class Person(models.Model):
+class Person(MyJsReplacementBuy):
     first_name=models.CharField(max_length=100)
     last_name=models.CharField(max_length=100)
     birthday=models.DateField(blank=True, null=True)
