@@ -1,4 +1,4 @@
-import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config
+import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime
 
 DATE='%Y-%m-%d'
 
@@ -160,3 +160,23 @@ def group_required(*group_names):
     #also redirects them to the proper group login.... assuming
     #we even want to keep multiple login pages for the separate groups.
     return user_passes_test(in_groups, login_url)
+
+def mk_default_field(vals):
+    """within a given klass (which is a subset of admin.ModelAdmin), 
+    return a function which, if assigned the name 'formfield_for_dbfield', 
+    will make the fields listed in vals default to their value there - either the raw val
+    or function call"""
+    def inner(self, db_field, **kwargs):
+        if db_field.name in vals:
+            th=vals[db_field.name]
+            if hasattr(th, '__call__'):
+                kwargs['initial']=th()
+            else:
+                kwargs['initial']=th
+            kwargs.pop('request')
+            return db_field.formfield(**kwargs)
+        return super(self.__class__, self).formfield_for_dbfield(db_field, **kwargs)        
+    return inner
+
+def nowdate():
+    return datetime.datetime.now().strftime(DATE)

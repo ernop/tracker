@@ -6,7 +6,7 @@ from django.db.models import Sum
 
 from tracker.buy.models import *
 from tracker.workout.models import *
-from tracker.utils import adminify, DATE
+from tracker.utils import adminify, DATE, mk_default_field, nowdate
 
 from spark import sparkline_discrete
 from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
@@ -84,21 +84,21 @@ class PurchaseAdmin(admin.ModelAdmin):
         return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.product.domain.id, obj.product.domain)
     
     adminify(mycost_per, myproduct, mywho_with, mydomain)
-
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        if db_field.name=='hour':
-            kwargs['initial']=hour2name[gethour()]
-            kwargs.pop('request')
-            return db_field.formfield(**kwargs)
-        if db_field.name=='quantity':
-            kwargs['initial']=1
-            kwargs.pop('request')
-            return db_field.formfield(**kwargs)
-        if db_field.name=='created':
-            kwargs['initial']=datetime.datetime.now()
-            kwargs.pop('request')
-            return db_field.formfield(**kwargs)
-        return super(PurchaseAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+    formfield_for_dbfield=mk_default_field({'hour':lambda x:hour2name[gethour()], 'quantity':1,'created':datetime.datetime.now})
+    #def formfield_for_dbfield(self, db_field, **kwargs):
+        #if db_field.name=='hour':
+            #kwargs['initial']=hour2name[gethour()]
+            #kwargs.pop('request')
+            #return db_field.formfield(**kwargs)
+        #if db_field.name=='quantity':
+            #kwargs['initial']=1
+            #kwargs.pop('request')
+            #return db_field.formfield(**kwargs)
+        #if db_field.name=='created':
+            #kwargs['initial']=datetime.datetime.now()
+            #kwargs.pop('request')
+            #return db_field.formfield(**kwargs)
+        #return super(PurchaseAdmin, self).formfield_for_dbfield(db_field, **kwargs)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'currency':
@@ -198,7 +198,6 @@ class SourceAdmin(admin.ModelAdmin):
         #return '%s'%obj.all_purchases_link()
     
     def mytotal(self, obj):
-        #import ipdb;ipdb.set_trace()
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
         total=Purchase.objects.filter(currency__name='rmb').filter(source=obj).aggregate(Sum('cost'))['cost__sum']
         ear=Purchase.objects.filter(currency__name='rmb').filter(source=obj).order_by('created')
@@ -249,12 +248,12 @@ class ExerciseAdmin(admin.ModelAdmin):
         past=[]
         res={}
         mindate=None
-        zets=Set.objects.filter(exweight__exercise=obj).order_by('-workout__date')
+        zets=Set.objects.filter(exweight__exercise=obj).order_by('-workout__created')
         if not zets:
             return ''
         for zet in zets:
             #past.append((zet.workout.date, zet.count, zet.exweight.weight))        
-            date=zet.workout.date.strftime(DATE)
+            date=zet.workout.created.strftime(DATE)
             res[date]=max(res.get(date, 0), zet.exweight.weight)
             if not mindate or date<mindate:
                 mindate=date
@@ -272,8 +271,8 @@ class ExerciseAdmin(admin.ModelAdmin):
     
     def myhistory(self, obj):
         past=[]
-        for zet in Set.objects.filter(exweight__exercise=obj).order_by('-workout__date'):
-            past.append((zet.workout.date, zet.count, zet.exweight.weight))
+        for zet in Set.objects.filter(exweight__exercise=obj).order_by('-workout__created'):
+            past.append((zet.workout.created , zet.count, zet.exweight.weight))
         past.sort(key=lambda x:x[0], reverse=True)
         res=''
         lasttime=None
@@ -295,7 +294,7 @@ class SetAdmin(admin.ModelAdmin):
 class ExWeightAdmin(admin.ModelAdmin):
     list_display='exercise weight side mysets'.split()
     def mysets(self, obj):
-        preres=[(s.workout.date.strftime(DATE), s.workout.id)  for s in obj.sets.all()]
+        preres=[(s.workout.created.strftime(DATE), s.workout.id)  for s in obj.sets.all()]
         date2workoutid={}
         for k,v in preres:
             date2workoutid[k]=v
@@ -324,13 +323,14 @@ class WorkoutForm(forms.ModelForm):
         super(WorkoutForm, self).__init__(*args, **kwgs)
     
     def clean_date(self):
-        import ipdb;ipdb.set_trace()
+        #import ipdb;ipdb.set_trace()
+        pass
     
     def clean(self):
         if self.is_bound:
-            if self.instance.date is None:
-                self.instance.date=datetime.datetime.now()
-                self.cleaned_data['date']=datetime.datetime.now()
+            if self.instance.created is None:
+                self.instance.created=datetime.datetime.now()
+                self.cleaned_data['created']=datetime.datetime.now()
         super(WorkoutForm, self).clean()
         return self.cleaned_data
     
@@ -339,8 +339,9 @@ class WorkoutForm(forms.ModelForm):
             #self.date=datetime.datetime.now()
         #super(WorkoutForm, self).save()
     
+
 class WorkoutAdmin(admin.ModelAdmin):
-    list_display='mydate mysets'.split()
+    list_display='mycreated mysets'.split()
     inlines=[SetInline,]
     #form=WorkoutForm#unnecessary
     def mysets(self, obj):
@@ -376,11 +377,11 @@ class WorkoutAdmin(admin.ModelAdmin):
             res3+='<br>'
         return res3
     
-    def mydate(self, obj):
-        return obj.date.strftime(DATE)
-    
-    adminify(mydate)
-    adminify(mysets)
+    def mycreated(self, obj):
+        return obj.created.strftime(DATE)
+    formfield_for_dbfield=mk_default_field({'created':datetime.datetime.now,})
+    adminify(mycreated, mysets)
+
 
 class MeasuringSpotAdmin(admin.ModelAdmin):
     list_display='name mymeasurements myhistory mydomain'.split()
@@ -395,7 +396,7 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
         mindate=None
         res={}
         for m in mes:
-            date=m.date.strftime(DATE)
+            date=m.created.strftime(DATE)
             res[date]=m.amount
             if not mindate or date<mindate:
                 mindate=date
@@ -415,27 +416,22 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
         return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.domain.id, obj.domain)
     
     adminify(mymeasurements, myhistory, mydomain)
-    
+
 class MeasurementAdmin(admin.ModelAdmin):
-    list_display='place mydate amount'.split()
+    list_display='place mycreated amount'.split()
     
-    def mydate(self, obj):
-        return obj.date.strftime(DATE)
+    def mycreated(self, obj):
+        return obj.created.strftime(DATE)
     
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        if db_field.name=='date':
-            kwargs['initial']=datetime.datetime.now()
-            kwargs.pop('request')
-            return db_field.formfield(**kwargs)
-        return super(MeasurementAdmin, self).formfield_for_dbfield(db_field, **kwargs)    
     
-    adminify(mydate)
+    formfield_for_dbfield=mk_default_field({'created':nowdate,})
+    adminify(mycreated)
     class Meta:
-        fields='place amount date'.split()
+        fields='place amount created'.split()
         
     fieldsets = (
           ('Main', {
-               'fields': ('place amount date'.split())
+               'fields': ('place amount created'.split())
            },),
        )    
         
