@@ -346,7 +346,6 @@ class WorkoutForm(forms.ModelForm):
         super(WorkoutForm, self).__init__(*args, **kwgs)
     
     def clean_date(self):
-        #import ipdb;ipdb.set_trace()
         pass
     
     def clean(self):
@@ -410,7 +409,6 @@ class MeasuringSpotAdmin(admin.ModelAdmin):
     list_display='name mymeasurements myhistory mydomain'.split()
     list_filter=['domain',]
     def mymeasurements(self, obj):
-        import ipdb;ipdb.set_trace()
         return '<br>'.join([m.adm() for m in obj.measurements.all()])
     
     def myhistory(self, obj):
