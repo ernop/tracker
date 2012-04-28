@@ -116,7 +116,7 @@ class Measurement(models.Model):
         ordering=['-created',]
         
     def adm(self):
-        return lnk('measurement',self.id,  '%s: <b>%0.2f</b>'%(self.date.strftime(DATE), self.amount))
+        return lnk('measurement',self.id,  '%s: <b>%0.2f</b>'%(self.created.strftime(DATE), self.amount))
         
 class MeasuringSpot(models.Model):
     name=models.CharField(max_length=100, unique=True)
