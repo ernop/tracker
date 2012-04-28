@@ -14,6 +14,7 @@ class Exercise(models.Model):
     smuscles=models.ManyToManyField('Muscle', related_name='synergists_exercises')
     barbell=models.BooleanField()
     note=models.CharField(max_length=500, blank=True)
+    created=models.DateField(auto_now_add=True)
     class Meta:
         db_table='exercise'    
         ordering=['name',]
@@ -29,7 +30,7 @@ class Exercise(models.Model):
 
 class Muscle(models.Model):
     name=models.CharField(max_length=100)
-    
+    created=models.DateField(auto_now_add=True)
     class Meta:
         ordering=['name',]
         db_table='muscle'    
@@ -45,6 +46,7 @@ class Set(models.Model):
     workout=models.ForeignKey('Workout', related_name='sets')
     count=models.IntegerField(blank=True)
     note=models.CharField(max_length=500, blank=True)
+    created=models.DateField(auto_now_add=True)
     
     def __unicode__(self):
         return '%s %s@%s lb'%(self.exweight.exercise, self.count, self.exweight.weight)            
@@ -65,7 +67,7 @@ class ExWeight(models.Model):
     exercise=models.ForeignKey(Exercise, related_name='exsets')
     weight=models.FloatField(blank=True)
     side=models.FloatField(blank=True)
-    
+    created=models.DateField(auto_now_add=True)
     def save(self, *args, **kwargs):
         if self.side and self.exercise.barbell:
             self.weight=self.side*2+45
@@ -91,29 +93,27 @@ class ExWeight(models.Model):
         
 class Workout(models.Model):
     exweights=models.ManyToManyField(ExWeight, through=Set, related_name='workout')
-    date=models.DateTimeField(auto_now_add=True)
-    
+    created=models.DateTimeField()
     def __unicode__(self):
-        return '%s'%(self.date.strftime(DATE), )#','.join([str(s) for s in self.sets.all()]),)
+        return '%s'%(self.created.strftime(DATE), )#','.join([str(s) for s in self.sets.all()]),)
     
     class Meta:
         db_table='workout'
-        ordering=['-date',]
+        ordering=['-created',]
         
     def adm(self):
         return lnk('workout',self.id, self)
     
 class Measurement(models.Model):
     place=models.ForeignKey('MeasuringSpot', related_name='measurements')
-    date=models.DateField()
     amount=models.FloatField()
-    
+    created=models.DateTimeField()
     def __unicode__(self):
-            return '%s %s: <b>%0.2f</b>'%(self.place, self.date.strftime(DATE), self.amount)#','.join([str(s) for s in self.sets.all()]),)
+            return '%s %s: <b>%0.2f</b>'%(self.place, self.created.strftime(DATE), self.amount)#','.join([str(s) for s in self.sets.all()]),)
     
     class Meta:
         db_table='measurement'
-        ordering=['-date',]
+        ordering=['-created',]
         
     def adm(self):
         return lnk('measurement',self.id,  '%s: <b>%0.2f</b>'%(self.date.strftime(DATE), self.amount))
@@ -121,6 +121,7 @@ class Measurement(models.Model):
 class MeasuringSpot(models.Model):
     name=models.CharField(max_length=100, unique=True)
     domain=models.ForeignKey(Domain, related_name='measuring_spots')
+    created=models.DateField(auto_now_add=True)
     def __unicode__(self):
         return '%s'%(self.name, )
         
@@ -130,3 +131,8 @@ class MeasuringSpot(models.Model):
         
     def adm(self):
         return lnk('measuringspot',self.id, self)
+    
+class MeasurementSet(models.Model):
+    measurements=models.ManyToManyField(MeasuringSpot, related_name='measurementsets')
+    created=models.DateField(auto_now_add=True)
+        

@@ -96,6 +96,7 @@ class Product(models.Model):
 class Currency(models.Model):
     name=models.CharField(max_length=100, unique=True)
     symbol=models.CharField(max_length=10)
+    created=models.DateField(auto_now_add=True)
     class Meta:
         db_table='currency'  
         ordering=['name',]
@@ -108,7 +109,7 @@ class Currency(models.Model):
 class Purchase(models.Model):
     product=models.ForeignKey(Product, related_name='purchases')
     #domain=models.ForeignKey(Domain, related_name='purchases')
-    created=models.DateField()
+    created=models.DateField(auto_now_add=True)
     quantity=models.FloatField()
     cost=models.FloatField()
     currency=models.ForeignKey('Currency')
@@ -137,6 +138,7 @@ class Person(models.Model):
     last_name=models.CharField(max_length=100)
     birthday=models.DateField(blank=True, null=True)
     met_through=models.ManyToManyField('Person', symmetrical=False, blank=True, null=True)
+    created=models.DateField(auto_now_add=True)
     
     class Meta:
         db_table='person'
