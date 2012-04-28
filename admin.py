@@ -6,7 +6,7 @@ from django.db.models import Sum
 
 from tracker.buy.models import *
 from tracker.workout.models import *
-from tracker.utils import adminify, DATE, mk_default_field, nowdate
+from tracker.utils import adminify, DATE, mk_default_field, nowdate, rstripz
 
 from spark import sparkline_discrete
 from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
@@ -34,16 +34,19 @@ def savetmp(self):
     return out
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display='name domain mypurchases mylastmonth'.split()
+    list_display='name mydomain mypurchases mylastmonth'.split()
+    
+    def mydomain(self, obj):
+        return obj.domain.clink()
     
     def mypurchases(self, obj):
+        return obj.summary()
         return ','.join([p.adm() for p in Purchase.objects.filter(product=obj)])
     
     def mylastmonth(self, obj):
         purch=Purchase.objects.filter(product=obj)
         if not purch:
-            return
-        
+            return ''
         mindate=None
         res={}
         for pu in purch:
@@ -61,21 +64,34 @@ class ProductAdmin(admin.ModelAdmin):
         im=sparkline_discrete(results=res2, width=5, height=30)
         tmp=savetmp(im)
         return '<img style="border:2px solid grey;"  src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
-
     
-    adminify(mylastmonth, mypurchases)
+    adminify(mylastmonth, mypurchases, mydomain)
+
+def get_named_hour():
+    return hour2name[gethour()]
 
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display='id myproduct mydomain quantity cost mycost_per currency source mywho_with created'.split()
+    list_display='id myproduct mydomain mycost mysource mywho_with mycreated'.split()
     
     list_filter='source currency product__domain'.split()
     date_hierarchy='created'
     
-    def mycost_per(self, obj):
-        return '%0.2f'%(float(obj.cost)/obj.quantity)
+    def mysource(self, obj):
+        return obj.source.clink()
+    
+    def mycreated(self, obj):
+        return '<a href="/admin/buy/purchase/?created__day=%d&created__month=%d&created__year=%d">%s</a>'%(obj.created.day, obj.created.month, obj.created.year, obj.created.strftime(DATE))
+    
+    def mycost(self, obj):
+        costper=''
+        if obj.quantity>1:
+            costper=' (%s, %s%s each)'%(rstripz(obj.quantity), rstripz(float(obj.cost)/obj.quantity), obj.currency.symbol)
+        if float(int(obj.cost))==obj.cost:
+            return '%d%s%s'%(obj.cost, obj.currency.symbol, costper)
+        return '%s%s'%(rstripz(float(obj.cost)), costper)
     
     def myproduct(self, obj):
-        return obj.product.adm()
+        return obj.product.clink()
     
     def mywho_with(self, obj):
         return '%s'%''.join([per.adm() for per in obj.who_with.all()])    
@@ -83,8 +99,9 @@ class PurchaseAdmin(admin.ModelAdmin):
     def mydomain(self, obj):
         return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.product.domain.id, obj.product.domain)
     
-    adminify(mycost_per, myproduct, mywho_with, mydomain)
-    formfield_for_dbfield=mk_default_field({'hour':lambda x:hour2name[gethour()], 'quantity':1,'created':datetime.datetime.now})
+    adminify(mycost, myproduct, mywho_with, mydomain, mycreated, mysource)
+    mywho_with.display_name='Who With'
+    formfield_for_dbfield=mk_default_field({'hour':get_named_hour, 'quantity':1,'created':datetime.datetime.now})
     #def formfield_for_dbfield(self, db_field, **kwargs):
         #if db_field.name=='hour':
             #kwargs['initial']=hour2name[gethour()]
@@ -106,17 +123,22 @@ class PurchaseAdmin(admin.ModelAdmin):
             return db_field.formfield(**kwargs)
         return super(PurchaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
+    fieldsets = (
+              ('Main', {
+                   'fields': ('product cost quantity source currency created hour'.split())
+               },),
+           )        
+
 class DomainAdmin(admin.ModelAdmin):
     list_display='id name myproducts mytotal myspent'.split()
     list_filter=['name',]
-    list_editable=['name',]
     def myproducts(self, obj):
         return obj.summary()
         
     def myspent(self, obj):
         purch=Purchase.objects.filter(product__domain=obj)
         if not purch:
-            return
+            return ''
         mindate=None
         res={}
         for pu in purch:
@@ -143,11 +165,12 @@ class DomainAdmin(admin.ModelAdmin):
         earliest=None
         if ear:
             earliest=datetime.datetime.combine(ear[0].created, datetime.time())
-        
+        else:
+            return ''
         if total and ear:
             now=datetime.datetime.now()
             dayrange=min(30.0,(abs((now-earliest).days))+1)
-            return '%0.0f<br>%0.2f /day<br>(%d days)'%(total, total/dayrange, dayrange)
+            return '%0.0f%s<br>%0.2f%s /day<br>(%d days)'%(total, Currency.objects.get(id=1).symbol, total/dayrange, Currency.objects.get(id=1).symbol, dayrange)
         
     adminify(myproducts, myspent, mytotal)
     
@@ -208,7 +231,7 @@ class SourceAdmin(admin.ModelAdmin):
         if total and earliest:
             now=datetime.datetime.now()
             dayrange=min(30.0,(abs((now-earliest).days))+1)
-            return '%0.0f<br>%0.2f /day<br>(%d days)'%(total, total/dayrange, dayrange)        
+            return '%0.0f%s<br>%s%s /day<br>(%d days)'%(total, Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
         
     adminify(mytotal, mysummary)
 

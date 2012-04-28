@@ -39,10 +39,18 @@ class Domain(models.Model):
         return '<a href="/admin/buy/purchase/?product__domain__id__exact=%d">all purch</a>'%(self.id)
     
     def summary(self):
-        return '%d products (%s) (%s)<br>%s'%(self.products.count(),
+        sums='<br>'.join([oo.summary() for oo in self.products.all() if oo.summary()])
+        ct=self.products.count()
+        if ct:
+            return '%d products (%s) (%s)<br>%s'%(ct,
                                                              self.all_products_link(),
                                                              self.all_purchases_link(),
-                                         '<br>'.join([oo.summary() for oo in self.products.all() if oo.summary()]),)        
+                                                             sums,)        
+        else:
+            return '%d products'%(ct,)
+    
+    def clink(self):
+        return clink('domain', self.id, self)            
     
 class Source(models.Model):
     name=models.CharField(max_length=100)
@@ -56,9 +64,9 @@ class Source(models.Model):
     def clink(self):
         return clink('source', self.id, self)
     def summary(self):
-        #import ipdb;ipdb.set_trace()
         if self.purchases.count():
-            return '%d purchases (%s)<br>%s'%(self.purchases.filter(currency__name='rmb').aggregate(Sum('quantity'))['quantity__sum'],
+            #self.purchases.filter(currency__name='rmb').aggregate(Sum('quantity'))['quantity__sum']
+            return '%d purchases (%s)<br>%s'%(self.purchases.count(),
                 #self.all_products_link(),
                 self.all_purchases_link(),
                 '<br>'.join([oo.summary(source=self) for oo in Product.objects.filter(purchases__source=self).distinct()]),)
@@ -90,8 +98,14 @@ class Product(models.Model):
             count=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('quantity'))['quantity__sum']
         if not count:
             return ''
+        if count==1:
+            count=''
+        else:
+            count='('+str(count).rstrip('0').rstrip('.')+')'
+        purches=Purchase.objects.filter(product=self)
+        symbol=purches[0].currency.symbol
         cost=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('cost'))['cost__sum'] or 0
-        return '<a href="/admin/buy/purchase/?product__id=%d">%s</a> (%d) for %0.2f'%(self.id, str(self), count, cost)
+        return '<a href="/admin/buy/purchase/?product__id=%d">%s</a> %s for %s%s'%(self.id, str(self), count, ('%f'%cost).rstrip('0').rstrip('.'), symbol)
 
 class Currency(models.Model):
     name=models.CharField(max_length=100, unique=True)
@@ -109,7 +123,7 @@ class Currency(models.Model):
 class Purchase(models.Model):
     product=models.ForeignKey(Product, related_name='purchases')
     #domain=models.ForeignKey(Domain, related_name='purchases')
-    created=models.DateField(auto_now_add=True)
+    created=models.DateField()
     quantity=models.FloatField()
     cost=models.FloatField()
     currency=models.ForeignKey('Currency')

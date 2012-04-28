@@ -180,3 +180,6 @@ def mk_default_field(vals):
 
 def nowdate():
     return datetime.datetime.now().strftime(DATE)
+
+def rstripz(x):
+    return ('%f'%x).rstrip('0').rstrip('.')
