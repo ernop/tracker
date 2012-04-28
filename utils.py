@@ -178,8 +178,19 @@ def mk_default_field(vals):
         return super(self.__class__, self).formfield_for_dbfield(db_field, **kwargs)        
     return inner
 
+def mk_default_fkfield(vals):
+    def inner(self, db_field, **kwargs):
+        if db_field.name in vals:
+            th=vals[db_field.name]
+            if hasattr(th, '__call__'):
+                kwargs['initial']=th()
+            else:
+                kwargs['initial']=th
+            return db_field.formfield(**kwargs)        
+    return inner
+
 def nowdate():
     return datetime.datetime.now().strftime(DATE)
 
 def rstripz(x):
-    return ('%f'%x).rstrip('0').rstrip('.')
+    return ('<b>%0.1f'%x).rstrip('0').rstrip('.')+'</b>'
