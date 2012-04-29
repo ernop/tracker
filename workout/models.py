@@ -17,8 +17,8 @@ for a in HOUR_CHOICES:
 def lnk(nodel, id, obj):
     return '<a href="/admin/workout/%s/%d/">%s</a>'%(nodel, id, str(obj))
 
-# Create your models here.
 def clink(nodel, id, obj):
+    #a link to the object list display with a filter only showing this guy
     return '<a href="/admin/workout/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
 
 from trackerutils import MyJsReplacementWorkout
@@ -148,3 +148,28 @@ class MeasuringSpot(MyJsReplacementWorkout):
         
     def adm(self):
         return lnk('measuringspot',self.id, self)
+    
+    def clink(self):
+        return clink('measuringspot',self.id, self)    
+    
+    def save(self):
+        if not self.pk:
+            self.created=datetime.datetime.now()
+        super(MeasuringSpot, self).save()
+    
+class MeasurementSet(MyJsReplacementWorkout):
+    name=models.CharField(max_length=100)
+    created=models.DateField(auto_now_add=True)
+    measurement_spots=models.ManyToManyField(MeasuringSpot)
+    
+    class Meta:
+        db_table='measurementset'
+        
+    def __unicode__(self):
+        return u'MeasurementSet %s'%self.name
+    
+    def adm(self):
+        return lnk('measurementset',self.id, self)
+    
+    def clink(self):
+        return clink('measurementset',self.id, self)        
