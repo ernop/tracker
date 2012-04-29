@@ -403,7 +403,6 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
     def mydomain(self, obj):
         return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.domain.id, obj.domain)
     def mysets(self, obj):
-        import ipdb;ipdb.set_trace()
         return ' | '.join([ms.clink() for ms in obj.measurementset_set.all()])    
     adminify(mymeasurements, myhistory, mydomain, mysets)
 
@@ -445,11 +444,9 @@ class MInline(admin.TabularInline):
     extra=1
     formset =  MSetFormSet
     def get_formset(self, request, obj, **kwargs):
-        import ipdb;ipdb.set_trace()
         formset = inlineformset_factory(MeasurementSet, Measurement)
         
     def get_formsets(self, request, obj, **kwargs):
-            import ipdb;ipdb.set_trace()
             formset = inlineformset_factory(MeasurementSet, Measurement)    
         
     #def queryset(self, request):

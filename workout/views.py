@@ -14,7 +14,6 @@ def do_measurementset(request, measurementset_id=None):
     vals={}
     if request.method=='POST':
         formset=modelformset_factory(Measurement)
-        import ipdb;ipdb.set_trace()
         ff=formset(request.POST)
         ff.save()
         #that's it!
