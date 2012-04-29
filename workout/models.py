@@ -126,7 +126,7 @@ class Measurement(MyJsReplacementWorkout):
     created=models.DateField()
     
     def __unicode__(self):
-        return '%s %s: <b>%0.2f</b>'%(self.place, self.created.strftime(DATE), self.amount)#','.join([str(s) for s in self.sets.all()]),)
+        return '%s %s: <b>%s</b>'%(self.place, self.created.strftime(DATE), rstripz(self.amount))#','.join([str(s) for s in self.sets.all()]),)
     
     class Meta:
         db_table='measurement'
