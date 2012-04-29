@@ -144,7 +144,7 @@ var DateTimeShortcuts = {
         today_link.appendChild(document.createTextNode(gettext('Today')));
         var ytoday_link = document.createElement('a');
         ytoday_link.setAttribute('href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', -1);');
-        ytoday_link.appendChild(document.createTextNode(gettext(' Yday | ')));
+        ytoday_link.appendChild(document.createTextNode(gettext(' Yday | '))); 
         var yytoday_link = document.createElement('a');
         yytoday_link.setAttribute('href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', -2);');
         yytoday_link.appendChild(document.createTextNode(gettext(' Y2day | ')));
