@@ -4,8 +4,7 @@ from django import forms
 from django.contrib import admin
 from django.conf import settings
 from django.db.models import Sum
-from django.forms import widgets
-from django.forms.models import BaseModelFormSet  
+from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 
 #import djangoplus.widgets 
 from spark import sparkline_discrete
@@ -18,7 +17,6 @@ from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
 
 class BetterDateWidget(admin.widgets.AdminDateWidget):
     def render(self, name, value, attrs=None):
-        import ipdb;ipdb.set_trace()        
         return super(BetterDateWidget, self).render(name, value)
     
 class OverriddenModelAdmin(admin.ModelAdmin):
@@ -211,12 +209,7 @@ class SourceAdmin(OverriddenModelAdmin):
         
     adminify(mytotal, mysummary)
 
-admin.site.register(Product, ProductAdmin)
-admin.site.register(Domain, DomainAdmin)
-admin.site.register(Purchase, PurchaseAdmin)
-admin.site.register(Source, SourceAdmin)
-admin.site.register(Currency, CurrencyAdmin)
-admin.site.register(Person, PersonAdmin)
+
 
 class PMuscleInline(admin.StackedInline):
     model = Exercise.pmuscles.through
@@ -358,7 +351,6 @@ class WorkoutAdmin(OverriddenModelAdmin):
                 for zet in zets:weights[zet.exweight.weight].append(zet.count)
             weights['sets']=zets
             res2[exercise]=weights
-            
         res3=''
         for exercise, summary in sorted(res2.items(), key=lambda x:x[1]['sets'][0].id):
             #order by set id, so the order you do them in the workout is right.
@@ -379,9 +371,8 @@ class WorkoutAdmin(OverriddenModelAdmin):
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
     adminify(mycreated, mysets)
 
-
 class MeasuringSpotAdmin(OverriddenModelAdmin):
-    list_display='name mymeasurements myhistory mydomain'.split()
+    list_display='name mymeasurements myhistory mydomain mysets'.split()
     list_filter=['domain',]
     def mymeasurements(self, obj):
         return '<br>'.join([m.adm() for m in obj.measurements.all()])
@@ -411,11 +402,15 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
     
     def mydomain(self, obj):
         return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.domain.id, obj.domain)
-    
-    adminify(mymeasurements, myhistory, mydomain)
+    def mysets(self, obj):
+        import ipdb;ipdb.set_trace()
+        return ' | '.join([ms.clink() for ms in obj.measurementset_set.all()])    
+    adminify(mymeasurements, myhistory, mydomain, mysets)
 
 class MeasurementAdmin(OverriddenModelAdmin):
     list_display='place mycreated amount'.split()
+    list_filter=['place',]
+    
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
     
@@ -423,6 +418,12 @@ class MeasurementAdmin(OverriddenModelAdmin):
     adminify(mycreated)
     fields='place amount created'.split()
         
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Domain, DomainAdmin)
+admin.site.register(Purchase, PurchaseAdmin)
+admin.site.register(Source, SourceAdmin)
+admin.site.register(Currency, CurrencyAdmin)
+admin.site.register(Person, PersonAdmin)
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Set, SetAdmin)
 admin.site.register(ExWeight, ExWeightAdmin)
@@ -430,3 +431,44 @@ admin.site.register(Muscle, MuscleAdmin)
 admin.site.register(Workout, WorkoutAdmin)
 admin.site.register(Measurement, MeasurementAdmin)
 admin.site.register(MeasuringSpot, MeasuringSpotAdmin)
+class MSetFormSet(BaseInlineFormSet):
+    def get_queryset(self):
+        if not hasattr(self, '_queryset'):
+            qs = super(MSetFormSet, self).get_queryset().none()
+            self._queryset = qs
+        return self._queryset
+
+from django.forms.models import (modelform_factory, modelformset_factory, inlineformset_factory, BaseInlineFormSet)
+
+class MInline(admin.TabularInline):
+    model=MeasurementSet.measurement_spots.through
+    extra=1
+    formset =  MSetFormSet
+    def get_formset(self, request, obj, **kwargs):
+        import ipdb;ipdb.set_trace()
+        formset = inlineformset_factory(MeasurementSet, Measurement)
+        
+    def get_formsets(self, request, obj, **kwargs):
+            import ipdb;ipdb.set_trace()
+            formset = inlineformset_factory(MeasurementSet, Measurement)    
+        
+    #def queryset(self, request):
+        #queryset = super(InlineModelAdmin, self).queryset(request)
+        #if not self.has_change_permission(request):
+            #queryset = queryset.none()
+        #return queryset    
+    
+class MeasurementSetAdmin(OverriddenModelAdmin):
+    list_display='id name mycontains mydo'.split()
+    filter_horizontal = ('measurement_spots',)
+    #inlines=[MInline,]
+    def mydo(self, obj):
+        return '<a href="/do_measurementset/%d">%s</a>'%(obj.id, obj.name)       
+    
+    def mycontains(self, obj):
+        return ' | '.join([spot.clink() for spot in obj.measurement_spots.all()])
+    
+    adminify(mydo, mycontains)
+        
+    
+admin.site.register(MeasurementSet, MeasurementSetAdmin)

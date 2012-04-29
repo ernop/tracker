@@ -1,0 +1,13 @@
+{% extends "jinja2/base.html" %}
+{% block content %}
+    {% if formset %}
+    <form action='.' method="POST">
+    {%csrf_token%}
+     {{ formset.management_form|safe }}
+        {% for form in formset%}
+            {{form.as_p()|safe}}
+        {% endfor %}
+        <input name='submit' type=submit value='subb.'/>
+    </form>
+    {% endif %}
+{% endblock %}
