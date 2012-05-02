@@ -192,5 +192,10 @@ def mk_default_fkfield(vals):
 def nowdate():
     return datetime.datetime.now().strftime(DATE)
 
-def rstripz(x):
-    return ('<b>%0.1f'%x).rstrip('0').rstrip('.')+'</b>'
+def rstripz(x, bold=False):
+    if bold:
+        return ('<b>%0.1f'%x).rstrip('0').rstrip('.')+'</b>'
+    return ('%0.1f'%x).rstrip('0').rstrip('.')
+
+def rstripzb(x):
+    return rstripz(x, bold=True)
