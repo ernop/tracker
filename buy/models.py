@@ -116,7 +116,7 @@ class Currency(MyJsReplacementBuy):
     def adm(self):
         return lnk('currency',self.id, self)    
 
-class Purchase(MyJsReplacementBuy):
+class Purchase(models.Model):
     product=models.ForeignKey(Product, related_name='purchases')
     #domain=models.ForeignKey(Domain, related_name='purchases')
     created=models.DateField()
@@ -128,7 +128,7 @@ class Purchase(MyJsReplacementBuy):
     hour=models.IntegerField(choices=HOUR_CHOICES)
     class Meta:
         db_table='purchase'    
-        ordering=['product__name',]
+        ordering=['-created','product__name',]
     
     def __unicode__(self):
         res='%s'%self.product
