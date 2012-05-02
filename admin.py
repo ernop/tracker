@@ -77,9 +77,9 @@ class PurchaseAdmin(OverriddenModelAdmin):
         costper=''
         if obj.quantity>1:
             costper=' (%s, %s%s each)'%(rstripz(obj.quantity), rstripz(float(obj.cost)/obj.quantity), obj.currency.symbol)
-        if float(int(obj.cost))==obj.cost:
-            return '%d%s%s'%(obj.cost, obj.currency.symbol, costper)
-        return '%s%s'%(rstripz(float(obj.cost)), costper)
+        #if float(int(obj.cost))==obj.cost:
+            #return '%d%s%s'%(rstripz(obj.cost), obj.currency.symbol, costper)
+        return '%s%s%s'%(rstripzb(float(obj.cost)), obj.currency.symbol, costper)
     
     def myproduct(self, obj):
         return obj.product.clink()
@@ -92,7 +92,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     
     adminify(mycost, myproduct, mywho_with, mydomain, mycreated, mysource)
     mywho_with.display_name='Who With'
-    formfield_for_dbfield=mk_default_field({'hour':get_named_hour, 'quantity':1,'created':datetime.datetime.now})
+    formfield_for_dbfield=mk_default_field({'hour':get_named_hour, 'quantity':1,'created':datetime.datetime.now, 'currency':1})
     formfield_form_foreignkey=mk_default_fkfield({'currency':1,'hour':gethour,})
     fields='product cost quantity source currency created hour'.split()
     #formfield_overrides = {
