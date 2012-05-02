@@ -174,7 +174,11 @@ def mk_default_field(vals):
             else:
                 kwargs['initial']=th
             kwargs.pop('request')
-            return db_field.formfield(**kwargs)
+            ff=db_field.formfield(**kwargs)
+            if db_field.name=='created':
+                ff.widget.attrs={'class':'vDateField'}
+                #omg, can't believe this works.
+            return ff
         return super(self.__class__, self).formfield_for_dbfield(db_field, **kwargs)        
     return inner
 

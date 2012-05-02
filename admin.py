@@ -27,6 +27,23 @@ class OverriddenModelAdmin(admin.ModelAdmin):
         models.DateTimeField: {'widget': BetterDateWidget,},
         models.DateField: { 'widget': BetterDateWidget,},        
     }
+    
+    def _media(self):
+        from django.forms import Media
+        js = ("/static/admin/js/core.js","/static/admin/js/admin/RelatedObjectLookups.js",
+              '/static/admin/js/jquery.js',"/static/admin/js/jquery.init.js",
+              "/static/admin/js/actions.js",
+              '/static/admin/js/calendar.js',
+              '/static/admin/js/admin/DateTimeShortcuts.js','/static/js/DjangoAjax.js',
+              )    
+        med=Media(js=js)
+        #print 'media;',
+        for u in med.render_js():
+            print u
+        #return js
+        return med
+    
+    media=property(_media)
 
 class ProductAdmin(OverriddenModelAdmin):
     list_display='name mydomain mypurchases mylastmonth'.split()
@@ -64,7 +81,7 @@ class ProductAdmin(OverriddenModelAdmin):
 
 class PurchaseAdmin(OverriddenModelAdmin):
     list_display='id myproduct mydomain mycost mysource mywho_with mycreated'.split()
-    list_filter='source currency product__domain'.split()
+    list_filter='source currency product__domain who_with'.split()
     date_hierarchy='created'
     
     def mysource(self, obj):

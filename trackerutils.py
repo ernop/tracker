@@ -4,17 +4,23 @@ from django.db import models
 from django.conf import settings
 
 class MyJsReplacementWorkout(models.Model):
-    class Media:
-        js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js',)    
+    #def _media(self):
+        #import ipdb;ipdb.set_trace()
+        #js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js',)    
+
+    #media=property(_media)
         
     class Meta:
         app_label='workout'
         abstract=True
         
 class MyJsReplacementBuy(models.Model):
-    class Media:
-        js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js',)    
+    #def _media(self):
+        #import ipdb;ipdb.set_trace()
+        #js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js', settings.MEDIA_URL + 'static/js/DjangoAjax.js',)  
         
+    #media=property(_media)
+    
     class Meta:
         app_label='buy'
         abstract=True
