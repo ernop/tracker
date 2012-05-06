@@ -111,7 +111,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     mywho_with.display_name='Who With'
     formfield_for_dbfield=mk_default_field({'hour':get_named_hour, 'quantity':1,'created':datetime.datetime.now, 'currency':1})
     formfield_form_foreignkey=mk_default_fkfield({'currency':1,'hour':gethour,})
-    fields='product cost quantity source currency created hour'.split()
+    fields='product cost quantity source currency created hour who_with'.split()
     #formfield_overrides = {
             #models.DateTimeField: {'widget': BetterDateWidget},
             ##models.DateField: {'widget': widgets.Input,},
