@@ -19,7 +19,7 @@ class Domain(MyJsReplacementBuy):
     body, house, experiences, food, stuff, clothes, etc.
     """
     name=models.CharField(max_length=100)
-    created=models.DateField()
+    created=models.DateField(auto_now_add=True)
             
     class Meta:
         db_table='domain'    
