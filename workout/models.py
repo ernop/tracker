@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from buy.models import Domain
 from tracker.utils import DATE
