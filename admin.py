@@ -432,7 +432,8 @@ class MeasurementAdmin(OverriddenModelAdmin):
     
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
     adminify(mycreated)
-    fields='place amount created'.split()
+    #fields='place amount created'.split()
+    fields=(('place','amount','created',),)
         
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Domain, DomainAdmin)

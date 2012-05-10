@@ -5,7 +5,9 @@
 ##################################################################
 [project attributes]
 proj.directory-list = [{'dirloc': loc('.'),
-                        'excludes': [u'trackenv'],
+                        'excludes': [u'sp',
+                                     u'soft',
+                                     u'trackenv'],
                         'filter': '*',
                         'include_hidden': False,
                         'recursive': True,

@@ -9,6 +9,7 @@ from workout.models import *
 from django.template import RequestContext
 from admin import *
 from django.forms.formsets import formset_factory
+from django import forms
 
 def do_measurementset(request, measurementset_id=None):
     vals={}
@@ -29,3 +30,16 @@ def do_measurementset(request, measurementset_id=None):
     formset=modelformset_factory(Measurement, extra=0)
     vals['formset']=formset(queryset=qs)
     return render_to_response('many.html',vals,RequestContext(request))
+
+class WorkoutForm(forms.ModelForm):
+    class Meta:
+        model=ExWeight
+        
+    
+
+def make_workout(request):
+    vals={}
+    vals['form']=WorkoutForm()
+    if request.method=='POST':
+        import ipdb;ipdb.set_trace()
+    return render_to_response('make_workout.html',vals,RequestContext(request))
