@@ -14,5 +14,6 @@ urlpatterns = patterns('',
     url(r'^/?$', lambda x:HttpResponseRedirect('/admin/'), name='redir'),
     url(r'^do_measurementset/$', 'tracker.workout.views.do_measurementset', name='do_set'),
     url(r'^do_measurementset/(?P<measurementset_id>[0-9]+)$', 'tracker.workout.views.do_measurementset', name='do_set_id'),
+    url(r'^make_workout','tracker.workout.views.make_workout',name='make_workout'),
 )
 
