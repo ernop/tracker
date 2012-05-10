@@ -153,6 +153,8 @@ class MeasuringSpot(MyJsReplacementWorkout):
         return clink('measuringspot',self.id, self)    
     
     def save(self):
+        if not self.created:
+            self.created=datetime.datetime.now()
         if not self.pk:
             self.created=datetime.datetime.now()
         super(MeasuringSpot, self).save()
