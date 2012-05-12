@@ -121,6 +121,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
 class DomainAdmin(OverriddenModelAdmin):
     list_display='id name myproducts mytotal myspent mycreated'.split()
     list_filter=['name',]
+    
     def myproducts(self, obj):
         return obj.summary()
         
@@ -148,8 +149,8 @@ class DomainAdmin(OverriddenModelAdmin):
     
     def mytotal(self, obj):
         """in the last month"""
-        monthago=datetime.datetime.now()-datetime.timedelta(days=30)
-        total=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).filter(created__gte=monthago).aggregate(Sum('cost'))['cost__sum']
+        sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
+        total=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).filter(created__gte=sixmonthago).aggregate(Sum('cost'))['cost__sum']
         ear=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).order_by('created')
         earliest=None
         if ear:
@@ -158,7 +159,7 @@ class DomainAdmin(OverriddenModelAdmin):
             return ''
         if total and ear:
             now=datetime.datetime.now()
-            dayrange=min(30.0,(abs((now-earliest).days))+1)
+            dayrange=min(180.0,(abs((now-earliest).days))+1)
             return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
         
     def mycreated(self, obj):
