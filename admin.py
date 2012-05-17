@@ -24,8 +24,8 @@ class OverriddenModelAdmin(admin.ModelAdmin):
     formfield_overrides = {
         #models.DateTimeField: {'widget': admin.widgets.AdminDateWidget,},
         #models.DateField: { 'widget': admin.widgets.AdminDateWidget,},
-        models.DateTimeField: {'widget': BetterDateWidget,},
-        models.DateField: { 'widget': BetterDateWidget,},        
+        #models.DateTimeField: {'widget': BetterDateWidget,},
+        #models.DateField: { 'widget': BetterDateWidget,},        
     }
     
     def _media(self):
@@ -80,9 +80,10 @@ class ProductAdmin(OverriddenModelAdmin):
     adminify(mylastmonth, mypurchases, mydomain)
 
 class PurchaseAdmin(OverriddenModelAdmin):
-    list_display='id myproduct mydomain mycost mysource mywho_with mycreated'.split()
+    list_display='id myproduct mydomain mycost mysource mywho_with mycreated note'.split()
     list_filter='source currency product__domain who_with'.split()
     date_hierarchy='created'
+    list_editable=['note',]
     
     def mysource(self, obj):
         return obj.source.clink()
@@ -111,7 +112,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     mywho_with.display_name='Who With'
     formfield_for_dbfield=mk_default_field({'hour':get_named_hour, 'quantity':1,'created':datetime.datetime.now, 'currency':1})
     formfield_form_foreignkey=mk_default_fkfield({'currency':1,'hour':gethour,})
-    fields='product cost quantity source currency created hour who_with'.split()
+    fields='product cost quantity source currency created hour who_with note'.split()
     #formfield_overrides = {
             #models.DateTimeField: {'widget': BetterDateWidget},
             ##models.DateField: {'widget': widgets.Input,},
