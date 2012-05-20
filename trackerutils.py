@@ -6,25 +6,25 @@ from django.conf import settings
 class MyJsReplacementWorkout(models.Model):
     #def _media(self):
         #import ipdb;ipdb.set_trace()
-        #js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js',)    
+        #js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js',)
 
     #media=property(_media)
-        
+
     class Meta:
         app_label='workout'
         abstract=True
-        
+
 class MyJsReplacementBuy(models.Model):
     #def _media(self):
         #import ipdb;ipdb.set_trace()
-        #js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js', settings.MEDIA_URL + 'static/js/DjangoAjax.js',)  
-        
+        #js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js', settings.MEDIA_URL + 'static/js/DjangoAjax.js',)
+
     #media=property(_media)
-    
+
     class Meta:
         app_label='buy'
         abstract=True
-        
+
 def gethour():
     hour=datetime.datetime.now().hour
     if hour<2:
@@ -55,6 +55,7 @@ def get_named_hour():
 
 
 HOUR_CHOICES=zip(range(10), 'morning noon afternoon evening night midnight'.split())
+HOUR_CHOICES.append((6,'early morning'))
 hour2name={}
 name2hour={}
 for a in HOUR_CHOICES:
