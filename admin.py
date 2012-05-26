@@ -390,11 +390,29 @@ class WorkoutAdmin(OverriddenModelAdmin):
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
     adminify(mycreated, mysets)
 
+def debu(func, *args, **kwgs):
+    def inner(*args, **kwgs):
+        try:
+            return func(*args, **kwgs)
+        except Exception, e:
+            import ipdb;ipdb.set_trace()
+            print 'XXX'
+    inner.__doc__=func.__doc__
+    inner.__name__=func.__name__    
+    return inner
+linesample = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]
 class MeasuringSpotAdmin(OverriddenModelAdmin):
     list_display='name mymeasurements myhistory mydomain mysets'.split()
     list_filter=['domain',]
+    @debu
     def mymeasurements(self, obj):
-        return '<br>'.join([m.adm() for m in obj.measurements.all()])
+        ct=obj.measurements.all()
+        ll=len(ct)
+        #import ipdb;ipdb.set_trace()	
+        if ll>8:
+            indexes=linesample(6,len(ct[2:]))+[len(ct)-1]
+            ct=ct[:2]+[ct[th] for th in indexes]
+        return '<br>'.join([m.adm() for m in ct])
     
     def myhistory(self, obj):
         mes=obj.measurements.all()
@@ -425,6 +443,8 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         return ' | '.join([ms.clink() for ms in obj.measurementset_set.all()])    
     adminify(mymeasurements, myhistory, mydomain, mysets)
 
+
+    
 class MeasurementAdmin(OverriddenModelAdmin):
     list_display='place mycreated amount'.split()
     list_filter=['place',]
