@@ -7,7 +7,7 @@ from django.db.models import Sum
 from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 
 #import djangoplus.widgets 
-from spark import sparkline_discrete
+from spark import *
 
 from trackerutils import *
 from tracker.buy.models import *
@@ -431,7 +431,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         if obj.exclude_zeros:
             ct=ct.exclude(amount=0)
         ll=len(ct)
-        if ll>8:
+        if ll>28:
             indexes=linesample(6,len(ct[2:]))+[len(ct)-1]
             ct=ct[:2]+[ct[th] for th in indexes]
         return '<br>'.join([m.adm() for m in ct])
@@ -454,10 +454,12 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         now=datetime.datetime.now()
         trying=first
         res2=[]
+        lastt=None
+        #import ipdb;ipdb.set_trace()
         while trying<now:
-            #if trying.strftime(DATE) in res:
-                #res2.append((res.get(trying.strftime(DATE))))
-            res2.append((res.get(trying.strftime(DATE), 0)))
+            if trying.strftime(DATE) in res:
+                lastt=res.get(trying.strftime(DATE))
+            res2.append(lastt)
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2, width=5, height=100)
         tmp=savetmp(im)
