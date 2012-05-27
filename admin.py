@@ -356,30 +356,50 @@ class WorkoutAdmin(OverriddenModelAdmin):
     def mysets(self, obj):
         res={}
         preres={}
-        for s in obj.sets.all():res[s.exweight.exercise]=[]
+        
+        ex_order=[]
+        for s in obj.sets.all():
+            res[s.exweight.exercise]=[]
+            if s.exweight.exercise not in ex_order:
+                ex_order.append(s.exweight.exercise)
         for s in obj.sets.all():res[s.exweight.exercise].append(s)
         #res is dict of exercise => [exweights,]
         res2={}
+        #import ipdb;ipdb.set_trace()
         for exercise,zets in res.items():
+            #import ipdb;ipdb.set_trace()
             weights={}
-            if exercise.barbell:
-                for zet in zets:weights[(zet.exweight.weight, zet.exweight.side,)]=[]
-                for zet in zets:weights[(zet.exweight.weight, zet.exweight.side,)].append(zet.count)
-            else:
-                for zet in zets:weights[zet.exweight.weight]=[]
-                for zet in zets:weights[zet.exweight.weight].append(zet.count)
+            ct=0 #counter - merge sequential sets of the same weight.
+            lastweight=None
+            #import ipdb;ipdb.set_trace()
+            for zet in zets:
+                if lastweight and zet.exweight.weight==lastweight:
+                    pass
+                else:
+                    ct+=1
+                    lastweight=zet.exweight.weight
+                    if exercise.barbell:
+                        weights[(ct, zet.exweight.weight, zet.exweight.side,)]=[]
+                    else:
+                        weights[(ct, zet.exweight.weight)]=[]
+                #import ipdb;ipdb.set_trace()
+                if exercise.barbell:
+                    weights[(ct, zet.exweight.weight, zet.exweight.side,)].append(zet.count)
+                else:
+                    weights[(ct, zet.exweight.weight)].append(zet.count)
             weights['sets']=zets
             res2[exercise]=weights
         res3=''
+        #import ipdb;ipdb.set_trace()
         for exercise, summary in sorted(res2.items(), key=lambda x:x[1]['sets'][0].id):
             #order by set id, so the order you do them in the workout is right.
             res3+='%s '%exercise.clink()
-            for weight, counts in summary.items():
+            for weight, counts in sorted(summary.items()):
                 if weight=='sets':continue
-                if type(weight) is tuple:
-                    res3+=' <b>%d</b>(%d):'%(weight[0], weight[1])
+                if exercise.barbell:
+                    res3+=' <b>%d</b>(%d):'%(weight[1], weight[2])
                 else:
-                    res3+='<b>%d</b>:'%(weight)
+                    res3+=' <b>%d</b>:'%(weight[1])
                 res3+=','.join(['%d'%cc for cc in counts])
             #res3+='%s %s'%(exercise, ' ,'.join(['%d'%s for s in summary]))
             res3+='<br>'
@@ -402,13 +422,15 @@ def debu(func, *args, **kwgs):
     return inner
 linesample = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]
 class MeasuringSpotAdmin(OverriddenModelAdmin):
-    list_display='name mymeasurements myhistory mydomain mysets'.split()
+    list_display='name mymeasurements myhistory mydomain mysets exclude_zeros'.split()
     list_filter=['domain',]
+    list_editable=['exclude_zeros',]
     @debu
     def mymeasurements(self, obj):
         ct=obj.measurements.all()
+        if obj.exclude_zeros:
+            ct=ct.exclude(amount=0)
         ll=len(ct)
-        #import ipdb;ipdb.set_trace()	
         if ll>8:
             indexes=linesample(6,len(ct[2:]))+[len(ct)-1]
             ct=ct[:2]+[ct[th] for th in indexes]
@@ -416,8 +438,11 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
     
     def myhistory(self, obj):
         mes=obj.measurements.all()
+        if obj.exclude_zeros:
+            mes=mes.exclude(amount=0)        
         if not mes:
             return
+        #import ipdb;ipdb.set_trace()
         mindate=None
         res={}
         for m in mes:
@@ -430,6 +455,8 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         trying=first
         res2=[]
         while trying<now:
+            #if trying.strftime(DATE) in res:
+                #res2.append((res.get(trying.strftime(DATE))))
             res2.append((res.get(trying.strftime(DATE), 0)))
             trying=datetime.timedelta(days=1)+trying
         im=sparkline_discrete(results=res2, width=5, height=100)

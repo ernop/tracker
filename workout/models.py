@@ -78,7 +78,7 @@ class Set(MyJsReplacementWorkout):
         super(Set, self).save(*args, **kwargs)
         
     class Meta:
-        ordering=['exweight__exercise',]
+        ordering=['id',]
         db_table='set'
 
 class ExWeight(MyJsReplacementWorkout):
@@ -141,6 +141,7 @@ class MeasuringSpot(MyJsReplacementWorkout):
     name=models.CharField(max_length=100, unique=True)
     domain=models.ForeignKey(Domain, related_name='measuring_spots')
     created=models.DateField(auto_now_add=True)
+    exclude_zeros=models.BooleanField()
     def __unicode__(self):
         return '%s'%(self.name, )
         
