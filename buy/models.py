@@ -121,7 +121,7 @@ class Purchase(models.Model):
     #domain=models.ForeignKey(Domain, related_name='purchases')
     created=models.DateField()
     quantity=models.FloatField()
-    size=models.TextField(max_length=100, null=True, blank=True)
+    size=models.CharField(max_length=100, null=True, blank=True)
     cost=models.FloatField()
     currency=models.ForeignKey('Currency')
     source=models.ForeignKey(Source, related_name='purchases')
