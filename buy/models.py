@@ -148,7 +148,7 @@ class Purchase(models.Model):
     
 class Person(MyJsReplacementBuy):
     first_name=models.CharField(max_length=100)
-    last_name=models.CharField(max_length=100)
+    last_name=models.CharField(max_length=100, blank=True, null=True)
     birthday=models.DateField(blank=True, null=True)
     met_through=models.ManyToManyField('Person', symmetrical=False, blank=True, null=True)
     created=models.DateField(auto_now_add=True)
