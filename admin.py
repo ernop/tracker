@@ -80,7 +80,7 @@ class ProductAdmin(OverriddenModelAdmin):
     adminify(mylastmonth, mypurchases, mydomain)
 
 class PurchaseAdmin(OverriddenModelAdmin):
-    list_display='id myproduct mydomain mycost mysource mywho_with mycreated note'.split()
+    list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
     list_filter='source currency product__domain who_with'.split()
     date_hierarchy='created'
     list_editable=['note',]
@@ -103,7 +103,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
         return obj.product.clink()
     
     def mywho_with(self, obj):
-        return ','.join([per.adm() for per in obj.who_with.all()])    
+        return ', '.join([per.adm() for per in obj.who_with.all()])    
     
     def mydomain(self, obj):
         return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.product.domain.id, obj.product.domain)
