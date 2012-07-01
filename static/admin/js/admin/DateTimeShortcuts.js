@@ -1,4 +1,4 @@
-// Inserts shortcut buttons after all of the following:a
+// Inserts shortcut buttons after all of the following:aa
 //     <input type="text" class="vDateField">
 //     <input type="text" class="vTimeField">
 

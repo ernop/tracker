@@ -2,7 +2,8 @@
 local
 trackenv
 soft
-trackenv
+trackerenv
 backup
 sp
 static/sparklines
+staticx
