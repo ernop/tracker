@@ -103,7 +103,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
         return obj.product.clink()
     
     def mywho_with(self, obj):
-        return '%s'%''.join([per.adm() for per in obj.who_with.all()])    
+        return ','.join([per.adm() for per in obj.who_with.all()])    
     
     def mydomain(self, obj):
         return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.product.domain.id, obj.product.domain)
@@ -170,6 +170,7 @@ class DomainAdmin(OverriddenModelAdmin):
 class PersonAdmin(OverriddenModelAdmin):
     list_display='id first_name last_name birthday mymet_through'.split()
     list_filter=['met_through',]
+    list_editable=['birthday',]
     
     def mymet_through(self, obj):
         return '%s'%''.join([str(per) for per in obj.met_through.all()])
