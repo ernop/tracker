@@ -37,10 +37,6 @@ class OverriddenModelAdmin(admin.ModelAdmin):
               '/static/admin/js/admin/DateTimeShortcuts.js','/static/js/DjangoAjax.js',
               )    
         med=Media(js=js)
-        #print 'media;',
-        for u in med.render_js():
-            print u
-        #return js
         return med
     
     media=property(_media)
@@ -112,12 +108,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     mywho_with.display_name='Who With'
     formfield_for_dbfield=mk_default_field({'hour':get_named_hour, 'quantity':1,'created':datetime.datetime.now, 'currency':1})
     formfield_form_foreignkey=mk_default_fkfield({'currency':1,'hour':gethour,})
-    fields='product cost quantity source currency created hour who_with note'.split()
-    #formfield_overrides = {
-            #models.DateTimeField: {'widget': BetterDateWidget},
-            ##models.DateField: {'widget': widgets.Input,},
-            #models.DateField: { 'widget': BetterDateWidget,}
-        #}
+    fields='product cost source size quantity created hour who_with note currency '.split()
 
 class DomainAdmin(OverriddenModelAdmin):
     list_display='id name myproducts mytotal myspent mycreated'.split()
