@@ -126,7 +126,7 @@ class Purchase(models.Model):
     cost=models.FloatField()
     currency=models.ForeignKey('Currency')
     source=models.ForeignKey(Source, related_name='purchases')
-    who_with=models.ManyToManyField('Person', related_name='purchases', blank=True, null=True, widget=FilteredSelectMultiple())
+    who_with=models.ManyToManyField('Person', related_name='purchases', blank=True, null=True)
     hour=models.IntegerField(choices=HOUR_CHOICES)
     note=models.CharField(max_length=2000, blank=True, null=True)
 
