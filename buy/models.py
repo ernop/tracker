@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db.models import Sum
 from utils import rstripz
 from trackerutils import *
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 def lnk(nodel, id, obj):
     return '<a href="/admin/buy/%s/%d/">%s</a>'%(nodel, id, str(obj))
@@ -20,20 +21,20 @@ class Domain(MyJsReplacementBuy):
     """
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
-            
+
     class Meta:
-        db_table='domain'    
+        db_table='domain'
         ordering=['name',]
-            
+
     def __unicode__(self):
         return self.name
-    
+
     def all_products_link(self):
         return '<a href="/admin/buy/product/?domain__id=%d">all prod</a>'%(self.id)
-    
+
     def all_purchases_link(self):
         return '<a href="/admin/buy/purchase/?product__domain__id__exact=%d">all purch</a>'%(self.id)
-    
+
     def summary(self):
         sums='<br>'.join([oo.summary() for oo in self.products.all() if oo.summary()])
         ct=self.products.count()
@@ -41,22 +42,22 @@ class Domain(MyJsReplacementBuy):
             return '%d products (%s) (%s)<br>%s'%(ct,
                                                              self.all_products_link(),
                                                              self.all_purchases_link(),
-                                                             sums,)        
+                                                             sums,)
         else:
             return '%d products'%(ct,)
-    
+
     def clink(self):
-        return clink('domain', self.id, self)            
-    
+        return clink('domain', self.id, self)
+
 class Source(MyJsReplacementBuy):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
     class Meta:
-        db_table='source'    
+        db_table='source'
         ordering=['name',]
-            
+
     def __unicode__(self):
-            return self.name        
+            return self.name
     def clink(self):
         return clink('source', self.id, self)
     def summary(self):
@@ -66,10 +67,10 @@ class Source(MyJsReplacementBuy):
                 #self.all_products_link(),
                 self.all_purchases_link(),
                 '<br>'.join([oo.summary(source=self) for oo in Product.objects.filter(purchases__source=self).distinct()]),)
-    
+
     def all_purchases_link(self):
-        return '<a href="/admin/buy/purchase/?source__id=%d">all purch</a>'%(self.id)    
-    
+        return '<a href="/admin/buy/purchase/?source__id=%d">all purch</a>'%(self.id)
+
 class Product(MyJsReplacementBuy):
     name=models.CharField(max_length=100, unique=True)
     created=models.DateField(auto_now_add=True)
@@ -78,11 +79,11 @@ class Product(MyJsReplacementBuy):
         db_table='product'
         ordering=['name',]
     def __unicode__(self):
-        return self.name            
+        return self.name
 
     def adm(self):
-        return lnk('product',self.id, self)    
-    
+        return lnk('product',self.id, self)
+
     def clink(self):
         return clink('product', self.id, self)
 
@@ -108,13 +109,13 @@ class Currency(MyJsReplacementBuy):
     symbol=models.CharField(max_length=10)
     created=models.DateField(auto_now_add=True)
     class Meta:
-        db_table='currency'  
+        db_table='currency'
         ordering=['name',]
-            
+
     def __unicode__(self):
-        return self.name            
+        return self.name
     def adm(self):
-        return lnk('currency',self.id, self)    
+        return lnk('currency',self.id, self)
 
 class Purchase(models.Model):
     product=models.ForeignKey(Product, related_name='purchases')
@@ -125,41 +126,41 @@ class Purchase(models.Model):
     cost=models.FloatField()
     currency=models.ForeignKey('Currency')
     source=models.ForeignKey(Source, related_name='purchases')
-    who_with=models.ManyToManyField('Person', related_name='purchases', blank=True, null=True)
+    who_with=models.ManyToManyField('Person', related_name='purchases', blank=True, null=True, widget=FilteredSelectMultiple())
     hour=models.IntegerField(choices=HOUR_CHOICES)
     note=models.CharField(max_length=2000, blank=True, null=True)
-    
+
     class Meta:
-        db_table='purchase'    
+        db_table='purchase'
         ordering=['-created','product__name',]
-    
+
     def __unicode__(self):
         res='%s'%self.product
         if not self.quantity==1:
             res+='(%d)'%self.quantity
         res+=' for %s%s'%(self.currency.symbol, rstripz(self.cost))
         return res
-    
+
     def adm(self):
-        return lnk('purchase',self.id, self)    
-    
+        return lnk('purchase',self.id, self)
+
     def clink(self):
         return clink('purchase', self.id, self)
-    
+
 class Person(MyJsReplacementBuy):
     first_name=models.CharField(max_length=100)
     last_name=models.CharField(max_length=100, blank=True, null=True)
     birthday=models.DateField(blank=True, null=True)
     met_through=models.ManyToManyField('Person', symmetrical=False, blank=True, null=True)
     created=models.DateField(auto_now_add=True)
-    
+
     class Meta:
         db_table='person'
         ordering=['first_name','last_name',]
-        
+
     def __unicode__(self):
         return '%s %s'%(self.first_name, self.last_name)
 
     def adm(self):
         return lnk('person',self.id, self)
-    
+
