@@ -51,6 +51,7 @@ def gethour():
     log.info('hour %d res %s',hour, res)
 
 def savetmp(self):
+    #import ipdb;ipdb.set_trace()
     out=tempfile.NamedTemporaryFile(dir=settings.SPARKLINES_DIR, delete=False)
     self.save(out,'png')
     print 'created',out.name
