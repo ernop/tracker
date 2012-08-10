@@ -5,8 +5,8 @@ from django.conf import settings
 SPAN_CHOICES=(('m','month'),('w','week'),('y','year'))
 span2days={'w':7,'m':30,'y':365}
 
-import logging
-log=logging.getLogger(__name__)
+#import logging
+#log=logging.getLogger(__name__)
 
 class MyJsReplacementWorkout(models.Model):
     #def _media(self):
@@ -49,12 +49,11 @@ def gethour():
     else:
         res='midnight'
     log.info('hour %d res %s',hour, res)
+    return res
 
 def savetmp(self):
-    #import ipdb;ipdb.set_trace()
     out=tempfile.NamedTemporaryFile(dir=settings.SPARKLINES_DIR, delete=False)
     self.save(out,'png')
-    print 'created',out.name
     os.chmod(out.name, 0644)
     return out
 

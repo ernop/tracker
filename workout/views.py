@@ -40,6 +40,4 @@ class WorkoutForm(forms.ModelForm):
 def make_workout(request):
     vals={}
     vals['form']=WorkoutForm()
-    if request.method=='POST':
-        import ipdb;ipdb.set_trace()
     return render_to_response('make_workout.html',vals,RequestContext(request))

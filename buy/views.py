@@ -19,4 +19,3 @@ def days(request):
 
 def domain_total(request, domain):
     dom=Domain.objects.get(name=domain)
-    import ipdb;ipdb.set_trace()
