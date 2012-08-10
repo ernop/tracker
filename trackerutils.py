@@ -5,8 +5,8 @@ from django.conf import settings
 SPAN_CHOICES=(('m','month'),('w','week'),('y','year'))
 span2days={'w':7,'m':30,'y':365}
 
-#import logging
-#log=logging.getLogger(__name__)
+import logging
+log=logging.getLogger(__name__)
 
 class MyJsReplacementWorkout(models.Model):
     #def _media(self):
