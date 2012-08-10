@@ -14,6 +14,37 @@ def clink(nodel, id, obj):
 
 from trackerutils import MyJsReplacementBuy
 
+class SpanAverage(MyJsReplacementBuy):
+    """for a span of time, starting date, and given domain (not general enough...) what was the running average per day spent on it?"""
+    """not working"""
+    domain=models.ForeignKey('Domain')
+    start_date=models.DateField()
+    span=models.CharField(max_length=1, choices=SPAN_CHOICES)
+    value=models.FloatField()
+    
+    def calc(self):
+        import ipdb;ipdb.set_trace()
+        days=span2days[self.span]
+        now=datetime.datetime.now()
+        end=min(now, start_date+datetime.timedelta(days=days))
+        partial=False
+        if end==now:
+            partial=True
+        purch=Purchase.objects.filter(product__domain=self.domain, created__gt=self.start_date, created__lte=end)
+        res=0
+        for p in purch:
+            res+=p.cost
+        self.value=res
+        self.save()
+
+    def __unicode__(self):
+        if self.value is None:
+            self.calc()
+        return '%0.1f/day for the %s starting %s'%(self.value, self.span, self.start_date)
+
+SPAN_CHOICES=(('m','month'),('w','week'),('y','year'))
+span2days={'w':7,'m':30,'y':365}
+
 class Domain(MyJsReplacementBuy):
     """
     body, house, experiences, food, stuff, clothes, etc.
@@ -39,14 +70,17 @@ class Domain(MyJsReplacementBuy):
         ct=self.products.count()
         if ct:
             return '%d products (%s) (%s)<br>%s'%(ct,
-                                                             self.all_products_link(),
-                                                             self.all_purchases_link(),
-                                                             sums,)        
+                                                  self.all_products_link(),
+                                                  self.all_purchases_link(),
+                                                  sums,)        
         else:
             return '%d products'%(ct,)
     
     def clink(self):
         return clink('domain', self.id, self)            
+
+    def piechart(self):
+        
     
 class Source(MyJsReplacementBuy):
     name=models.CharField(max_length=100)
@@ -104,6 +138,7 @@ class Product(MyJsReplacementBuy):
         return '<a href="/admin/buy/purchase/?product__id=%d">%s</a> %s for %s%s'%(self.id, str(self), count, ('%f'%cost).rstrip('0').rstrip('.'), symbol)
 
 class Currency(MyJsReplacementBuy):
+    """changed from currency; now, it represents an account i.e. cash, a specific bank acct, taobao"""
     name=models.CharField(max_length=100, unique=True)
     symbol=models.CharField(max_length=10)
     created=models.DateField(auto_now_add=True)
