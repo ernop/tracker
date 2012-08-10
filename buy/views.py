@@ -16,3 +16,7 @@ def days(request):
     now=datetime.datetime.now()
     dayrange=min(180.0,(abs((now-earliest).days))+1)
     return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)    
+
+def domain_total(request, domain):
+    dom=Domain.objects.get(name=domain)
+    import ipdb;ipdb.set_trace()

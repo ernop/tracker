@@ -141,8 +141,8 @@ class DomainAdmin(OverriddenModelAdmin):
     
     def mytotal(self, obj):
         """in the last month"""
-        sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
-        total=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).filter(created__gte=sixmonthago).aggregate(Sum('cost'))['cost__sum']
+        #sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
+        total=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).aggregate(Sum('cost'))['cost__sum']#.filter(created__gte=sixmonthago)
         ear=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).order_by('created')
         earliest=None
         if ear:
