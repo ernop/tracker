@@ -19,8 +19,8 @@ if LOCAL:
         'default': {
             'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
             'NAME': 'django_track',                      # Or path to database file if using sqlite3.
-            'USER': 'djangotrack',                      # Not used with sqlite3.
-            'PASSWORD':open(pw,'r').read().strip(),
+            'USER': '',                      # Not used with sqlite3.
+            'PASSWORD':'',
             'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
             'PORT': '',                      #WSGI Set to empty string for default. Not used with sqlite3.
         }
@@ -31,7 +31,7 @@ else:
             'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
             'NAME': 'django_track',                      # Or path to database file if using sqlite3.
             'USER': 'djangotrack',                      # Not used with sqlite3.
-            'PASSWORD':open(pw,'r').read().strip(),
+            'PASSWORD':open('pw','r').read().strip(),
             'HOST': 'mysql.fuseki.net',                      # Set to empty string for localhost. Not used with sqlite3.
             'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
         }

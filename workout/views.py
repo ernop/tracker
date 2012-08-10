@@ -7,7 +7,7 @@ from django.forms.models import (modelform_factory, modelformset_factory, inline
 from django.shortcuts import HttpResponseRedirect
 from workout.models import *
 from django.template import RequestContext
-from admin import *
+#from admin import *
 from django.forms.formsets import formset_factory
 from django import forms
 
