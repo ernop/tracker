@@ -2,6 +2,11 @@ import datetime, tempfile, os
 
 from django.db import models
 from django.conf import settings
+SPAN_CHOICES=(('m','month'),('w','week'),('y','year'))
+span2days={'w':7,'m':30,'y':365}
+
+import logging
+log=logging.getLogger(__name__)
 
 class MyJsReplacementWorkout(models.Model):
     #def _media(self):
@@ -28,20 +33,22 @@ class MyJsReplacementBuy(models.Model):
 def gethour():
     hour=datetime.datetime.now().hour
     if hour<2:
-        return 'midnight'
+        res= 'midnight'
     if hour<5:
-        return 'deep night'
+        res='deep night'
     if hour<7:
-        return 'early morning'
+        res='early morning'
     if hour<11:
-        return 'morning'
+        res='morning'
     elif hour<14:
-        return 'noon'
+        res='noon'
     elif hour<=20:
-        return 'evening'
+        res='evening'
     elif hour<=23:
-        return 'night'
-    return 'midnight'
+        res='night'
+    else:
+        res='midnight'
+    log.info('hour %d res %s',hour, res)
 
 def savetmp(self):
     out=tempfile.NamedTemporaryFile(dir=settings.SPARKLINES_DIR, delete=False)
