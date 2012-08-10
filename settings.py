@@ -86,9 +86,9 @@ if LOCAL:
         # Put strings here, like "/home/html/static" or "C:/www/django/static".
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
-        '/home/ernie/proj/tracker/static',
+        'p:/proj/tracker/static',
     )
-    SPARKLINES_DIR='/home/ernie/proj/tracker/static/sparklines'
+    SPARKLINES_DIR='p:/proj/tracker/static/sparklines'
 else:
     STATICFILES_DIRS=(
         '/home/ernop/django.fuseki.net/tracker/static',
