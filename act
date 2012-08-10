@@ -1,1 +1,1 @@
-source trackerenv/Scripts/activate
+source env/Scripts/activate

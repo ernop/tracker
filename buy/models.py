@@ -43,8 +43,7 @@ class SpanAverage(MyJsReplacementBuy):
             self.calc()
         return '%0.1f/day for the %s starting %s'%(self.value, self.span, self.start_date)
 
-SPAN_CHOICES=(('m','month'),('w','week'),('y','year'))
-span2days={'w':7,'m':30,'y':365}
+
 
 class Domain(MyJsReplacementBuy):
     """
