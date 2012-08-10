@@ -382,7 +382,6 @@ class WorkoutAdmin(OverriddenModelAdmin):
             weights['sets']=zets
             res2[exercise]=weights
         res3=''
-        #import ipdb;ipdb.set_trace()
         for exercise, summary in sorted(res2.items(), key=lambda x:x[1]['sets'][0].id):
             #order by set id, so the order you do them in the workout is right.
             res3+='%s '%exercise.clink()

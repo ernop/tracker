@@ -153,9 +153,9 @@ def group_required(*group_names):
     elif 'sales' in group_names:
         login_url='/admin/'
     else:
-        logger.error('there was an error in group_required. for groups %s'%str(group_names))
-        import traceback
-        logger.error(traceback.format_exc())
+        #logger.error('there was an error in group_required. for groups %s'%str(group_names))
+        #import traceback
+        #logger.error(traceback.format_exc())
         login_url='/'
     #also redirects them to the proper group login.... assuming
     #we even want to keep multiple login pages for the separate groups.

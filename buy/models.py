@@ -24,7 +24,6 @@ class SpanAverage(MyJsReplacementBuy):
     value=models.FloatField()
     
     def calc(self):
-        import ipdb;ipdb.set_trace()
         days=span2days[self.span]
         now=datetime.datetime.now()
         end=min(now, start_date+datetime.timedelta(days=days))
