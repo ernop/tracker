@@ -10,3 +10,4 @@ staticx
 pw
 backups
 env
+local_settings.py
