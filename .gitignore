@@ -9,9 +9,4 @@ static/sparklines
 staticx
 pw
 backups
-<<<<<<< HEAD
 env
-=======
-env
-local_settings.py
->>>>>>> fa3ed3e1bd52858d13a9af7f08ac690eba687c2c
