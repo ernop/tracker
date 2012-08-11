@@ -8,9 +8,8 @@ from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 
 #import djangoplus.widgets 
 from spark import *
-PIE_WIDTH, PIE_HEIGHT= 420, 300
-LG=[PIE_WIDTH, PIE_HEIGHT]
-MED=[290,200]
+LG=[700, 427]
+MED=[340,200]
 SM=[200,100]
 
 from trackerutils import *
