@@ -8,6 +8,7 @@ requires = [
     'jinja2',
     'coffin',    
     'simplejson',
+    'pygooglechart',
     ]
 
 setup(name='django tracker', version='0.0.1',

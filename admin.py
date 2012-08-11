@@ -22,6 +22,7 @@ from pygooglechart import PieChart2D
 
 def chart_url(data, size=None):
     data.sort()
+    data=[d for d in data if d[0]]
     if not size:
         size=[PIE_WIDTH, PIE_HEIGHT]
     pc=PieChart2D(*size)
