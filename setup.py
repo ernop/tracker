@@ -5,6 +5,9 @@ requires = [
     'MySQL-python',
     'PIL',
     'ipdb',
+    'jinja2',
+    'coffin',    
+    'simplejson',
     ]
 
 setup(name='django tracker', version='0.0.1',

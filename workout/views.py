@@ -2,7 +2,7 @@ import datetime
 
 # Create your views here.
 
-from coffin.shortcuts import *
+#from coffin.shortcuts import *
 from django.forms.models import (modelform_factory, modelformset_factory, inlineformset_factory, BaseInlineFormSet)
 from django.shortcuts import HttpResponseRedirect
 from workout.models import *
