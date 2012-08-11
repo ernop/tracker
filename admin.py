@@ -24,7 +24,14 @@ def chart_url(data, size=None):
     data.sort()
     data=[d for d in data if d[0]]
     if not size:
-        size=[PIE_WIDTH, PIE_HEIGHT]
+        if len(data)<=1:
+            return ''
+        elif len(data)<3:
+            size=SM
+        elif len(data)<6:
+            size=MED
+        else:
+            size=LG
     pc=PieChart2D(*size)
     pc.add_data([d[0] for d in data])
     pc.set_pie_labels([d[1] for d in data])
@@ -94,11 +101,7 @@ class ProductAdmin(OverriddenModelAdmin):
         pie=''
         sources=Source.objects.filter(purchases__product=obj).distinct()
         dat=[(ss.total_spent(product=obj), str(ss)) for ss in sources]
-        if sources.count()>1:
-            if sources.count()>5:
-                pie=chart_url(dat, LG)
-            else:
-                pie=chart_url(dat, SM)
+        pie=chart_url(dat)
         return '%s<p>%s'%(pie, spark)
     
     adminify(mylastmonth, mypurchases, mydomain)
@@ -147,11 +150,11 @@ class DomainAdmin(OverriddenModelAdmin):
         res=''
         if obj.products.count()>1:
             dat=[(p.total_spent(), str(p)) for p in obj.products.all()]
-            cu=chart_url(dat, LG)
+            cu=chart_url(dat)
             if cu:
                 res+='Life<br>%s'%cu
             dat=[(p.total_spent(start=monthago()),str(p)) for p in obj.products.all()]
-            cu=chart_url(dat, LG)
+            cu=chart_url(dat)
             if cu:
                 res+='<p>Month<br>%s'%cu
         return res
@@ -246,13 +249,7 @@ class SourceAdmin(OverriddenModelAdmin):
     def mypie(self, obj):
         products=Product.objects.filter(purchases__source=obj).distinct()
         dat=[(oo.total_spent(source=obj),str(oo)) for oo in products]
-        if products.count()<=1:
-            sz=None
-        elif products.count()<4:
-            return chart_url(data=dat, size=MED)
-        else:
-            return chart_url(data=dat, size=LG)
-        return ''
+        return chart_url(dat)
     
     def mysummary(self, obj):
         return obj.summary()
