@@ -1,0 +1,1 @@
+RMB_CURRENCY_IDS=[1,7]

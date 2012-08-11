@@ -8,13 +8,30 @@ from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 
 #import djangoplus.widgets 
 from spark import *
+PIE_WIDTH, PIE_HEIGHT= 420, 300
+LG=[PIE_WIDTH, PIE_HEIGHT]
+MED=[290,200]
+SM=[200,100]
 
 from trackerutils import *
 from tracker.buy.models import *
 from tracker.workout.models import *
 from tracker.utils import adminify, DATE, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
 from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
+from pygooglechart import PieChart2D
 
+def chart_url(data, size=None):
+    data.sort()
+    if not size:
+        size=[PIE_WIDTH, PIE_HEIGHT]
+    pc=PieChart2D(*size)
+    pc.add_data([d[0] for d in data])
+    pc.set_pie_labels([d[1] for d in data])
+    try:
+        return '<img src="%s">'%pc.get_url()
+    except:
+        return ''
+    
 class BetterDateWidget(admin.widgets.AdminDateWidget):
     def render(self, name, value, attrs=None):
         return super(BetterDateWidget, self).render(name, value)
@@ -43,7 +60,7 @@ class OverriddenModelAdmin(admin.ModelAdmin):
 
 class ProductAdmin(OverriddenModelAdmin):
     list_display='name mydomain mypurchases mylastmonth'.split()
-    
+        
     def mydomain(self, obj):
         return obj.domain.clink()
     
@@ -54,24 +71,34 @@ class ProductAdmin(OverriddenModelAdmin):
     def mylastmonth(self, obj):
         purch=Purchase.objects.filter(product=obj)
         if not purch:
-            return ''
-        mindate=None
-        res={}
-        for pu in purch:
-            date=pu.created.strftime(DATE)
-            res[date]=res.get(date, 0)+1
-            if not mindate or date<mindate:
-                mindate=date
-        first=datetime.datetime.strptime(mindate, DATE)
-        now=datetime.datetime.now()
-        trying=first
-        res2=[]
-        while trying<now:
-            res2.append((res.get(trying.strftime(DATE), 0)))
-            trying=datetime.timedelta(days=1)+trying
-        im=sparkline_discrete(results=res2, width=5, height=30)
-        tmp=savetmp(im)
-        return '<img style="border:2px solid grey;"  src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
+            spark= ''
+        else:
+            mindate=None
+            res={}
+            for pu in purch:
+                date=pu.created.strftime(DATE)
+                res[date]=res.get(date, 0)+1
+                if not mindate or date<mindate:
+                    mindate=date
+            first=datetime.datetime.strptime(mindate, DATE)
+            now=datetime.datetime.now()
+            trying=first
+            res2=[]
+            while trying<now:
+                res2.append((res.get(trying.strftime(DATE), 0)))
+                trying=datetime.timedelta(days=1)+trying
+            im=sparkline_discrete(results=res2, width=5, height=30)
+            tmp=savetmp(im)
+            spark='<img style="border:2px solid grey;"  src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
+        pie=''
+        sources=Source.objects.filter(purchases__product=obj).distinct()
+        dat=[(ss.total_spent(product=obj), str(ss)) for ss in sources]
+        if sources.count()>1:
+            if sources.count()>5:
+                pie=chart_url(dat, LG)
+            else:
+                pie=chart_url(dat, SM)
+        return '%s<p>%s'%(pie, spark)
     
     adminify(mylastmonth, mypurchases, mydomain)
 
@@ -80,6 +107,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     list_filter='source currency product__domain who_with'.split()
     date_hierarchy='created'
     list_editable=['note',]
+    search_fields='product__name'.split()
     
     def mysource(self, obj):
         return obj.source.clink()
@@ -111,35 +139,26 @@ class PurchaseAdmin(OverriddenModelAdmin):
     fields='product cost source size quantity created hour who_with note currency '.split()
 
 class DomainAdmin(OverriddenModelAdmin):
-    list_display='id name myproducts mytotal myspent mycreated'.split()
+    list_display='id name myproducts mypie myspent'.split()
     list_filter=['name',]
+    
+    def mypie(self, obj):
+        res=''
+        if obj.products.count()>1:
+            dat=[(p.total_spent(), str(p)) for p in obj.products.all()]
+            cu=chart_url(dat, LG)
+            if cu:
+                res+='Life<br>%s'%cu
+            dat=[(p.total_spent(start=monthago()),str(p)) for p in obj.products.all()]
+            cu=chart_url(dat, LG)
+            if cu:
+                res+='<p>Month<br>%s'%cu
+        return res
     
     def myproducts(self, obj):
         return obj.summary()
         
     def myspent(self, obj):
-        purch=Purchase.objects.filter(product__domain=obj)
-        if not purch:
-            return ''
-        mindate=None
-        res={}
-        for pu in purch:
-            date=pu.created.strftime(DATE)
-            res[date]=res.get(date, 0)+pu.cost
-            if not mindate or date<mindate:
-                mindate=date
-        first=datetime.datetime.strptime(mindate, DATE)
-        now=datetime.datetime.now()
-        trying=first
-        res2=[]
-        while trying<now:
-            res2.append((res.get(trying.strftime(DATE), 0)))
-            trying=datetime.timedelta(days=1)+trying
-        im=sparkline_discrete(results=res2, width=5, height=100)
-        tmp=savetmp(im)
-        return '<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
-    
-    def mytotal(self, obj):
         """in the last month"""
         #sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
         total=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).aggregate(Sum('cost'))['cost__sum']#.filter(created__gte=sixmonthago)
@@ -148,15 +167,38 @@ class DomainAdmin(OverriddenModelAdmin):
         if ear:
             earliest=datetime.datetime.combine(ear[0].created, datetime.time())
         else:
-            return ''
+            total= ''
         if total and ear:
             now=datetime.datetime.now()
             dayrange=min(180.0,(abs((now-earliest).days))+1)
-            return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
-        
+            total='%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)        
+            
+        purch=Purchase.objects.filter(product__domain=obj)
+        if not purch:
+            graph=''
+        else:
+            mindate=None
+            res={}
+            for pu in purch:
+                date=pu.created.strftime(DATE)
+                res[date]=res.get(date, 0)+pu.cost
+                if not mindate or date<mindate:
+                    mindate=date
+            first=datetime.datetime.strptime(mindate, DATE)
+            now=datetime.datetime.now()
+            trying=first
+            res2=[]
+            while trying<now:
+                res2.append((res.get(trying.strftime(DATE), 0)))
+                trying=datetime.timedelta(days=1)+trying
+            im=sparkline_discrete(results=res2, width=2, height=100)
+            tmp=savetmp(im)
+            graph='<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
+        return '%s<p>%s'%(total, graph)
+            
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
-    adminify(myproducts, myspent, mytotal, mycreated)
+    adminify(myproducts, myspent, mycreated, mypie)
     
 class PersonAdmin(OverriddenModelAdmin):
     list_display='id first_name last_name birthday mymet_through'.split()
@@ -196,14 +238,23 @@ class CurrencyAdmin(OverriddenModelAdmin):
         
     adminify(mytotal, my3months)
 
+
 class SourceAdmin(OverriddenModelAdmin):
-    list_display='name mytotal mysummary'.split()
+    list_display='name mytotal mypie mysummary'.split()
+    
+    def mypie(self, obj):
+        products=Product.objects.filter(purchases__source=obj).distinct()
+        dat=[(oo.total_spent(source=obj),str(oo)) for oo in products]
+        if products.count()<=1:
+            sz=None
+        elif products.count()<4:
+            return chart_url(data=dat, size=MED)
+        else:
+            return chart_url(data=dat, size=LG)
+        return ''
     
     def mysummary(self, obj):
         return obj.summary()
-    
-    #def mypurch(self, obj):
-        #return '%s'%obj.all_purchases_link()
     
     def mytotal(self, obj):
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
@@ -218,9 +269,7 @@ class SourceAdmin(OverriddenModelAdmin):
             dayrange=min(30.0,(abs((now-earliest).days))+1)
             return '%0.0f%s<br>%s%s /day<br>(%d days)'%(total, Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
         
-    adminify(mytotal, mysummary)
-
-
+    adminify(mytotal, mysummary, mypie)
 
 class PMuscleInline(admin.StackedInline):
     model = Exercise.pmuscles.through

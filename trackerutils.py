@@ -8,6 +8,9 @@ span2days={'w':7,'m':30,'y':365}
 import logging
 log=logging.getLogger(__name__)
 
+def monthago():
+    return datetime.datetime.now()-datetime.timedelta(days=30)
+
 class MyJsReplacementWorkout(models.Model):
     #def _media(self):
         #import ipdb;ipdb.set_trace()

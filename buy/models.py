@@ -4,6 +4,7 @@ from django.db.models import Sum
 from utils import rstripz
 from trackerutils import *
 from django.contrib.admin.widgets import FilteredSelectMultiple
+from choices import *
 
 def lnk(nodel, id, obj):
     return '<a href="/admin/buy/%s/%d/">%s</a>'%(nodel, id, str(obj))
@@ -104,6 +105,17 @@ class Source(MyJsReplacementBuy):
     def all_purchases_link(self):
         return '<a href="/admin/buy/purchase/?source__id=%d">all purch</a>'%(self.id)
 
+    def total_spent(self, start=None, end=None, product=None):
+        valid=Purchase.objects.filter(source=self).filter(currency__id__in=RMB_CURRENCY_IDS)
+        if product:
+            valid=valid.filter(product=product)
+        if start:
+            valid=valid.filter(created__gt=start)
+        if end:
+            valid=valid.filter(created__lt=end)
+        cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
+        return cost        
+
 class Product(MyJsReplacementBuy):
     name=models.CharField(max_length=100, unique=True)
     created=models.DateField(auto_now_add=True)
@@ -123,9 +135,9 @@ class Product(MyJsReplacementBuy):
     def summary(self, source=None):
         """summary of all purchases of this product."""
         if source:
-            count=Purchase.objects.filter(product=self, source=source).filter(currency__id=1).aggregate(Sum('quantity'))['quantity__sum']
+            count=Purchase.objects.filter(product=self, source=source).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
         else:
-            count=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('quantity'))['quantity__sum']
+            count=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
         if not count:
             return ''
         if count==1:
@@ -134,8 +146,19 @@ class Product(MyJsReplacementBuy):
             count='('+str(count).rstrip('0').rstrip('.')+')'
         purches=Purchase.objects.filter(product=self)
         symbol=purches[0].currency.symbol
-        cost=Purchase.objects.filter(product=self).filter(currency__id=1).aggregate(Sum('cost'))['cost__sum'] or 0
+        cost=self.total_spent(source=source)
         return '<a href="/admin/buy/purchase/?product__id=%d">%s</a> %s for %s%s'%(self.id, str(self), count, ('%f'%cost).rstrip('0').rstrip('.'), symbol)
+
+    def total_spent(self, start=None, end=None, source=None):
+        valid=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS)
+        if source:
+            valid=valid.filter(source=source)
+        if start:
+            valid=valid.filter(created__gt=start)
+        if end:
+            valid=valid.filter(created__lt=end)
+        cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
+        return cost
 
 class Currency(MyJsReplacementBuy):
     """changed from currency; now, it represents an account i.e. cash, a specific bank acct, taobao"""
