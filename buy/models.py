@@ -147,7 +147,7 @@ class Product(MyJsReplacementBuy):
         purches=Purchase.objects.filter(product=self)
         symbol=purches[0].currency.symbol
         cost=self.total_spent(source=source)
-        return '<a href="/admin/buy/purchase/?product__id=%d">%s</a> %s for %s%s'%(self.id, str(self), count, ('%f'%cost).rstrip('0').rstrip('.'), symbol)
+        return '<a href="/admin/buy/product/?id=%d">%s</a> %s for %s%s'%(self.id, str(self), count, ('%f'%cost).rstrip('0').rstrip('.'), symbol)
 
     def total_spent(self, start=None, end=None, source=None):
         valid=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS)

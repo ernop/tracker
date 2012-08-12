@@ -11,7 +11,7 @@ from spark import *
 LG=[700, 427]
 MED=[340,200]
 SM=[200,100]
-
+from choices import *
 from trackerutils import *
 from tracker.buy.models import *
 from tracker.workout.models import *
@@ -20,7 +20,7 @@ from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
 from pygooglechart import PieChart2D
 
 class PurchaseForm(forms.ModelForm):
-    who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False))
+    who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False), requred=False)
     class Meta:
         model = Purchase
 
@@ -36,7 +36,7 @@ def chart_url(data, size=None):
             size=MED
         else:
             size=LG
-    pc=PieChart2D(*size)
+    pc=PieChart2D(*size, colours=('0000FF',))
     pc.add_data([d[0] for d in data])
     pc.set_pie_labels([d[1] for d in data])
     try:
@@ -71,16 +71,16 @@ class OverriddenModelAdmin(admin.ModelAdmin):
     media=property(_media)
 
 class ProductAdmin(OverriddenModelAdmin):
-    list_display='name mydomain mypurchases mylastmonth'.split()
+    list_display='name mydomain mypurchases mypie'.split()
         
     def mydomain(self, obj):
         return obj.domain.clink()
     
     def mypurchases(self, obj):
-        return obj.summary()
-        return ','.join([p.adm() for p in Purchase.objects.filter(product=obj)])
+        #return obj.summary()
+        return '<br>'.join([p.adm() for p in Purchase.objects.filter(product=obj)])
     
-    def mylastmonth(self, obj):
+    def mypie(self, obj):
         purch=Purchase.objects.filter(product=obj)
         if not purch:
             spark= ''
@@ -106,9 +106,9 @@ class ProductAdmin(OverriddenModelAdmin):
         sources=Source.objects.filter(purchases__product=obj).distinct()
         dat=[(ss.total_spent(product=obj), str(ss)) for ss in sources]
         pie=chart_url(dat)
-        return '%s<p>%s'%(pie, spark)
+        return '<h2>%s</h2>%s<br>%s'%(obj.name, pie, spark)
     
-    adminify(mylastmonth, mypurchases, mydomain)
+    adminify(mypie, mypurchases, mydomain)
 
 class PurchaseAdmin(OverriddenModelAdmin):
     list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
@@ -156,7 +156,7 @@ class DomainAdmin(OverriddenModelAdmin):
             dat=[(p.total_spent(), str(p)) for p in obj.products.all()]
             cu=chart_url(dat)
             if cu:
-                res+='Life<br>%s'%cu
+                res+='<h2>%s</h2><br>Lifetime<br>%s'%(obj.name, cu)
             dat=[(p.total_spent(start=monthago()),str(p)) for p in obj.products.all()]
             cu=chart_url(dat)
             if cu:
@@ -169,8 +169,8 @@ class DomainAdmin(OverriddenModelAdmin):
     def myspent(self, obj):
         """in the last month"""
         #sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
-        total=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).aggregate(Sum('cost'))['cost__sum']#.filter(created__gte=sixmonthago)
-        ear=Purchase.objects.filter(currency__name='rmb').filter(product__domain=obj).order_by('created')
+        total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(product__domain=obj).aggregate(Sum('cost'))['cost__sum']#.filter(created__gte=sixmonthago)
+        ear=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(product__domain=obj).order_by('created')
         earliest=None
         if ear:
             earliest=datetime.datetime.combine(ear[0].created, datetime.time())
@@ -203,6 +203,9 @@ class DomainAdmin(OverriddenModelAdmin):
             tmp=savetmp(im)
             graph='<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
         return '%s<p>%s'%(total, graph)
+    
+    def my_month_history(self, obj):
+        purchases=Purchage.objects.filter()
             
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
@@ -222,8 +225,8 @@ class PersonAdmin(OverriddenModelAdmin):
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name symbol mytotal my3months'.split()
     def mytotal(self, obj):
-        total=Purchase.objects.filter(currency__name='rmb').filter(source=obj).aggregate(Sum('cost'))['cost__sum']
-        cre=Purchase.objects.filter(currency__name='rmb').filter(source=obj).order_by('created')
+        total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).aggregate(Sum('cost'))['cost__sum']
+        cre=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).order_by('created')
         earliest=None
         if cre:
             earliest=datetime.datetime.combine(cre[0].created, datetime.time())
@@ -234,8 +237,8 @@ class CurrencyAdmin(OverriddenModelAdmin):
 
     def my3months(self, obj):
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
-        total=Purchase.objects.filter(currency__name='rmb').filter(source=obj).filter(created__gte=monthago).aggregate(Sum('cost'))['cost__sum']
-        cre=Purchase.objects.filter(currency__name='rmb').filter(source=obj).order_by('created')
+        total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).filter(created__gte=monthago).aggregate(Sum('cost'))['cost__sum']
+        cre=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).order_by('created')
         earliest=None
         if cre:
             earliest=datetime.datetime.combine(cre[0].created, datetime.time())
@@ -260,8 +263,8 @@ class SourceAdmin(OverriddenModelAdmin):
     
     def mytotal(self, obj):
         monthago=datetime.datetime.now()-datetime.timedelta(days=30)
-        total=Purchase.objects.filter(currency__name='rmb').filter(source=obj).aggregate(Sum('cost'))['cost__sum']
-        ear=Purchase.objects.filter(currency__name='rmb').filter(source=obj).order_by('created')
+        total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).aggregate(Sum('cost'))['cost__sum']
+        ear=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).order_by('created')
         earliest=None
         if ear:
             earliest=datetime.datetime.combine(ear[0].created, datetime.time())
