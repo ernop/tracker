@@ -19,6 +19,11 @@ from tracker.utils import adminify, DATE, mk_default_field, nowdate, rstripz, mk
 from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
 from pygooglechart import PieChart2D
 
+class PurchaseForm(forms.ModelForm):
+    who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False))
+    class Meta:
+        model = Purchase
+
 def chart_url(data, size=None):
     data.sort()
     data=[d for d in data if d[0]]
@@ -111,7 +116,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     date_hierarchy='created'
     list_editable=['note',]
     search_fields='product__name'.split()
-    
+    form=PurchaseForm
     def mysource(self, obj):
         return obj.source.clink()
     
@@ -142,7 +147,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     fields='product cost source size quantity created hour who_with note currency '.split()
 
 class DomainAdmin(OverriddenModelAdmin):
-    list_display='id name myproducts mypie myspent'.split()
+    list_display='id myproducts mypie myspent'.split()
     list_filter=['name',]
     
     def mypie(self, obj):
