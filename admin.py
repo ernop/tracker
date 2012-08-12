@@ -18,7 +18,7 @@ from tracker.workout.models import *
 from tracker.utils import adminify, DATE, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
 from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
 from pygooglechart import PieChart2D
-
+RMBSYMBOL=Currency.objects.get(id=1).symbol
 class PurchaseForm(forms.ModelForm):
     who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False), required=False)
     class Meta:
@@ -36,9 +36,9 @@ def chart_url(data, size=None):
             size=MED
         else:
             size=LG
-    pc=PieChart2D(*size, colours=('0000FF',))
+    pc=PieChart2D(*size)
     pc.add_data([d[0] for d in data])
-    pc.set_pie_labels([d[1] for d in data])
+    pc.set_pie_labels(['%s (%0.0f)'%(d[1], d[0]) for d in data])
     try:
         return '<img src="%s">'%pc.get_url()
     except:
@@ -147,7 +147,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     fields='product cost source size quantity created hour who_with note currency '.split()
 
 class DomainAdmin(OverriddenModelAdmin):
-    list_display='id myproducts mypie myspent'.split()
+    list_display='id myproducts mypie mysource'.split()
     list_filter=['name',]
     
     def mypie(self, obj):
@@ -156,19 +156,14 @@ class DomainAdmin(OverriddenModelAdmin):
             dat=[(p.total_spent(), str(p)) for p in obj.products.all()]
             cu=chart_url(dat)
             if cu:
-                res+='<h2>%s</h2><br>Lifetime<br>%s'%(obj.name, cu)
+                res+='<h3>Lifetime</h3>%s'%(cu)
             dat=[(p.total_spent(start=monthago()),str(p)) for p in obj.products.all()]
             cu=chart_url(dat)
             if cu:
-                res+='<br><br>Month<br>%s'%cu
+                res+='<h3>Month</h3>%s'%cu
         return res
     
     def myproducts(self, obj):
-        return obj.summary()
-        
-    def myspent(self, obj):
-        """in the last month"""
-        #sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
         total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(product__domain=obj).aggregate(Sum('cost'))['cost__sum']#.filter(created__gte=sixmonthago)
         ear=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(product__domain=obj).order_by('created')
         earliest=None
@@ -179,7 +174,7 @@ class DomainAdmin(OverriddenModelAdmin):
         if total and ear:
             now=datetime.datetime.now()
             dayrange=min(180.0,(abs((now-earliest).days))+1)
-            total='%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)        
+            total='%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), RMBSYMBOL, rstripz(total/dayrange), RMBSYMBOL, dayrange)        
             
         purch=Purchase.objects.filter(product__domain=obj)
         if not purch:
@@ -202,20 +197,27 @@ class DomainAdmin(OverriddenModelAdmin):
             im=sparkline_discrete(results=res2, width=2, height=100)
             tmp=savetmp(im)
             graph='<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
+        summary=obj.summary()
+        return '<h2>%s</h2>%s<br>%s<br>%s<br>'%(obj.name, total, graph, summary)
+        
+    def mysource(self, obj):
+        """in the last month"""
+        #sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
+        
         #-------------------------------source pie
         ss=Source.objects.filter(purchases__product__domain=obj).distinct()
         
         dat=[(s.total_spent(domain=obj), s.name) for s in ss]
         sourcepie=chart_url(dat)
         
-        return '%s<br>%s<br><br>%s'%(total, graph, sourcepie)
+        return '<br>%s'%(sourcepie)
     
     def my_month_history(self, obj):
         purchases=Purchage.objects.filter()
             
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
-    adminify(myproducts, myspent, mycreated, mypie)
+    adminify(myproducts, mysource, mycreated, mypie)
     
 class PersonAdmin(OverriddenModelAdmin):
     list_display='id first_name last_name birthday mymet_through'.split()
@@ -268,17 +270,15 @@ class SourceAdmin(OverriddenModelAdmin):
         return obj.summary()
     
     def mytotal(self, obj):
-        monthago=datetime.datetime.now()-datetime.timedelta(days=30)
-        total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).aggregate(Sum('cost'))['cost__sum']
-        ear=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).order_by('created')
-        earliest=None
-        if ear:
-            earliest=datetime.datetime.combine(ear[0].created, datetime.time())
+        #monthago=datetime.datetime.now()-datetime.timedelta(days=30)
+        purchases=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).order_by('created')
+        total=purchases.aggregate(Sum('cost'))['cost__sum']
+        if purchases:
+            earliest=datetime.datetime.combine(purchases[0].created, datetime.time())
         
         if total and earliest:
-            now=datetime.datetime.now()
-            dayrange=min(30.0,(abs((now-earliest).days))+1)
-            return '%0.0f%s<br>%s%s /day<br>(%d days)'%(total, Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
+            dayrange=abs((datetime.datetime.now()-earliest).days)+1
+            return '%0.0f%s<br>%s%s /day<br>(%d days)'%(total, RMBSYMBOL, rstripz(total/dayrange), RMBSYMBOL, dayrange)
         
     adminify(mytotal, mysummary, mypie)
 
