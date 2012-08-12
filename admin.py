@@ -78,7 +78,7 @@ class ProductAdmin(OverriddenModelAdmin):
     
     def mypurchases(self, obj):
         #return obj.summary()
-        return '<br>'.join([p.adm() for p in Purchase.objects.filter(product=obj)])
+        return '<br>'.join([p.clink() for p in Purchase.objects.filter(product=obj)])
     
     def mypie(self, obj):
         purch=Purchase.objects.filter(product=obj)
@@ -473,20 +473,19 @@ def debu(func, *args, **kwgs):
     return inner
 linesample = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]
 class MeasuringSpotAdmin(OverriddenModelAdmin):
-    list_display='name mymeasurements myhistory mydomain mysets exclude_zeros'.split()
+    list_display='myname myhistory'.split()
     list_filter=['domain',]
-    list_editable=['exclude_zeros',]
-    @debu
-    def mymeasurements(self, obj):
+    def myname(self, obj):
         ct=obj.measurements.all()
         if obj.exclude_zeros:
             ct=ct.exclude(amount=0)
         ll=len(ct)
         if ll>28:
             indexes=linesample(6,len(ct[2:]))+[len(ct)-1]
-            ct=ct[:2]+[ct[th] for th in indexes]
-        return '<br>'.join([m.adm() for m in ct])
-    
+            ct=ct[:2]+[ct[th] for th in indexes]        
+        meas='<br>'.join([m.adm() for m in ct])
+        return '<h3>%s</h3><h4>%s</h4>%s'%(obj.name, obj.domain.clink(), meas)
+ 
     def myhistory(self, obj):
         mes=obj.measurements.all()
         if obj.exclude_zeros:
@@ -521,7 +520,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.domain.id, obj.domain)
     def mysets(self, obj):
         return ' | '.join([ms.clink() for ms in obj.measurementset_set.all()])    
-    adminify(mymeasurements, myhistory, mydomain, mysets)
+    adminify( myhistory, mydomain, mysets, myname)
 
 
     
