@@ -160,7 +160,7 @@ class DomainAdmin(OverriddenModelAdmin):
             dat=[(p.total_spent(start=monthago()),str(p)) for p in obj.products.all()]
             cu=chart_url(dat)
             if cu:
-                res+='<p>Month<br>%s'%cu
+                res+='<br><br>Month<br>%s'%cu
         return res
     
     def myproducts(self, obj):
@@ -202,7 +202,13 @@ class DomainAdmin(OverriddenModelAdmin):
             im=sparkline_discrete(results=res2, width=2, height=100)
             tmp=savetmp(im)
             graph='<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])    
-        return '%s<p>%s'%(total, graph)
+        #-------------------------------source pie
+        ss=Source.objects.filter(purchases__product__domain=obj).distinct()
+        
+        dat=[(s.total_spent(domain=obj), s.name) for s in ss]
+        sourcepie=chart_url(dat)
+        
+        return '%s<br>%s<br><br>%s'%(total, graph, sourcepie)
     
     def my_month_history(self, obj):
         purchases=Purchage.objects.filter()

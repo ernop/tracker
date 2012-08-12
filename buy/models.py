@@ -105,8 +105,10 @@ class Source(MyJsReplacementBuy):
     def all_purchases_link(self):
         return '<a href="/admin/buy/purchase/?source__id=%d">all purch</a>'%(self.id)
 
-    def total_spent(self, start=None, end=None, product=None):
+    def total_spent(self, start=None, end=None, product=None, domain=None):
         valid=Purchase.objects.filter(source=self).filter(currency__id__in=RMB_CURRENCY_IDS)
+        if domain:
+            valid=valid.filter(product__domain=domain)
         if product:
             valid=valid.filter(product=product)
         if start:
