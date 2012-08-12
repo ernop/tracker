@@ -20,7 +20,7 @@ from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
 from pygooglechart import PieChart2D
 
 class PurchaseForm(forms.ModelForm):
-    who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False), requred=False)
+    who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False), required=False)
     class Meta:
         model = Purchase
 
