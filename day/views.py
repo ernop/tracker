@@ -58,12 +58,12 @@ def ajax_day_data(request):
 
 def gettoday():
     now=datetime.datetime.now()
-    today=datetime.datetime(year=now.year, day=now.day, month=now.month)
+    today=datetime.date(year=now.year, day=now.day, month=now.month)
     return today
 
 def index(request):
     now=datetime.datetime.now()
-    today=datetime.datetime(year=now.year, day=now.day, month=now.month)
+    today=datetime.date(year=now.year, day=now.day, month=now.month)
     day, new=Day.objects.get_or_create(date=today)
     vals={}
     vals['day']=day
