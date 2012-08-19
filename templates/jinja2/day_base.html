@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>{% block title %}{{title}}{% endblock %}</title>
+{% block head %}
+
+<script src='/static/js/jquery.js'></script>
+<script src='/static/js/day.js'></script>
+<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="/static/css/day.css" />
+{% endblock %}
+</head>
+<body><div class="container">{% block content %}
+{% endblock %}
+{% block footer %}<hr>footer
+{% endblock %}</div>
+</body>

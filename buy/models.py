@@ -14,38 +14,38 @@ def clink(nodel, id, obj):
 
 # Create your models here.
 
-from trackerutils import MyJsReplacementBuy
+from trackerutils import BuyModel
 
-class SpanAverage(MyJsReplacementBuy):
-    """for a span of time, starting date, and given domain (not general enough...) what was the running average per day spent on it?"""
-    """not working"""
-    domain=models.ForeignKey('Domain')
-    start_date=models.DateField()
-    span=models.CharField(max_length=1, choices=SPAN_CHOICES)
-    value=models.FloatField()
+#class SpanAverage(BuyModel):
+    #"""for a span of time, starting date, and given domain (not general enough...) what was the running average per day spent on it?"""
+    #"""not working"""
+    #domain=models.ForeignKey('Domain')
+    #start_date=models.DateField()
+    #span=models.CharField(max_length=1, choices=SPAN_CHOICES)
+    #value=models.FloatField()
     
-    def calc(self):
-        days=span2days[self.span]
-        now=datetime.datetime.now()
-        end=min(now, start_date+datetime.timedelta(days=days))
-        partial=False
-        if end==now:
-            partial=True
-        purch=Purchase.objects.filter(product__domain=self.domain, created__gt=self.start_date, created__lte=end)
-        res=0
-        for p in purch:
-            res+=p.cost
-        self.value=res
-        self.save()
+    #def calc(self):
+        #days=span2days[self.span]
+        #now=datetime.datetime.now()
+        #end=min(now, start_date+datetime.timedelta(days=days))
+        #partial=False
+        #if end==now:
+            #partial=True
+        #purch=Purchase.objects.filter(product__domain=self.domain, created__gt=self.start_date, created__lte=end)
+        #res=0
+        #for p in purch:
+            #res+=p.cost
+        #self.value=res
+        #self.save()
 
-    def __unicode__(self):
-        if self.value is None:
-            self.calc()
-        return '%0.1f/day for the %s starting %s'%(self.value, self.span, self.start_date)
+    #def __unicode__(self):
+        #if self.value is None:
+            #self.calc()
+        #return '%0.1f/day for the %s starting %s'%(self.value, self.span, self.start_date)
 
 
 
-class Domain(MyJsReplacementBuy):
+class Domain(BuyModel):
     """
     body, house, experiences, food, stuff, clothes, etc.
     """
@@ -77,13 +77,11 @@ class Domain(MyJsReplacementBuy):
         else:
             return '%d products'%(ct,)
 
-    def clink(self):
-        return clink('domain', self.id, self)            
-
+    
     def piechart(self):
         return clink('domain', self.id, self)
 
-class Source(MyJsReplacementBuy):
+class Source(BuyModel):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
     class Meta:
@@ -92,8 +90,6 @@ class Source(MyJsReplacementBuy):
 
     def __unicode__(self):
             return self.name
-    def clink(self):
-        return clink('source', self.id, self)
     def summary(self):
         if self.purchases.count():
             #self.purchases.filter(currency__name='rmb').aggregate(Sum('quantity'))['quantity__sum']
@@ -118,7 +114,7 @@ class Source(MyJsReplacementBuy):
         cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
         return cost        
 
-class Product(MyJsReplacementBuy):
+class Product(BuyModel):
     name=models.CharField(max_length=100, unique=True)
     created=models.DateField(auto_now_add=True)
     domain=models.ForeignKey(Domain, related_name='products')
@@ -127,12 +123,6 @@ class Product(MyJsReplacementBuy):
         ordering=['name',]
     def __unicode__(self):
         return self.name
-
-    def adm(self):
-        return lnk('product',self.id, self)
-
-    def clink(self):
-        return clink('product', self.id, self)
 
     def summary(self, source=None):
         """summary of all purchases of this product."""
@@ -162,7 +152,7 @@ class Product(MyJsReplacementBuy):
         cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
         return cost
 
-class Currency(MyJsReplacementBuy):
+class Currency(BuyModel):
     """changed from currency; now, it represents an account i.e. cash, a specific bank acct, taobao"""
     name=models.CharField(max_length=100, unique=True)
     symbol=models.CharField(max_length=10)
@@ -176,7 +166,7 @@ class Currency(MyJsReplacementBuy):
     def adm(self):
         return lnk('currency',self.id, self)
 
-class Purchase(models.Model):
+class Purchase(BuyModel):
     product=models.ForeignKey(Product, related_name='purchases')
     #domain=models.ForeignKey(Domain, related_name='purchases')
     created=models.DateField()
@@ -188,6 +178,7 @@ class Purchase(models.Model):
     who_with=models.ManyToManyField('Person', related_name='purchases', blank=True, null=True)
     hour=models.IntegerField(choices=HOUR_CHOICES)
     note=models.CharField(max_length=2000, blank=True, null=True)
+    object_created=models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table='purchase'
@@ -197,16 +188,11 @@ class Purchase(models.Model):
         res='%s'%self.product
         if not self.quantity==1:
             res+='(%d)'%self.quantity
-        res+=' for %s%s'%(self.currency.symbol, rstripz(self.cost))
+        res+=' for %s%s'%(rstripz(self.cost), self.currency.symbol)
         return res
 
-    def adm(self):
-        return lnk('purchase',self.id, self)
 
-    def clink(self):
-        return clink('purchase', self.id, self)
-
-class Person(MyJsReplacementBuy):
+class Person(BuyModel):
     first_name=models.CharField(max_length=100)
     last_name=models.CharField(max_length=100, blank=True, null=True)
     birthday=models.DateField(blank=True, null=True)
@@ -220,6 +206,5 @@ class Person(MyJsReplacementBuy):
     def __unicode__(self):
         return '%s %s'%(self.first_name, self.last_name)
 
-    def adm(self):
-        return lnk('person',self.id, self)
+    
 

@@ -1,0 +1,42 @@
+{% extends 'jinja2/day_base.html' %}
+{% block title %}day{% endblock %}
+{% block head %}
+    {{super()}}
+    <script>
+        var day_id={{day.id}};
+        var alltags=[{% for tag in alltags %}"{{tag.name}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
+        var recenttags=[{% for tag in recenttags %}"{{tag.name}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
+        var people=[{% for pdf in persondays %}"{{tag.name}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
+        var exitags=[{% for tag in exitags %}"{{tag.name}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
+        var exipeople=[{% for person in people %}"{{person}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
+        var csrf_token="{{csrf_token}}"
+    </script>
+{% endblock %}
+{% block content %}
+<div class="row"><div class="span8">
+<h2>{{day.date}}</h2>
+</div></div>
+<div class="row"><div class="span6">
+<textarea value="{{day.text}}"></textarea>
+</div>
+<div class="span2">
+
+<div id="exitags"><h3>Tags</h3></div>
+<div id="alltags"><h3>Available</h3></div>
+<div id="exipeople"><h3>People</h3></div>
+<div id="allpeople"><h3>Available</h3></div>
+</div>
+
+</div>
+{{day.text}}
+<div class="row"><div class="span8">
+<div id="notification"></div>
+</div></div>
+<div class="row"><div class="span8">
+<h2>Purchases</h2>
+{% for pur in purchases %}
+<br>{{pur.clink()|safe}}, {{name2hour[pur.hour]}}
+{% endfor %}
+</div></div>
+{% endblock %}
+{% block footer %}<div class="footer">{{super()}}<a class="btn" href="/aday/{{day.yesterday()}}/">prev</a><a class="btn"  href="/aday/{{day.tomorrow()}}/">next</a></div>{% endblock %}

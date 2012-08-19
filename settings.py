@@ -28,7 +28,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 )
@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'tracker',
     'tracker.buy',
     'tracker.workout',
+    'tracker.day',
 )
 
 LOGGING = {
@@ -81,3 +82,5 @@ LOGGING = {
     }
 }
 
+
+ADMIN_EXTERNAL_BASE='/admin'

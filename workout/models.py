@@ -23,8 +23,8 @@ def clink(nodel, id, obj):
     #a link to the object list display with a filter only showing this guy
     return '<a href="/admin/workout/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
 
-from trackerutils import MyJsReplacementWorkout
-class Exercise(MyJsReplacementWorkout):
+from trackerutils import WorkoutModel
+class Exercise(WorkoutModel):
     name=models.CharField(max_length=100, unique=True)
     pmuscles=models.ManyToManyField('Muscle', related_name='primary_exercises')
     smuscles=models.ManyToManyField('Muscle', related_name='synergists_exercises')
@@ -39,13 +39,8 @@ class Exercise(MyJsReplacementWorkout):
     def __unicode__(self):
         return self.name
     
-    def adm(self):
-        return lnk('exercise',self.id, self)
 
-    def clink(self):
-        return clink('exercise', self.id, self)
-
-class Muscle(MyJsReplacementWorkout):
+class Muscle(WorkoutModel):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
     
@@ -59,7 +54,7 @@ class Muscle(MyJsReplacementWorkout):
     def adm(self):
         return lnk('muscle',self.id, self)
 
-class Set(MyJsReplacementWorkout):
+class Set(WorkoutModel):
     exweight=models.ForeignKey('ExWeight', related_name='sets')
     workout=models.ForeignKey('Workout', related_name='sets')
     count=models.IntegerField(blank=True)
@@ -69,9 +64,7 @@ class Set(MyJsReplacementWorkout):
     def __unicode__(self):
         return '%s %s@%s lb'%(self.exweight.exercise, self.count, self.exweight.weight)            
 
-    def adm(self):
-        return lnk('set',self.id, self)    
-    
+
     def save(self, *args, **kwargs):
         if not self.count:
             self.count=5    
@@ -81,7 +74,7 @@ class Set(MyJsReplacementWorkout):
         ordering=['id',]
         db_table='set'
 
-class ExWeight(MyJsReplacementWorkout):
+class ExWeight(WorkoutModel):
     exercise=models.ForeignKey(Exercise, related_name='exsets')
     weight=models.FloatField(blank=True)
     side=models.FloatField(blank=True)
@@ -109,7 +102,7 @@ class ExWeight(MyJsReplacementWorkout):
     def adm(self):
         return lnk('exweight',self.id, self)
         
-class Workout(MyJsReplacementWorkout):
+class Workout(WorkoutModel):
     exweights=models.ManyToManyField(ExWeight, through=Set, related_name='workout')
     created=models.DateTimeField()
     def __unicode__(self):
@@ -122,7 +115,7 @@ class Workout(MyJsReplacementWorkout):
     def adm(self):
         return lnk('workout',self.id, self)
     
-class Measurement(MyJsReplacementWorkout):
+class Measurement(WorkoutModel):
     place=models.ForeignKey('MeasuringSpot', related_name='measurements')
     amount=models.FloatField()
     created=models.DateField()
@@ -134,10 +127,8 @@ class Measurement(MyJsReplacementWorkout):
         db_table='measurement'
         ordering=['-created',]
         
-    def adm(self):
-        return lnk('measurement',self.id,  '%s: <b>%0.2f</b>'%(self.created.strftime(DATE), self.amount))
-        
-class MeasuringSpot(MyJsReplacementWorkout):
+
+class MeasuringSpot(WorkoutModel):
     name=models.CharField(max_length=100, unique=True)
     domain=models.ForeignKey(Domain, related_name='measuring_spots')
     created=models.DateField(auto_now_add=True)
@@ -149,11 +140,6 @@ class MeasuringSpot(MyJsReplacementWorkout):
         db_table='measuringspot'
         ordering=['name',]
         
-    def adm(self):
-        return lnk('measuringspot',self.id, self)
-    
-    def clink(self):
-        return clink('measuringspot',self.id, self)    
     
     def save(self):
         if not self.created:
@@ -162,7 +148,7 @@ class MeasuringSpot(MyJsReplacementWorkout):
             self.created=datetime.datetime.now()
         super(MeasuringSpot, self).save()
     
-class MeasurementSet(MyJsReplacementWorkout):
+class MeasurementSet(WorkoutModel):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
     measurement_spots=models.ManyToManyField(MeasuringSpot)
@@ -173,8 +159,4 @@ class MeasurementSet(MyJsReplacementWorkout):
     def __unicode__(self):
         return u'MeasurementSet %s'%self.name
     
-    def adm(self):
-        return lnk('measurementset',self.id, self)
-    
-    def clink(self):
-        return clink('measurementset',self.id, self)        
+  

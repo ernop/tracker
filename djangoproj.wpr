@@ -5,7 +5,8 @@
 ##################################################################
 [project attributes]
 proj.directory-list = [{'dirloc': loc('env/Lib/site-packages/django-1.4.1-py2.7.egg'),
-                        'excludes': (),
+                        'excludes': [u'EGG-INFO',
+                                     u'django/contrib/localflavor'],
                         'filter': '*',
                         'include_hidden': False,
                         'recursive': True,

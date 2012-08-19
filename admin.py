@@ -15,6 +15,7 @@ from choices import *
 from trackerutils import *
 from tracker.buy.models import *
 from tracker.workout.models import *
+from tracker.day.models import *
 from tracker.utils import adminify, DATE, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
 from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
 from pygooglechart import PieChart2D
@@ -69,6 +70,7 @@ class OverriddenModelAdmin(admin.ModelAdmin):
         return med
     
     media=property(_media)
+
 
 class ProductAdmin(OverriddenModelAdmin):
     list_display='name mydomain mypurchases mypie'.split()
@@ -135,7 +137,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
         return obj.product.clink()
     
     def mywho_with(self, obj):
-        return ', '.join([per.adm() for per in obj.who_with.all()])    
+        return ', '.join([per.clink() for per in obj.who_with.all()])    
     
     def mydomain(self, obj):
         return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.product.domain.id, obj.product.domain)
@@ -301,7 +303,7 @@ class ExerciseAdmin(OverriddenModelAdmin):
     exclude=['pmuscles','smuscles',]
         
     def mymuscles(self, obj):
-        return 'primary:%s\n<br>synergists:%s'%(', '.join([m.adm() for m in obj.pmuscles.all()]),', '.join([m.adm() for m in obj.smuscles.all()]))
+        return 'primary:%s\n<br>synergists:%s'%(', '.join([m.clink() for m in obj.pmuscles.all()]),', '.join([m.adm() for m in obj.smuscles.all()]))
 
     def get_changelist_form(self, request, **kwargs):
         kwargs.setdefault('form', ApplicantForm)
@@ -373,7 +375,7 @@ class MuscleAdmin(OverriddenModelAdmin):
     list_editable=['name',]
 
     def myexercises(self, obj):
-        return '%s<br>\n%s'%(','.join([ex.adm() for ex in obj.primary_exercises.all()]), ','.join([ex.adm() for ex in obj.synergists_exercises.all()]))
+        return '%s<br>\n%s'%(','.join([ex.clink() for ex in obj.primary_exercises.all()]), ','.join([ex.adm() for ex in obj.synergists_exercises.all()]))
 
     adminify(myexercises)
 
@@ -461,16 +463,7 @@ class WorkoutAdmin(OverriddenModelAdmin):
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
     adminify(mycreated, mysets)
 
-def debu(func, *args, **kwgs):
-    def inner(*args, **kwgs):
-        try:
-            return func(*args, **kwgs)
-        except Exception, e:
-            import ipdb;ipdb.set_trace()
-            print 'XXX'
-    inner.__doc__=func.__doc__
-    inner.__name__=func.__name__    
-    return inner
+
 linesample = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]
 class MeasuringSpotAdmin(OverriddenModelAdmin):
     list_display='myname myhistory'.split()
@@ -483,7 +476,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         if ll>28:
             indexes=linesample(6,len(ct[2:]))+[len(ct)-1]
             ct=ct[:2]+[ct[th] for th in indexes]        
-        meas='<br>'.join([m.adm() for m in ct])
+        meas='<br>'.join([m.clink() for m in ct])
         return '<h3>%s</h3><h4>%s</h4>%s'%(obj.name, obj.domain.clink(), meas)
  
     def myhistory(self, obj):
@@ -536,6 +529,28 @@ class MeasurementAdmin(OverriddenModelAdmin):
     #fields='place amount created'.split()
     fields=(('place','amount','created',),)
         
+
+class TagAdmin(OverriddenModelAdmin):
+    list_display='name mydays'.split()
+    list_filter=['name',]
+    #date_hierarchy='day'
+    @debu
+    def mydays(self, obj):
+        return ', '.join([td.day.clink() for td in obj.tagdays.all()])
+    adminify(mydays)
+
+class TagDayAdmin(OverriddenModelAdmin):
+    list_display='id tag day'.split()
+
+class DayAdmin(OverriddenModelAdmin):
+    list_display='date mytags'.split()
+    
+    @debu
+    def mytags(self, obj):
+        return ', '.join([t.tag.clink() for t in obj.tagdays.all()])
+        
+    adminify(mytags)
+
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Domain, DomainAdmin)
 admin.site.register(Purchase, PurchaseAdmin)
@@ -549,6 +564,11 @@ admin.site.register(Muscle, MuscleAdmin)
 admin.site.register(Workout, WorkoutAdmin)
 admin.site.register(Measurement, MeasurementAdmin)
 admin.site.register(MeasuringSpot, MeasuringSpotAdmin)
+
+admin.site.register(Tag, TagAdmin)
+admin.site.register(Day, DayAdmin)
+admin.site.register(TagDay, TagDayAdmin)
+
 class MSetFormSet(BaseInlineFormSet):
     def get_queryset(self):
         if not hasattr(self, '_queryset'):
