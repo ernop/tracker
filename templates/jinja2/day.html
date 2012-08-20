@@ -11,7 +11,7 @@
         var exitags=[{% for tag in exitags %}"{{tag.name}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
     </script>
 {% endblock %}
-{% block content %}
+{% block content %}{% if LOCAL %}LOCAL{% endif %}
 <div class="row"><div class="span8">
 <h2>{{day.date}} {{day.day()}}</h2>
 </div></div>
@@ -37,21 +37,25 @@
 <button class="btn savebutton" value="save">save</button>
 </div></div>
 <div class="row"><div class="span8">
-    {% if purchases %}<h2>Purchases</h2>
+    <h2>Purchases</h2>
     {% for pur in purchases %}
     <br>{{pur.prodlink()|safe}}, {{name2hour[pur.hour]}}
     {% endfor %}
-    {% endif %}
+    <br><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/purchase/add">add new</a>
 </div></div>
 
 <div class="row"><div class="span8">
+<h2>Workouts</h2>
     {% for workout in day.getworkouts() %}
-    {% if loop.first %}<h2>Workouts</h2>{% endif %}{{workout.mysets()|safe}}{% endfor %}
+    {{workout.mysets()|safe}}{% endfor %}
+    <br><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/workout/add">add new</a>
 </div></div>
 
 <div class="row"><div class="span8">
+    <h2>Measurements</h2>
     {% for measurement in day.getmeasurements() %}
-    {% if loop.first %}<h2>Measurements</h2>{% endif %}<br>{{measurement.place.clink()|safe}} - {{measurement.amount}}{% endfor %}
+    <br>{{measurement.place.clink()|safe}} - {{measurement.amount}}{% endfor %}
+    <br><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/measurement/add">add new</a>
 </div></div>
 
 {% endblock %}
