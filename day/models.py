@@ -41,16 +41,44 @@ class Day(DayModel):
     def __unicode__(self):
         return str(self.date)
     
-    def tomorrow(self):
-        t=datetime.timedelta(days=1)+self.date
-        return str(datetime.date(year=t.year, day=t.day, month=t.month))
+    #def tomorrow(self):
+        #t=datetime.timedelta(days=1)+self.date
+        #return str(datetime.date(year=t.year, day=t.day, month=t.month))
     
-    def yesterday(self):
-        y=self.date-datetime.timedelta(days=1)
-        return str(datetime.date(year=y.year, day=y.day, month=y.month))
+    #def yesterday(self):
+        #y=self.date-datetime.timedelta(days=1)
+        #return str(datetime.date(year=y.year, day=y.day, month=y.month))
+    
+    def plus(self, days=None, years=None):
+        days=days or 0
+        years=years or 0
+        newyear=self.date.year+years
+        t=self.date+datetime.timedelta(days=days)
+        return str(datetime.date(newyear, day=t.day, month=t.month))
     
     def vlink(self):
         return '<a href="/aday/%s">day %s</a>'%(str(self.date), str(self.date))
+    
+    def day(self):
+        return datetime.datetime.strftime(self.date, '%A')
+    
+    def getmeasurements(self):
+        try:
+            from workout.models import Measurement
+            nextday=self.date+datetime.timedelta(days=1)
+            return Measurement.objects.filter(created__gte=self.date, created__lt=nextday)
+        except:
+            return []
+        
+    def getworkouts(self):
+        try:
+            from workout.models import Workout
+            nextday=self.date+datetime.timedelta(days=1)
+            return Workout.objects.filter(created__gte=self.date, created__lt=nextday)
+        except:
+            return []
+        
+        
     
 class PersonDay(DayModel):
     person=models.ForeignKey(Person, related_name='persondays')

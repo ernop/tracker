@@ -151,6 +151,8 @@ class Product(BuyModel):
             valid=valid.filter(created__lt=end)
         cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
         return cost
+    
+    
 
 class Currency(BuyModel):
     """changed from currency; now, it represents an account i.e. cash, a specific bank acct, taobao"""
@@ -190,7 +192,9 @@ class Purchase(BuyModel):
             res+='(%d)'%self.quantity
         res+=' for %s%s'%(rstripz(self.cost), self.currency.symbol)
         return res
-
+    
+    def prodlink(self):
+        return u'<a href="%s/buy/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.product.__class__.__name__.lower(), self.product.id, unicode(self))
 
 class Person(BuyModel):
     first_name=models.CharField(max_length=100)

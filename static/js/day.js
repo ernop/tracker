@@ -3,7 +3,22 @@ $(document).ready(function(){
     place_tags();
     place_people();
     setup_tag_clicks();
+    setup_textarea();
+    setup_savebutton();
 });
+
+var save_timeout=null;
+
+function setup_savebutton(){
+    $('.savebutton').click(function(){data_changed('text')});
+}
+
+function setup_textarea(){
+    $(".textarea").bind('keyup', function(){
+        clearTimeout(save_timeout);
+        save_timeout=setTimeout(function(){data_changed('text')}, 2000);
+    });
+}
 
 function zplace_tags(array, all, target, alltarget){
     $.each(array, function(index){
@@ -30,7 +45,6 @@ function place_tags(){
 }
 
 function place_people(){
-    debugger;
     $.each(exipeople, function(index){
         $("#exipeople").append(tagify(exipeople[index]));   
     });
@@ -59,8 +73,8 @@ function toggle_tag(e){
             $("#exitags").append(tagify(tagname));
         }
         var dtype='tags';
-    }else
-    if (zone.hasClass('peoplezone')){
+    }
+    else if (zone.hasClass('peoplezone')){
         if (par.attr('id')=='exipeople'){
             $("#allpeople").append(tagify(tagname));
         }else{
@@ -92,6 +106,9 @@ function data_changed(kind){
             tagnames.push($(tags[index]).attr('name'));
         });
         data['peoplenames']=tagnames.join(',');
+    }else if (kind=='text'){
+        var dat=$('.textarea').val();
+        data['text']=dat;
     }
     send_data(data);
 }
@@ -107,11 +124,10 @@ function send_data(data){
             var pdat=JSON.parse(dat)
             $("#notification").find('.alert').slideUp()
             $("#notification").append($('<div class="alert alert-success">'+pdat['message']+'</div>'));
+            setTimeout(function(){$(".alert").slideUp()}, 500);
         }   ,
         error:function(dat){
             $("#notification").find('.alert').slideUp().append($('<div class="alert alert-error">'+pdat['message']+'</div>'));
         }   
-        
-        }
-        );
+    });
 }

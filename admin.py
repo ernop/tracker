@@ -408,55 +408,8 @@ class WorkoutAdmin(OverriddenModelAdmin):
     inlines=[SetInline,]
     #form=WorkoutForm#unnecessary
     def mysets(self, obj):
-        res={}
-        preres={}
+        return obj.mysets()
         
-        ex_order=[]
-        for s in obj.sets.all():
-            res[s.exweight.exercise]=[]
-            if s.exweight.exercise not in ex_order:
-                ex_order.append(s.exweight.exercise)
-        for s in obj.sets.all():res[s.exweight.exercise].append(s)
-        #res is dict of exercise => [exweights,]
-        res2={}
-        #import ipdb;ipdb.set_trace()
-        for exercise,zets in res.items():
-            #import ipdb;ipdb.set_trace()
-            weights={}
-            ct=0 #counter - merge sequential sets of the same weight.
-            lastweight=None
-            #import ipdb;ipdb.set_trace()
-            for zet in zets:
-                if lastweight and zet.exweight.weight==lastweight:
-                    pass
-                else:
-                    ct+=1
-                    lastweight=zet.exweight.weight
-                    if exercise.barbell:
-                        weights[(ct, zet.exweight.weight, zet.exweight.side,)]=[]
-                    else:
-                        weights[(ct, zet.exweight.weight)]=[]
-                #import ipdb;ipdb.set_trace()
-                if exercise.barbell:
-                    weights[(ct, zet.exweight.weight, zet.exweight.side,)].append(zet.count)
-                else:
-                    weights[(ct, zet.exweight.weight)].append(zet.count)
-            weights['sets']=zets
-            res2[exercise]=weights
-        res3=''
-        for exercise, summary in sorted(res2.items(), key=lambda x:x[1]['sets'][0].id):
-            #order by set id, so the order you do them in the workout is right.
-            res3+='%s '%exercise.clink()
-            for weight, counts in sorted(summary.items()):
-                if weight=='sets':continue
-                if exercise.barbell:
-                    res3+=' <b>%d</b>(%d):'%(weight[1], weight[2])
-                else:
-                    res3+=' <b>%d</b>:'%(weight[1])
-                res3+=','.join(['%d'%cc for cc in counts])
-            #res3+='%s %s'%(exercise, ' ,'.join(['%d'%s for s in summary]))
-            res3+='<br>'
-        return res3
     
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
@@ -543,8 +496,9 @@ class TagDayAdmin(OverriddenModelAdmin):
     list_display='id tag day'.split()
 
 class DayAdmin(OverriddenModelAdmin):
-    list_display='date mytags myaday'.split()
-    
+    list_display='date mytags text myaday'.split()
+    search_fields=['text','tagdays__tag__name']
+    date_hierarchy='date'
     @debu
     def mytags(self, obj):
         return ', '.join([t.tag.clink() for t in obj.tagdays.all()])

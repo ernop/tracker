@@ -16,32 +16,38 @@ def monthago():
     return datetime.datetime.now()-datetime.timedelta(days=30)
 
 class WorkoutModel(models.Model):
-    def clink(self):
-        return u'<a href="%s/workout/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, self)
+    def clink(self, text=None):
+        if not text:            text=self
+        return u'<a href="%s/workout/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     
-    def alink(self):
-        return u'<a href="%s/workout/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, self)
+    def alink(self, text=None):
+        if not text:            text=self
+        return u'<a href="%s/workout/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     class Meta:
         app_label='workout'
         abstract=True
         
 class BuyModel(models.Model):
-    def clink(self):
-        return u'<a href="%s/buy/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, self)
+    def clink(self, text=None):
+        if not text:            text=self
+        return u'<a href="%s/buy/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     
-    def alink(self):
-        return u'<a href="%s/buy/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, self)
+    def alink(self, text=None):
+        if not text:            text=self
+        return u'<a href="%s/buy/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     class Meta:
         app_label='buy'
         abstract=True
         
 class DayModel(models.Model):
-    def clink(self):
-        #import ipdb;ipdb.set_trace()
-        return u'<a href="%s/day/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, self)
+
+    def clink(self, text=None):
+        if not text:            text=self
+        return u'<a href="%s/day/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     
-    def alink(self):
-        return u'<a href="%s/day/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, self)
+    def alink(self, text=None):
+        if not text:            text=self
+        return u'<a href="%s/day/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     class Meta:
         app_label='day'
         abstract=True

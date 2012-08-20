@@ -11,10 +11,13 @@ from trackerutils import *
 from day.models import *
 from buy.models import Person, Purchase
 from trackerutils import name2hour
-
+import logging
+log=logging.getLogger(__name__)
 from forms import DayForm
 
 def ajax_day_data(request):
+    log.info(request.POST)
+    print request.POST
     day_id=request.POST['day_id']
     day=Day.objects.get(id=day_id)
     vals={}
@@ -82,6 +85,7 @@ def index(request):
     today=datetime.date(year=now.year, day=now.day, month=now.month)
     day, new=Day.objects.get_or_create(date=today)
     vals={}
+    
     vals['day']=day
     vals['df']=DayForm()
     return r2r('jinja2/day.html',request, vals)
@@ -108,10 +112,10 @@ def y2day(request):
     #return aday(request, d)
     
 def aday(request, day):
-    day=datetime.datetime.strptime(day, '%Y-%m-%d')
-    day=Day.objects.get_or_create(date=day)[0]
-    day.text=''
+    dtday=datetime.datetime.strptime(day, '%Y-%m-%d')
+    day,created=Day.objects.get_or_create(date=dtday)
     day.save()
+    day=Day.objects.get_or_create(date=dtday)[0]
     dtoday=gettoday()
     vals={}
     vals['day']=day
@@ -123,7 +127,7 @@ def aday(request, day):
     
     vals['exipeople']=set([pd.person for pd in day.persondays.all()])
     vals['allpeople']=Person.objects.all()
-    
+    vals['allpeople']=[]
     vals['name2hour']=name2hour
     nextday=day.date+datetime.timedelta(days=1)
     vals['purchases']=Purchase.objects.filter(created__gte=day.date, created__lt=nextday).order_by('hour')

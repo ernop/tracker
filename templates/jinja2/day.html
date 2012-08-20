@@ -2,7 +2,6 @@
 {% block title %}day{% endblock %}
 {% block head %}
     {{super()}}
-    alltags {{alltags}}
     <script>
         var day_id={{day.id}};
         var alltags=[{% for tag in alltags %}"{{tag.name}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
@@ -14,13 +13,12 @@
 {% endblock %}
 {% block content %}
 <div class="row"><div class="span8">
-<h2>{{day.date}}</h2>
+<h2>{{day.date}} {{day.day()}}</h2>
 </div></div>
 <div class="row"><div class="span6">
-<textarea value="{{day.text}}"></textarea>
+<textarea class="textarea" id="note">{{day.text or ''|safe}}</textarea>
 </div>
 <div class="span2">
-
 <div class="tagzone zone">
     <div id="exitags"><h3>Tags</h3></div>
     <div id="alltags"><h3>Available</h3></div>
@@ -32,15 +30,34 @@
 </div>
 
 </div>
-{{day.text}}
-<div class="row"><div class="span8">
-<div id="notification"></div>
+<div class="row"><div class="span6">
+<div id="notification" class="notification-zone">&nbsp;</div>
 </div></div>
 <div class="row"><div class="span8">
-<h2>Purchases</h2>
-{% for pur in purchases %}
-<br>{{pur.clink()|safe}}, {{name2hour[pur.hour]}}
-{% endfor %}
+<button class="btn savebutton" value="save">save</button>
 </div></div>
+<div class="row"><div class="span8">
+    {% if purchases %}<h2>Purchases</h2>
+    {% for pur in purchases %}
+    <br>{{pur.prodlink()|safe}}, {{name2hour[pur.hour]}}
+    {% endfor %}
+    {% endif %}
+</div></div>
+
+<div class="row"><div class="span8">
+    {% for workout in day.getworkouts() %}
+    {% if loop.first %}<h2>Workouts</h2>{% endif %}{{workout.mysets()|safe}}{% endfor %}
+</div></div>
+
+<div class="row"><div class="span8">
+    {% for measurement in day.getmeasurements() %}
+    {% if loop.first %}<h2>Measurements</h2>{% endif %}<br>{{measurement.place.clink()|safe}} - {{measurement.amount}}{% endfor %}
+</div></div>
+
 {% endblock %}
-{% block footer %}<div class="footer">{{super()}}<a class="btn" href="/aday/{{day.yesterday()}}/">prev</a><a class="btn"  href="/aday/{{day.tomorrow()}}/">next</a></div>{% endblock %}
+{% block footer %}<div class="footer">{{super()}}
+<div class="daynav"><a class="btn" href="/aday/{{day.plus(days=-1)}}/">prev</a><a class="btn"  href="/aday/{{day.plus(days=1)}}/">next</a></div>
+<br><div class="weeknav"><a class="btn"  href="/aday/{{day.plus(days=-7)}}/">last week</a><a class="btn"  href="/aday/{{day.plus(days=7)}}/">next week</a></div>
+<br><div class="bignav"><a class="btn"  href="/aday/{{day.plus(years=-1)}}/">last year</a><a class="btn"  href="/aday/{{day.plus(years=1)}}/">next year</a></div>
+</div>
+{% endblock %}
