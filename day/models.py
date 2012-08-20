@@ -49,13 +49,18 @@ class Day(DayModel):
         y=self.date-datetime.timedelta(days=1)
         return str(datetime.date(year=y.year, day=y.day, month=y.month))
     
+    def vlink(self):
+        return '<a href="/aday/%s">day %s</a>'%(str(self.date), str(self.date))
+    
 class PersonDay(DayModel):
     person=models.ForeignKey(Person, related_name='persondays')
     day=models.ForeignKey('Day', related_name='persondays')
     created=models.DateTimeField(auto_now_add=True)
+    
     class Meta:
         db_table='personday'
         
     def __unicode__(self):
         return '%s%s'%(self.person, str(self.day))
+    
     

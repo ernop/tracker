@@ -1,8 +1,21 @@
 $(document).ready(function(){
     console.log("docready.h")
     place_tags();
+    place_people();
     setup_tag_clicks();
 });
+
+function zplace_tags(array, all, target, alltarget){
+    $.each(array, function(index){
+        $("#"+target).append(tagify(array[index]));   
+    });
+    $.each(all, function(index){
+        var identifier=all[index];
+        if (!($("#"+target).find('.tag[name="'+identifier+'"]').length)){
+            $("#"+alltarget).append(tagify(all[index]));      
+        }
+    })
+}
 
 function place_tags(){
     $.each(exitags, function(index){
@@ -16,6 +29,19 @@ function place_tags(){
     })
 }
 
+function place_people(){
+    debugger;
+    $.each(exipeople, function(index){
+        $("#exipeople").append(tagify(exipeople[index]));   
+    });
+    $.each(allpeople, function(index){
+        var personname=allpeople[index];
+        if (!($("#exipeople").find('.tag[name="'+personname+'"]').length)){
+            $("#allpeople").append(tagify(allpeople[index]));      
+        }
+    })
+}
+
 function setup_tag_clicks(){
     $(".tag").live('click', toggle_tag);
 }
@@ -25,13 +51,25 @@ function toggle_tag(e){
     var tagname=tag.attr('name')
     console.log("toggle tag"+tagname);
     var par=tag.parent();
-    if (par.attr('id')=='exitags'){
-        $("#alltags").append(tagify(tagname));
-    }else{
-        $("#exitags").append(tagify(tagname));
+    var zone=tag.closest('.zone');
+    if (zone.hasClass('tagzone')){
+        if (par.attr('id')=='exitags'){
+            $("#alltags").append(tagify(tagname));
+        }else{
+            $("#exitags").append(tagify(tagname));
+        }
+        var dtype='tags';
+    }else
+    if (zone.hasClass('peoplezone')){
+        if (par.attr('id')=='exipeople'){
+            $("#allpeople").append(tagify(tagname));
+        }else{
+            $("#exipeople").append(tagify(tagname));
+        }
+        var dtype='people';
     }
     tag.remove();
-    data_changed('tags');
+    data_changed(dtype);
 }   
 
 function tagify(txt){
@@ -48,7 +86,12 @@ function data_changed(kind){
         });
         data['tagnames']=tagnames.join(',');
     }else if (kind=='people'){
-    
+        var tags=$("#exipeople").find('.tag')
+        var tagnames=[];
+        $.each(tags, function(index){
+            tagnames.push($(tags[index]).attr('name'));
+        });
+        data['peoplenames']=tagnames.join(',');
     }
     send_data(data);
 }

@@ -543,13 +543,17 @@ class TagDayAdmin(OverriddenModelAdmin):
     list_display='id tag day'.split()
 
 class DayAdmin(OverriddenModelAdmin):
-    list_display='date mytags'.split()
+    list_display='date mytags myaday'.split()
     
     @debu
     def mytags(self, obj):
         return ', '.join([t.tag.clink() for t in obj.tagdays.all()])
+    
+    @debu
+    def myaday(self, obj):
+        return obj.vlink()
         
-    adminify(mytags)
+    adminify(mytags, myaday)
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Domain, DomainAdmin)

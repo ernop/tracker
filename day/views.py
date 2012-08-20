@@ -45,9 +45,25 @@ def ajax_day_data(request):
         elif k=='text':
             day.text=v
             day.save()
-        elif k=='people_ids':
-            day.text=v
-            day.save()
+        elif k=='peoplenames':
+            newtags=v.split(',')
+            exitags=day.tagdays.all()
+            todelete=[]
+            had=[]
+            for td in exitags:
+                had.append(td.tag.name)
+                if td.tag.name in newtags:
+                    continue
+                else:
+                    todelete.append(td)
+            for td in todelete:
+                td.delete()
+            for nt in newtags:
+                if not nt:continue
+                if nt in had:
+                    continue
+                td=TagDay(day=day, tag=Tag.objects.get_or_create(name=nt)[0])
+                td.save()
         elif k=='day_id':
             continue
         else:
@@ -73,7 +89,7 @@ def index(request):
 def today(request):
     
     today=gettoday()
-    return HttpResponseRedirect('/day/%s'%str(today))
+    return HttpResponseRedirect('/aday/%s'%str(today))
     #d,created=Day.objects.get_or_create(date=today)
     return aday(request, d)
     
@@ -99,11 +115,14 @@ def aday(request, day):
     dtoday=gettoday()
     vals={}
     vals['day']=day
+    
     vals['recenttags']=Tag.objects.filter(created__gte=(dtoday-datetime.timedelta(days=30)))
-    vals['alltags']=Tag.objects.all()
-    vals['people']=Person.objects.all()
-    vals['exipeople']=set([pd.person for pd in day.persondays.all()])
     vals['exitags']=[dt.tag for dt in day.tagdays.all()]
+    
+    vals['alltags']=Tag.objects.all()
+    
+    vals['exipeople']=set([pd.person for pd in day.persondays.all()])
+    vals['allpeople']=Person.objects.all()
     
     vals['name2hour']=name2hour
     nextday=day.date+datetime.timedelta(days=1)
