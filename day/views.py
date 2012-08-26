@@ -170,6 +170,6 @@ def notekind(request, id=None, name=None):
         assert False
     vals={}
     vals['nk']=nk
-    vals['notes']=nk.notes.all().order_by('day__date')
+    vals['notes']=nk.notes.all().order_by('-day__date')
     vals['allnks']=NoteKind.objects.all()
     return r2r('jinja2/notekind.html', request, vals)

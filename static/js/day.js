@@ -39,6 +39,11 @@ function setup_nkselect(){
         
         $(".notekindselect").unbind('change').on('change', change_tag);
     });
+    
+    fix_links()
+}
+
+function fix_links(){
     var divs=$(".select2-search-choice").find('div');
     $.each(divs, function(index, div){
         if ($(div).find('a').length){}else{
@@ -49,6 +54,7 @@ function setup_nkselect(){
 
 function change_tag(e){
     data_changed($(e.target), 'notekind');
+    fix_links();
 }
 
 function setup_savebutton(){
@@ -196,7 +202,6 @@ function add_note(){
     newrow.find('.notekindselect').addClass('new');
     setup_nkselect();    
     setup_textarea();
-    
     setup_savebutton();
 }
 
