@@ -128,4 +128,6 @@ class NoteKind(DayModel):
     
     @debu
     def vlink(self, text=None):
-        return '<a class="btn"  href="/notekind/%s/">%s (%d)</a>'%(self.id, text or self.name, self.notes.count())
+        if not text:
+            text='%s (%d)'%(self.name, self.notes.count())
+        return '<a class="btn"  href="/notekind/%s/">%s </a>'%(self.id, text)
