@@ -1,7 +1,7 @@
 <div class="note-row" note_id="{{note.id}}">
     <div class="row">
         <div class="span6">
-            <textarea class="textarea" id="note">{{note.text or ''|safe}}</textarea>
+            <textarea class="textarea" id="note" style="height:{{note.getheight()}}px;">{{note.text or ''|safe}}</textarea>
         </div>
         
         <div class="span2">

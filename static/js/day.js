@@ -191,7 +191,7 @@ function send_data(data, target){
 }
 
 function add_note(){
-    $(".notezone").prepend($('#notemodel').clone().show());
+    $(".notezone").prepend($('#notemodel').clone().attr('id','').show());
     setup_textarea();
     setup_nkselect();
     setup_savebutton();
