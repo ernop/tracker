@@ -1,7 +1,0 @@
-setup.py
-src/django_tracker.egg-info/PKG-INFO
-src/django_tracker.egg-info/SOURCES.txt
-src/django_tracker.egg-info/dependency_links.txt
-src/django_tracker.egg-info/not-zip-safe
-src/django_tracker.egg-info/requires.txt
-src/django_tracker.egg-info/top_level.txt
