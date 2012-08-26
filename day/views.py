@@ -156,7 +156,7 @@ def aday(request, day):
     vals['notes']=day.notes.all()
     nextday=day.date+datetime.timedelta(days=1)
     vals['purchases']=Purchase.objects.filter(created__gte=day.date, created__lt=nextday).order_by('hour')
-    vals['full_notekinds']=[{'id':n.id,'text':n.name} for n in NoteKind.objects.all()]
+    vals['full_notekinds']=[{'id':n.id,'text':n.name} for n in NoteKind.objects.order_by('name')]
     vals['notekinds']=[n.name for n in NoteKind.objects.order_by('name')]
     #vals['notekind_list']
     return r2r('jinja2/day.html', request, vals)

@@ -533,8 +533,8 @@ class NoteKindAdmin(OverriddenModelAdmin):
     @debu
     def mynotes(self, obj):
         #return '<b>'.join(['%s %s'%(n.clink(text=n.day), ','.join([nk.clink() for nk in n.kinds.all()])) for n in obj.notes.all()])
-        return '<b>'.join(['%s %s'%(n.clink(), n.subnotelink()) for n in obj.notes.all()])
-    
+        return '<br>'.join(['%s (%s) %s'%(n.clink(text=n.day), n.day.vlink(text='day'), n.subnotelink()) for n in obj.notes.all()])
+    @debu
     def myvlink(self, obj):
         return obj.vlink()
     

@@ -55,8 +55,10 @@ class Day(DayModel):
         t=self.date+datetime.timedelta(days=days)
         return str(datetime.date(newyear, day=t.day, month=t.month))
     
-    def vlink(self):
-        return '<a class="btn" href="/aday/%s/">%s</a>'%(str(self.date), str(self.date)+' '+datetime.datetime.strftime(self.date, '%a'))
+    def vlink(self, text=None):
+        if not text:
+            text=str(self.date)+' '+datetime.datetime.strftime(self.date, '%a')
+        return '<a class="btn" href="/aday/%s/">%s</a>'%(str(self.date), text)
     
     def day(self):
         return datetime.datetime.strftime(self.date, '%A')
