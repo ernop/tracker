@@ -1,5 +1,5 @@
 {% extends 'jinja2/day_base.html' %}
-{% block title %}day{% endblock %}
+{% block title %}{{day}}{% endblock %}
 {% block head %}
     {{super()}}
     <script>
@@ -52,7 +52,12 @@
 </div></div>
 
 
-<div id="notemodel" class="note-row" note_id="new" style="display:none;"><div class="row"><div class="span6 note note-2"><textarea class="textarea" id="note" note_id="new"></textarea></div><div class="span2"><div class="notekindzone">   <div class="notekind-available"></div><button class="notekindselect new" value=""></button></div></div></div>
+<div id="notemodel" class="note-row" note_id="new" style="display:none;">
+<div class="row"><div class="span6 note note-2">
+<textarea class="textarea" id="note" note_id="new"></textarea></div>
+<div class="span2"><div class="notekindzone">
+<div class="notekind-available"></div>
+<button class="notekindselect" value=""></button></div></div></div>
 </div>
 
 {% endblock %}

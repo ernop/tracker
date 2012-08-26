@@ -24,9 +24,9 @@ myinitSelection = function(element, callback) {
 
 function setup_nkselect(){
     $.each($(".notekindselect.new"), function(index, thing){
-        $("#notekindsel-"+thing['id']);
         $(thing).removeClass("new");
-        console.log('doing',thing);
+        console.log('doing',$(thing).closest('.note-row'));
+        
         $.each(notekinds, function(index, nk){
             var th=$(thing);
             var option=$('<option value="'+index+'">'+nk+'</option>');
@@ -178,7 +178,6 @@ function send_data(data, target){
             setTimeout(function(){$(".alert").slideUp()}, 1500);
             target.closest('.note-row').attr('note_id',pdat['note_id']);
             if (pdat['deleted']){
-                debugger;
                 if (target.closest('.note-row').attr('note_id')!='new'){
                     target.closest('.note-row').slideUp(function(){$(this).remove()});
                 }
@@ -191,9 +190,13 @@ function send_data(data, target){
 }
 
 function add_note(){
-    $(".notezone").prepend($('#notemodel').clone().attr('id','').show());
+    var newrow=$('#notemodel').clone().removeAttr('id');
+    $(".notezone").prepend(newrow);
+    newrow.show();
+    newrow.find('.notekindselect').addClass('new');
+    setup_nkselect();    
     setup_textarea();
-    setup_nkselect();
+    
     setup_savebutton();
 }
 
