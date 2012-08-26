@@ -9,6 +9,8 @@ requires = [
     'coffin',    
     'simplejson',
     'pygooglechart',
+    'django_extensions',
+    'pyreadline',
     ]
 
 setup(name='django tracker', version='0.0.1',

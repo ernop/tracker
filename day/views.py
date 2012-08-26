@@ -14,64 +14,88 @@ from trackerutils import name2hour
 import logging
 log=logging.getLogger(__name__)
 from forms import DayForm
-
+@debu
 def ajax_day_data(request):
     log.info(request.POST)
-    print request.POST
-    day_id=request.POST['day_id']
-    day=Day.objects.get(id=day_id)
     vals={}
     vals['success']=True
-    todo=request.POST.items()
-    if 'tagnames' not in request.POST:
-        todo.append(('tagnames',''))
-    for k,v in todo:
-        if k=='tagnames':
-            newtags=v.split(',')
-            exitags=day.tagdays.all()
-            todelete=[]
-            had=[]
-            for td in exitags:
-                had.append(td.tag.name)
-                if td.tag.name in newtags:
-                    continue
-                else:
-                    todelete.append(td)
-            for td in todelete:
-                td.delete()
-            for nt in newtags:
-                if not nt:continue
-                if nt in had:
-                    continue
-                td=TagDay(day=day, tag=Tag.objects.get_or_create(name=nt)[0])
-                td.save()
-        elif k=='text':
-            day.text=v
-            day.save()
-        elif k=='peoplenames':
-            newtags=v.split(',')
-            exitags=day.tagdays.all()
-            todelete=[]
-            had=[]
-            for td in exitags:
-                had.append(td.tag.name)
-                if td.tag.name in newtags:
-                    continue
-                else:
-                    todelete.append(td)
-            for td in todelete:
-                td.delete()
-            for nt in newtags:
-                if not nt:continue
-                if nt in had:
-                    continue
-                td=TagDay(day=day, tag=Tag.objects.get_or_create(name=nt)[0])
-                td.save()
-        elif k=='day_id':
-            continue
+    vals['message']='start.'
+    todo=request.POST
+    kind=request.POST['kind']
+    #import ipdb;ipdb.set_trace()
+    if kind=='tagnames':
+        day_id=request.POST['day_id']
+        day=Day.objects.get(id=day_id)
+        newtags=v.split(',')
+        exitags=day.tags.all()
+        todelete=[]
+        had=[]
+        for tag in exitags:
+            had.append(tag.name)
+            if tag.name in newtags:
+                continue
+            else:
+                day.tags.remove(tag)
+        for nt in newtags:
+            if not nt:continue
+            if nt in had:
+                continue
+            tag=Tag.objects.get_or_create(name=nt)[0]
+            day.tags.add(tag)
+            #td=TagDay(day=day, tag=Tag.objects.get_or_create(name=nt)[0])
+            #td.save()
+    elif kind=='note_text':
+        note_id=todo['note_id']
+        if note_id=='new':
+            note=Note(day_id=todo['day_id'])
+            vals['message']+=' created.'
         else:
-            print 'bad k',k
-            continue
+            note=Note.objects.get(pk=int(note_id))
+        note.text=todo['note_text']
+        note.save()
+        vals['note_id']=note.id
+        if not note.text and not note.kinds.count():
+            note.delete()
+            vals['message']+=' deleted.'
+            vals['deleted']=True
+    elif kind=='peoplenames':
+        newtags=v.split(',')
+        exitags=day.tagdays.all()
+        todelete=[]
+        had=[]
+        for td in exitags:
+            had.append(td.tag.name)
+            if td.tag.name in newtags:
+                continue
+            else:
+                todelete.append(td)
+        for td in todelete:
+            td.delete()
+        for nt in newtags:
+            if not nt:continue
+            if nt in had:
+                continue
+            td=TagDay(day=day, tag=Tag.objects.get_or_create(name=nt)[0])
+            td.save()
+    elif kind=='notekind':
+        if todo['note_id']=='new':
+            note=Note(day_id=int(todo['day_id']))
+            vals['message']+=' created.'
+            note.save()
+        else:
+            note=Note.objects.get(id=todo['note_id'])
+        nks=NoteKind.objects.filter(id__in=[int(th) for th in todo['notekind_ids'].split(',') if th])
+        for rel in note.kinds.all():note.kinds.remove(rel)
+        for n in nks:note.kinds.add(n)
+        note.save()
+        vals['note_id']=note.id
+        if not note.text and not note.kinds.count():
+            note.delete()
+            vals['message']+=' deleted.'
+            vals['deleted']=True
+    else:
+        print 'bad k',k
+        import ipdb;ipdb.set_trace()
     vals['message']='success'
     return r2j(vals)
 
@@ -121,7 +145,7 @@ def aday(request, day):
     vals['day']=day
     
     vals['recenttags']=Tag.objects.filter(created__gte=(dtoday-datetime.timedelta(days=30)))
-    vals['exitags']=[dt.tag for dt in day.tagdays.all()]
+    vals['exitags']=day.tags.all()
     
     vals['alltags']=Tag.objects.all()
     
@@ -129,6 +153,23 @@ def aday(request, day):
     vals['allpeople']=Person.objects.all()
     vals['allpeople']=[]
     vals['name2hour']=name2hour
+    vals['notes']=day.notes.all()
     nextday=day.date+datetime.timedelta(days=1)
     vals['purchases']=Purchase.objects.filter(created__gte=day.date, created__lt=nextday).order_by('hour')
+    vals['full_notekinds']=[{'id':n.id,'text':n.name} for n in NoteKind.objects.all()]
+    vals['notekinds']=[n.name for n in NoteKind.objects.all()]
+    #vals['notekind_list']
     return r2r('jinja2/day.html', request, vals)
+
+def notekind(request, id=None, name=None):
+    if id:
+        nk=NoteKind.objects.get(id=id)
+    elif name:
+        nk=NoteKind.objects.get(name=name)
+    else:
+        assert False
+    vals={}
+    vals['nk']=nk
+    vals['notes']=nk.notes.all().order_by('day__date')
+    vals['allnks']=NoteKind.objects.all()
+    return r2r('jinja2/notekind.html', request, vals)

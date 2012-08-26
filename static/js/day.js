@@ -1,22 +1,66 @@
-$(document).ready(function(){
-    console.log("docready.h")
-    place_tags();
-    place_people();
-    setup_tag_clicks();
-    setup_textarea();
-    setup_savebutton();
-});
-
 var save_timeout=null;
 
+$(document).ready(function(){
+    //place_tags();
+    //place_people();
+    //setup_tag_clicks();
+    $(".add-note").click(add_note);
+    $(".add-note").click();
+});
+
+myinitSelection = function(element, callback) {
+    var data = [];
+    console.log(element.val());
+    var ids = element.val().split(",");
+    console.log(ids);
+    $(ids).each(function() {
+        var id=this;
+        $(full_notekinds).each(function() {
+            if (id.localeCompare(""+this.id)==0) data.push(this);
+        });
+    });
+    callback(data);                   
+}
+
+function setup_nkselect(){
+    $.each($(".notekindselect.new"), function(index, thing){
+        $("#notekindsel-"+thing['id']);
+        $(thing).removeClass("new");
+        console.log('doing',thing);
+        $.each(notekinds, function(index, nk){
+            var th=$(thing);
+            var option=$('<option value="'+index+'">'+nk+'</option>');
+            th.append(option);
+        });
+        $(thing).select2({data:full_notekinds, 
+            multiple: true,
+            initSelection: myinitSelection,
+        });
+        
+        $(".notekindselect").unbind('change').on('change', change_tag);
+    });
+    var divs=$(".select2-search-choice").find('div');
+    $.each(divs, function(index, div){
+        if ($(div).find('a').length){}else{
+            div.innerHTML='<a href="/notekind/'+div.innerHTML+'/">'+div.innerHTML+'</a>';
+        }
+    });
+}
+
+function change_tag(e){
+    data_changed($(e.target), 'notekind');
+}
+
 function setup_savebutton(){
-    $('.savebutton').click(function(){data_changed('text')});
+    $('.savebutton').unbind('click').click(function(e){data_changed($(e.target), 'note_text')});
 }
 
 function setup_textarea(){
-    $(".textarea").bind('keyup', function(){
+    $(".textarea").live('keyup', function(e){
         clearTimeout(save_timeout);
-        save_timeout=setTimeout(function(){data_changed('text')}, 2000);
+        console.log('target is ',$(e.target));
+        tar=$(e.target);
+        save_timeout=setTimeout(function(e){data_changed(tar, 'note_text')}, 700);
     });
 }
 
@@ -90,8 +134,8 @@ function tagify(txt){
     return $("<div class='tag btn' name='"+txt+"'>"+txt+"</div>");
 }
 
-function data_changed(kind){
-    var data={};
+function data_changed(target, kind){
+    var data={'kind':kind};
     if (kind=='tags'){
         var tags=$("#exitags").find('.tag')
         var tagnames=[];
@@ -106,16 +150,22 @@ function data_changed(kind){
             tagnames.push($(tags[index]).attr('name'));
         });
         data['peoplenames']=tagnames.join(',');
-    }else if (kind=='text'){
-        var dat=$('.textarea').val();
-        data['text']=dat;
+    }else if (kind=='note_text'){
+        data['note_text']=target.closest('.textarea').val();
+        data['note_id']=target.closest('.note-row').attr('note_id');
+    }else if (kind=='notekind'){
+        data['note_id']=target.closest('.note-row').attr('note_id');
+        data['notekind_ids']=target.attr('value');
+    }else if (kind=='deletenote'){
+        data['note_id']=target.closest('.note-row').attr('note_id');
+        data['notekind_ids']=target.attr('value');
     }
-    send_data(data);
+    data['day_id']=$("#day_id").attr('day_id');
+    send_data(data, target);
 }
 
-function send_data(data){
-    data['day_id']=day_id;
-    console.log('data is'+data);
+function send_data(data, target){
+    console.log(data);
     $.ajax({
         url:'/ajax/day_data/',
         type:'POST',
@@ -124,10 +174,26 @@ function send_data(data){
             var pdat=JSON.parse(dat)
             $("#notification").find('.alert').slideUp()
             $("#notification").append($('<div class="alert alert-success">'+pdat['message']+'</div>'));
-            setTimeout(function(){$(".alert").slideUp()}, 500);
-        }   ,
-        error:function(dat){
+            console.log('pdat',pdat);
+            setTimeout(function(){$(".alert").slideUp()}, 1500);
+            target.closest('.note-row').attr('note_id',pdat['note_id']);
+            if (pdat['deleted']){
+                debugger;
+                if (target.closest('.note-row').attr('note_id')!='new'){
+                    target.closest('.note-row').slideUp(function(){$(this).remove()});
+                }
+            }
+        },
+        error:function(pdat){
             $("#notification").find('.alert').slideUp().append($('<div class="alert alert-error">'+pdat['message']+'</div>'));
         }   
     });
 }
+
+function add_note(){
+    $(".notezone").prepend($('#notemodel').clone().show());
+    setup_textarea();
+    setup_nkselect();
+    setup_savebutton();
+}
+

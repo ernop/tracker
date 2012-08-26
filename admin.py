@@ -489,25 +489,56 @@ class TagAdmin(OverriddenModelAdmin):
     #date_hierarchy='day'
     @debu
     def mydays(self, obj):
-        return ', '.join([td.day.clink() for td in obj.tagdays.all()])
+        return ', '.join([day.clink() for day in obj.days.all()])
     adminify(mydays)
 
-class TagDayAdmin(OverriddenModelAdmin):
-    list_display='id tag day'.split()
+#class TagDayAdmin(OverriddenModelAdmin):
+    #list_display='id tag day'.split()
 
 class DayAdmin(OverriddenModelAdmin):
-    list_display='date mytags text myaday'.split()
-    search_fields=['text','tagdays__tag__name']
+    list_display='date mytags mynotes myaday'.split()
+    search_fields=['text','tag__name']
     date_hierarchy='date'
     @debu
     def mytags(self, obj):
-        return ', '.join([t.tag.clink() for t in obj.tagdays.all()])
+        return ', '.join([t.clink() for t in obj.tags.all()])
     
     @debu
     def myaday(self, obj):
         return obj.vlink()
         
-    adminify(mytags, myaday)
+    
+    @debu
+    def mynotes(self, obj):
+        return '<br>'.join(['%s %s'%(n.clink(text=n.day), n.subnotelink()) for n in obj.notes.all()])
+        
+    adminify(mytags, myaday, mynotes)
+
+class NoteAdmin(OverriddenModelAdmin):
+    list_display='text myaday mynotekinds'.split()
+    list_filter=['kinds',]
+    list_search=['kinds',]
+    
+    @debu
+    def myaday(self, obj):
+        return obj.day.vlink()
+    @debu
+    def mynotekinds(self, obj):
+        return '<br>'.join([n.clink() for n in obj.kinds.all()])
+    adminify(myaday, mynotekinds)
+    
+class NoteKindAdmin(OverriddenModelAdmin):
+    list_display='name mynotes myvlink'.split()
+    
+    @debu
+    def mynotes(self, obj):
+        #return '<b>'.join(['%s %s'%(n.clink(text=n.day), ','.join([nk.clink() for nk in n.kinds.all()])) for n in obj.notes.all()])
+        return '<b>'.join(['%s %s'%(n.clink(), n.subnotelink()) for n in obj.notes.all()])
+    
+    def myvlink(self, obj):
+        return obj.vlink()
+    
+    adminify(mynotes, myvlink)
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Domain, DomainAdmin)
@@ -525,7 +556,9 @@ admin.site.register(MeasuringSpot, MeasuringSpotAdmin)
 
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Day, DayAdmin)
-admin.site.register(TagDay, TagDayAdmin)
+admin.site.register(Note, NoteAdmin)
+admin.site.register(NoteKind, NoteKindAdmin)
+#admin.site.register(TagDay, TagDayAdmin)
 
 class MSetFormSet(BaseInlineFormSet):
     def get_queryset(self):

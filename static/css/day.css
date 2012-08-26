@@ -1,8 +1,10 @@
 .notification-zone{display:inline-block;height:70px;}
 
-.footer{position:absolute; bottom:100px;right:100px;}
+.footer{position:fixed; bottom:100px;right:100px;}
 
 .textarea{
     width:450px;
-    height:250px;
+    height:50px;
 }
+
+.select2-container{width:300px;}

@@ -3,43 +3,36 @@
 {% block head %}
     {{super()}}
     <script>
-        var day_id={{day.id}};
-        var alltags=[{% for tag in alltags %}"{{tag.name}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
-        var allpeople=[{% for person in allpeople %}"{{person}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
-        var recenttags=[{% for tag in recenttags %}"{{tag.name}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
-        var exipeople=[{% for pdf in persondays %}"{{pdf.person}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
-        var exitags=[{% for tag in exitags %}"{{tag.name}}"{% if loop.last %}{% else %},{% endif %}{% endfor %}];
+        notekinds={{notekinds|jsonify|safe}};
+        full_notekinds={{full_notekinds|jsonify|safe}};
     </script>
 {% endblock %}
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
-<div class="row"><div class="span8">
-<h2>{{day.date}} {{day.day()}}</h2>
-</div></div>
-<div class="row"><div class="span6">
-<textarea class="textarea" id="note">{{day.text or ''|safe}}</textarea>
+<div id="day_id" day_id="{{day.id}}"></div>
+<div class="row">
+    <div class="span5">
+        <h2>{{day.date}} {{day.day()}}</h2>
+    </div>
+    <div class="span2">
+        <div class="btn add-note">
+            <i class="icon-plus"></i>
+        </div>
+    </div>
 </div>
-<div class="span2">
-<div class="tagzone zone">
-    <div id="exitags"><h3>Tags</h3></div>
-    <div id="alltags"><h3>Available</h3></div>
-</div>
-<div class="peoplezone zone">
-    <div id="exipeople"><h3>People</h3></div>
-    <div id="allpeople"><h3>Available</h3></div>
-</div>
+<div class="notezone">
+{% for note in notes %}
+    {% include "jinja2/noteedit.html" %}
+{% endfor %}
 </div>
 
-</div>
 <div class="row"><div class="span6">
-<div id="notification" class="notification-zone">&nbsp;</div>
+    <div id="notification" class="notification-zone">&nbsp;</div>
 </div></div>
-<div class="row"><div class="span8">
-<button class="btn savebutton" value="save">save</button>
-</div></div>
+
 <div class="row"><div class="span8">
     <h2>Purchases</h2>
     {% for pur in purchases %}
-    <br>{{pur.prodlink()|safe}}, {{name2hour[pur.hour]}}
+    {{pur.prodlink()|safe}}, {{name2hour[pur.hour]}}<br>
     {% endfor %}
     <br><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/purchase/add">add new</a>
 </div></div>
@@ -47,21 +40,21 @@
 <div class="row"><div class="span8">
 <h2>Workouts</h2>
     {% for workout in day.getworkouts() %}
-    {{workout.mysets()|safe}}{% endfor %}
-    <br><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/workout/add">add new</a>
+    {{workout.mysets()|safe}}<br>{% endfor %}
+    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/workout/add">add new</a><br>
 </div></div>
 
 <div class="row"><div class="span8">
     <h2>Measurements</h2>
     {% for measurement in day.getmeasurements() %}
-    <br>{{measurement.place.clink()|safe}} - {{measurement.amount}}{% endfor %}
-    <br><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/measurement/add">add new</a>
+    {{measurement.place.clink()|safe}} - {{measurement.amount}}<br>{% endfor %}
+    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/measurement/add">add new</a><br>
 </div></div>
 
-{% endblock %}
-{% block footer %}<div class="footer">{{super()}}
-<div class="daynav"><a class="btn" href="/aday/{{day.plus(days=-1)}}/">prev</a><a class="btn"  href="/aday/{{day.plus(days=1)}}/">next</a></div>
-<br><div class="weeknav"><a class="btn"  href="/aday/{{day.plus(days=-7)}}/">last week</a><a class="btn"  href="/aday/{{day.plus(days=7)}}/">next week</a></div>
-<br><div class="bignav"><a class="btn"  href="/aday/{{day.plus(years=-1)}}/">last year</a><a class="btn"  href="/aday/{{day.plus(years=1)}}/">next year</a></div>
+
+<div id="notemodel" class="note-row" note_id="new" style="display:none;"><div class="row"><div class="span6 note note-2"><textarea class="textarea" id="note" note_id="new"></textarea></div><div class="span2"><div class="notekindzone">   <div class="notekind-available"></div><button class="notekindselect new" value=""></button></div></div></div>
 </div>
+
+{% endblock %}
+{% block footer %}{{super()}}{% include "jinja2/dayfooter.html" %}
 {% endblock %}

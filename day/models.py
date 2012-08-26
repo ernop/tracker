@@ -5,11 +5,12 @@ from django.contrib import admin
 # Create your models here.
 from buy.models import Person
 
-from trackerutils import DayModel
+from trackerutils import DayModel, debu
 
 class Tag(DayModel):
     name=models.CharField(max_length=100)
     created=models.DateTimeField(auto_now_add=True)
+    days=models.ManyToManyField('Day', related_name='tags')
     #day=models.ForeignKey('Day')
     class Meta:
         db_table='tag'
@@ -20,20 +21,18 @@ class Tag(DayModel):
     def html(self):
         return '<div class="tag">%s%s</div>'%(self.name, self.day)
     
-class TagDay(DayModel):
-    day=models.ForeignKey('Day', related_name='tagdays')
-    tag=models.ForeignKey('Tag', related_name='tagdays')
-    created=models.DateTimeField(auto_now_add=True)
-    class Meta:
-        db_table='tagday'
+#class TagDay(DayModel):
+    #day=models.ForeignKey('Day', related_name='tagdays')
+    #tag=models.ForeignKey('Tag', related_name='tagdays')
+    #created=models.DateTimeField(auto_now_add=True)
+    #class Meta:
+        #db_table='tagday'
 
-class TagDayInline(admin.StackedInline):
-    model=TagDay
+#class TagDayInline(admin.StackedInline):
+    #model=TagDay
     
 class Day(DayModel):
     date=models.DateField()
-    text=models.TextField()
-    #inlines=[TagDayInline,]
     created=models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table='day'
@@ -57,7 +56,7 @@ class Day(DayModel):
         return str(datetime.date(newyear, day=t.day, month=t.month))
     
     def vlink(self):
-        return '<a href="/aday/%s">day %s</a>'%(str(self.date), str(self.date))
+        return '<a class="btn" href="/aday/%s/">%s</a>'%(str(self.date), str(self.date))
     
     def day(self):
         return datetime.datetime.strftime(self.date, '%A')
@@ -66,7 +65,7 @@ class Day(DayModel):
         try:
             from workout.models import Measurement
             nextday=self.date+datetime.timedelta(days=1)
-            return Measurement.objects.filter(created__gte=self.date, created__lt=nextday)
+            return Measurement.objects.filter(created__gte=self.date, created__lt=nextday).order_by('place__domain','place__name')
         except:
             return []
         
@@ -92,3 +91,38 @@ class PersonDay(DayModel):
         return '%s%s'%(self.person, str(self.day))
     
     
+class Note(DayModel):
+    day=models.ForeignKey('Day', related_name='notes')
+    text=models.TextField()
+    #kind=models.ForeignKey('NoteKind', related_name='notes')
+    created=models.DateTimeField(auto_now_add=True)
+    kinds=models.ManyToManyField('NoteKind', related_name='notes')
+    
+    class Meta:
+        db_table='note'
+        
+    def __unicode__(self):
+        return '%s %s'%(str(self.day), self.nks() or 'no kind')
+    
+    def nks(self):
+        return ','.join([str(nk) for nk in self.kinds.all()])
+    def subnotelink(self):
+        return ','.join([nk.clink() for nk in self.kinds.all()])
+    
+    def nkids(self):
+        return ','.join([str(n.id) for n in self.kinds.all()])
+    
+class NoteKind(DayModel):
+    name=models.CharField(max_length=100)
+    created=models.DateTimeField(auto_now_add=True)
+    
+    def __unicode__(self):
+        return '%s'%(self.name)
+    
+    class Meta:
+        db_table='notekind'
+        
+    
+    @debu
+    def vlink(self, text=None):
+        return '<a class="btn"  href="/notekind/%s/">%s (%d)</a>'%(self.id, text or self.name, self.notes.count())

@@ -1,0 +1,15 @@
+<div class="note-row" note_id="{{note.id}}">
+    <div class="row">
+        <div class="span6">
+            <textarea class="textarea" id="note">{{note.text or ''|safe}}</textarea>
+        </div>
+        
+        <div class="span2">
+            <div class="notekindzone{% for kind in note.kinds.all() %} notekind-{{kind.id}}{% endfor %}">   
+                <div class="notekind-available"></div>
+                <button class="notekindselect new" value="{{note.nkids()}}"></button>
+            </div>
+            {{note.clink(text='link')|safe}}
+        </div>
+    </div>
+</div>

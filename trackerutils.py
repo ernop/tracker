@@ -43,11 +43,11 @@ class DayModel(models.Model):
 
     def clink(self, text=None):
         if not text:            text=self
-        return u'<a href="%s/day/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+        return u'<a class="btn" href="%s/day/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     
     def alink(self, text=None):
         if not text:            text=self
-        return u'<a href="%s/day/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+        return u'<a class="btn" href="%s/day/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     class Meta:
         app_label='day'
         abstract=True

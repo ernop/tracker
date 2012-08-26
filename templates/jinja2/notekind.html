@@ -1,0 +1,22 @@
+{% extends 'jinja2/day_base.html' %}
+{% block title %}{{nk.name}}{% endblock %}
+{% block head %}
+    {{super()}}
+{% endblock %}
+{% block content %}
+    {% if LOCAL %}LOCAL{% endif %}
+    <div class="row"><div class="span8">
+    <h2>{{nk.name}}</h2>
+    </div></div>
+    {% for note in notes %}
+        {% include "jinja2/noteview.html" %}
+    {% endfor %}
+    
+    <div class="row"><div class="span6">
+        <div id="notification" class="notification-zone">&nbsp;</div>
+    </div></div>
+{% endblock %}
+{% block footer %}{% for onk in allnks%}
+{{onk.vlink()|safe}}
+{% endfor %}
+{% endblock %}
