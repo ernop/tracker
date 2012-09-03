@@ -1,3 +1,0 @@
-django
-MySQL-python
-PIL
