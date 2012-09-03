@@ -2,7 +2,6 @@ import datetime
 
 from django.db import models
 from django.contrib import admin
-# Create your models here.
 from buy.models import Person
 
 from trackerutils import DayModel, debu
@@ -14,6 +13,7 @@ class Tag(DayModel):
     #day=models.ForeignKey('Day')
     class Meta:
         db_table='tag'
+        ordering='name'
         
     def __unicode__(self):
         return self.name
@@ -21,32 +21,15 @@ class Tag(DayModel):
     def html(self):
         return '<div class="tag">%s%s</div>'%(self.name, self.day)
     
-#class TagDay(DayModel):
-    #day=models.ForeignKey('Day', related_name='tagdays')
-    #tag=models.ForeignKey('Tag', related_name='tagdays')
-    #created=models.DateTimeField(auto_now_add=True)
-    #class Meta:
-        #db_table='tagday'
-
-#class TagDayInline(admin.StackedInline):
-    #model=TagDay
-    
 class Day(DayModel):
     date=models.DateField()
     created=models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table='day'
+        ordering='date'
         
     def __unicode__(self):
         return str(self.date)
-    
-    #def tomorrow(self):
-        #t=datetime.timedelta(days=1)+self.date
-        #return str(datetime.date(year=t.year, day=t.day, month=t.month))
-    
-    #def yesterday(self):
-        #y=self.date-datetime.timedelta(days=1)
-        #return str(datetime.date(year=y.year, day=y.day, month=y.month))
     
     def plus(self, days=None, years=None):
         days=days or 0
@@ -96,9 +79,8 @@ class PersonDay(DayModel):
 class Note(DayModel):
     day=models.ForeignKey('Day', related_name='notes')
     text=models.TextField()
-    #kind=models.ForeignKey('NoteKind', related_name='notes')
     created=models.DateTimeField(auto_now_add=True)
-    kinds=models.ManyToManyField('NoteKind', related_name='notes')
+    kinds=models.ManyToManyField('NoteKind', related_name='notes', blank=True, null=True)
     
     class Meta:
         db_table='note'
@@ -115,7 +97,7 @@ class Note(DayModel):
         return ','.join([str(n.id) for n in self.kinds.all()])
     
     def getheight(self):
-        return (self.text and len(self.text)/10+100) or '100'
+        return (self.text and len(self.text)/3+100) or '120'
     
 class NoteKind(DayModel):
     name=models.CharField(max_length=100)
