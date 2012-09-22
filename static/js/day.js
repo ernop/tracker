@@ -176,20 +176,18 @@ function send_data(data, target){
         type:'POST',
         data:data,
         success:function(dat){
-            var pdat=JSON.parse(dat)
             $("#notification").find('.alert').slideUp()
-            $("#notification").append($('<div class="alert alert-success">'+pdat['message']+'</div>'));
-            console.log('pdat',pdat);
+            $("#notification").append($('<div class="alert alert-success">'+dat['message']+'</div>'));
             setTimeout(function(){$(".alert").slideUp()}, 1500);
-            target.closest('.note-row').attr('note_id',pdat['note_id']);
-            if (pdat['deleted']){
+            target.closest('.note-row').attr('note_id',dat['note_id']);
+            if (dat['deleted']){
                 if (target.closest('.note-row').attr('note_id')!='new'){
                     target.closest('.note-row').slideUp(function(){$(this).remove()});
                 }
             }
         },
-        error:function(pdat){
-            $("#notification").find('.alert').slideUp().append($('<div class="alert alert-error">'+pdat['message']+'</div>'));
+        error:function(dat){
+            $("#notification").find('.alert').slideUp().append($('<div class="alert alert-error">'+dat['message']+'</div>'));
         }   
     });
 }
