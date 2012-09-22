@@ -1,6 +1,7 @@
 $(document).ready(function(){
     
     setup_new_purch();
+	display_purch();
 });
 
 function setup_new_purch(){

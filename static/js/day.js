@@ -6,7 +6,6 @@ $(document).ready(function(){
     //setup_tag_clicks();
     $(".add-note").click(add_note);
     $(".add-note").click();
-    display_purch();
 });
 
 
