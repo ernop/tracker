@@ -13,7 +13,7 @@ class Tag(DayModel):
     #day=models.ForeignKey('Day')
     class Meta:
         db_table='tag'
-        ordering='name'
+        ordering=['name',]
         
     def __unicode__(self):
         return self.name
@@ -26,7 +26,7 @@ class Day(DayModel):
     created=models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table='day'
-        ordering='date'
+        ordering=['date',]
         
     def __unicode__(self):
         return str(self.date)

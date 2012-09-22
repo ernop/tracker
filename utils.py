@@ -1,5 +1,11 @@
 import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime
 
+
+from django.template import RequestContext
+
+
+import json
+
 DATE='%Y-%m-%d'
 
 def adminify(*args):
@@ -203,3 +209,21 @@ def rstripz(x, bold=False):
 
 def rstripzb(x):
     return rstripz(x, bold=True)
+
+def staff_test(user):
+    return user and user.is_authenticated() and user.is_staff
+
+def r2r(template, request, context=None, lang=None):
+    if not context:
+        context={}
+    from coffin.shortcuts import render_to_response
+    return render_to_response(template, context, RequestContext(request))
+
+def r2s(template, context=None):
+    from coffin.shortcuts import render_to_string
+    return render_to_string(template, dictionary=context)
+
+def r2j(res):
+    from django.shortcuts import HttpResponse, HttpResponseRedirect
+    return HttpResponse(json.dumps(res), mimetype='application/json')
+

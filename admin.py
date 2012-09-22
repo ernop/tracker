@@ -144,7 +144,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     
     adminify(mycost, myproduct, mywho_with, mydomain, mycreated, mysource)
     mywho_with.display_name='Who With'
-    formfield_for_dbfield=mk_default_field({'hour':get_named_hour, 'quantity':1,'created':datetime.datetime.now, 'currency':1})
+    formfield_for_dbfield=mk_default_field({ 'quantity':1,'created':datetime.datetime.now, 'currency':1}) #'hour':get_named_hour
     formfield_form_foreignkey=mk_default_fkfield({'currency':1,'hour':gethour,})
     fields='product cost source size quantity created hour who_with note currency '.split()
 

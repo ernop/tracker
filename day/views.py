@@ -9,8 +9,8 @@ from django.forms.models import (modelform_factory, modelformset_factory, inline
 from django.shortcuts import HttpResponseRedirect, HttpResponse
 from trackerutils import *
 from day.models import *
-from buy.models import Person, Purchase
-from trackerutils import name2hour
+from buy.models import *
+from utils import *
 import logging
 log=logging.getLogger(__name__)
 from forms import DayForm
@@ -137,11 +137,12 @@ def y2day(request):
     
 def aday(request, day):
     dtday=datetime.datetime.strptime(day, '%Y-%m-%d')
+    vals={}
+    vals['today']=day
     day,created=Day.objects.get_or_create(date=dtday)
     day.save()
     day=Day.objects.get_or_create(date=dtday)[0]
     dtoday=gettoday()
-    vals={}
     vals['day']=day
     
     vals['recenttags']=Tag.objects.filter(created__gte=(dtoday-datetime.timedelta(days=30)))
@@ -158,8 +159,24 @@ def aday(request, day):
     vals['purchases']=Purchase.objects.filter(created__gte=day.date, created__lt=nextday).order_by('hour')
     vals['full_notekinds']=[{'id':n.id,'text':n.name} for n in NoteKind.objects.order_by('name')]
     vals['notekinds']=[n.name for n in NoteKind.objects.order_by('name')]
-    #vals['notekind_list']
+    from buy.models import Product
+    vals['products']=[{'id':p.id,'text':p.name} for p in Product.objects.all()]
+    vals['sources']=[source2obj(s) for s in Source.objects.all()]
+    vals['people']=[per2obj(p) for p in Person.objects.all()]
+    vals['currencies']=[currency2obj(c) for c in Currency.objects.all()]
+    vals['hour']=datetime.datetime.now().hour
+    vals['hours']=[{'id':9,'name':'morning','text':'morning',},
+                   {'id':12,'name':'noon','text':'noon',},
+                   {'id':15,'name':'afternoon','text':'afternoon',},
+                   {'id':19,'name':'evening','text':'evening',},
+                   {'id':22,'name':'night','text':'night',},
+                   {'id':1,'name':'midnight','text':'midnight',},
+                   {'id':3,'name':'deep night','text':'deep night',},
+                   {'id':6,'name':'early morning','text':'early morning',},]
     return r2r('jinja2/day.html', request, vals)
+#('morning noon afternoon evening night midnight'.split(),[9,12,15,19,22,1])
+#HOUR_CHOICES.append(('deep night',3))
+#HOUR_CHOICES.append(('early morning',6))
 
 def notekind(request, id=None, name=None):
     if id:

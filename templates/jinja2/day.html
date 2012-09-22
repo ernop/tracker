@@ -3,8 +3,15 @@
 {% block head %}
     {{super()}}
     <script>
-        notekinds={{notekinds|jsonify|safe}};
-        full_notekinds={{full_notekinds|jsonify|safe}};
+        var today={{today|jsonify|safe}};
+        var notekinds={{notekinds|jsonify|safe}};
+        var full_notekinds={{full_notekinds|jsonify|safe}};
+        var products={{products|jsonify|safe}};
+        var sources={{sources|jsonify|safe}};
+        var people={{people|jsonify|safe}};
+        var currencies={{currencies|jsonify|safe}};
+        var hours={{hours|jsonify|safe}};
+        var hour={{hour|jsonify|safe}};
     </script>
 {% endblock %}
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
@@ -34,11 +41,22 @@
 </div></div>
 
 <div class="row"><div class="span8">
+    <div class="purchase-list">
     <h2>Purchases</h2>
-    {% for pur in purchases %}
-    {{pur.prodlink()|safe}}, {{name2hour[pur.hour]}}<br>
-    {% endfor %}
+    </div>
     <br><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/purchase/add">add new</a>
+    <div class="purchase-zone">
+        <input id="product"></input>
+        <input type=text style="width:30px;" id=cost></input>for
+        <input type=text id=quantity style="width:20px;" value=1></input>
+        <br>from <input id=source></input>
+        <br>hour<input type=text id=hour value="{{hour}}"></input>
+        <br>size<input type=text id=size  style="width:30px;"></input>
+        <br>with<input id=who_with></input>
+        <br>note<input type=text id=note></input>
+        <br>currency<input type=text id=currency></input>
+        <br><div class="btn make-purchase">Make</div>
+    </div>
 </div></div>
 
 <div class="row"><div class="span8">
@@ -57,11 +75,11 @@
 
 
 <div id="notemodel" class="note-row" note_id="new" style="display:none;">
-<div class="row"><div class="span6 note note-2">
-<textarea class="textarea" id="note" note_id="new"></textarea></div>
-<div class="span2"><div class="notekindzone">
-<div class="notekind-available"></div>
-<button class="notekindselect" value=""></button></div></div></div>
+    <div class="row"><div class="span6 note note-2">
+    <textarea class="textarea" id="note" note_id="new"></textarea></div>
+    <div class="span2"><div class="notekindzone">
+    <div class="notekind-available"></div>
+    <button class="notekindselect" value=""></button></div></div></div>
 </div>
 
 {% endblock %}

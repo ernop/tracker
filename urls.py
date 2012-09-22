@@ -23,6 +23,11 @@ urlpatterns = patterns('',
     url(r'^aday/(?P<day>[0-9\-]+)/$','tracker.day.views.aday',name='aday'),
     url(r'^notekind/(?P<id>[0-9]+)/$','tracker.day.views.notekind',name='notekind'),
     url(r'^notekind/(?P<name>[a-z]+)/$','tracker.day.views.notekind',name='notekind'),
+
+    #-------------------------------------------AJAX-------------------------------------------
+    
+    url(r'^ajax/get_purchases/$','tracker.day.ajax_views.ajax_get_purchases',name='ajax_get_purchases'),
+    url(r'^ajax/make_purchase/$','tracker.day.ajax_views.ajax_make_purchase',name='ajax_make_purchase'),
 )
 
 

@@ -6,13 +6,13 @@ $(document).ready(function(){
     //setup_tag_clicks();
     $(".add-note").click(add_note);
     $(".add-note").click();
+    display_purch();
 });
+
 
 myinitSelection = function(element, callback) {
     var data = [];
-    console.log(element.val());
     var ids = element.val().split(",");
-    console.log(ids);
     $(ids).each(function() {
         var id=this;
         $(full_notekinds).each(function() {
@@ -39,8 +39,7 @@ function setup_nkselect(){
         
         $(".notekindselect").unbind('change').on('change', change_tag);
     });
-    
-    fix_links()
+    fix_links();
 }
 
 function fix_links(){
@@ -63,6 +62,7 @@ function setup_savebutton(){
 
 function setup_textarea(){
     $(".textarea").live('keyup', function(e){
+        console.log('up');
         clearTimeout(save_timeout);
         console.log('target is ',$(e.target));
         tar=$(e.target);

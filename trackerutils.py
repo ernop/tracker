@@ -63,15 +63,16 @@ class MyJsReplacementBuy(models.Model):
         app_label='buy'
         abstract=True
 
-def gethour():
-    hour=datetime.datetime.now().hour
+def gethour(hour=None):
+    if not hour:
+        hour=datetime.datetime.now().hour
     if hour<2:
         res= 'midnight'
-    if hour<5:
+    elif hour<5:
         res='deep night'
-    if hour<7:
+    elif hour<7:
         res='early morning'
-    if hour<11:
+    elif hour<11:
         res='morning'
     elif hour<14:
         res='noon'
@@ -90,12 +91,10 @@ def savetmp(self):
     os.chmod(out.name, 0644)
     return out
 
-def get_named_hour():
-    return hour2name[gethour()]
 
-
-HOUR_CHOICES=zip(range(10), 'morning noon afternoon evening night midnight'.split())
-HOUR_CHOICES.append((6,'early morning'))
+HOUR_CHOICES=zip('morning noon afternoon evening night midnight'.split(),[9,12,15,19,22,1])
+HOUR_CHOICES.append(('deep night',3))
+HOUR_CHOICES.append(('early morning',6))
 hour2name={}
 name2hour={}
 for a in HOUR_CHOICES:
@@ -135,3 +134,21 @@ def debu(func, *args, **kwgs):
     inner.__doc__=func.__doc__
     inner.__name__=func.__name__    
     return inner
+
+
+
+def purchase2obj(p):
+    return {'id':p.id, 'name':p.product.name, 'quantity':p.quantity,
+            'size':p.size,'cost':p.cost,'source':source2obj(p.source),
+            'who_with':[per2obj(per) for per in p.who_with.all()],
+            'note':p.note, 
+            'text':p.product.name,}
+
+def per2obj(per):
+    return {'id':per.id,'first_name':per.first_name,'last_name':per.last_name,'text':'%s %s'%(per.first_name, per.last_name),}
+
+def source2obj(source):
+    return {'id':source.id,'name':source.name,'text':source.name,}
+
+def currency2obj(cur):
+    return {'id':cur.id,'name':cur.name,'text':'%s %s'%(cur.symbol, cur.name),'symbol':cur.symbol,}

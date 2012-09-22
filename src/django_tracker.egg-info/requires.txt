@@ -1,3 +1,10 @@
 django
 MySQL-python
 PIL
+ipdb
+jinja2
+coffin
+simplejson
+pygooglechart
+django_extensions
+pyreadline

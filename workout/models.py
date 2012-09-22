@@ -10,6 +10,8 @@ from django.db.models import Sum
 from utils import rstripz
 
 HOUR_CHOICES=zip(range(10), 'morning noon afternoon evening night midnight'.split())
+HOUR_CHOICES.append((6,'deep night'))
+HOUR_CHOICES.append((7,'early morning'))
 hour2name={}
 name2hour={}
 for a in HOUR_CHOICES:

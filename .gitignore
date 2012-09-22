@@ -15,3 +15,5 @@ build
 dist
 env
 src
+ipython
+*.stackdump

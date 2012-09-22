@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.conf import settings
 from django.db.models import Sum
@@ -195,6 +197,11 @@ class Purchase(BuyModel):
     
     def prodlink(self):
         return u'<a href="%s/buy/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.product.__class__.__name__.lower(), self.product.id, unicode(self))
+
+    def save(self, *args, **kwargs):
+        if not self.created:
+            self.created=datetime.datetime.now()
+        super(Purchase, self).save(*args, **kwargs)
 
 class Person(BuyModel):
     first_name=models.CharField(max_length=100)
