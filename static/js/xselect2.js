@@ -1,7 +1,7 @@
 /*
  Copyright 2012 Igor Vaynberg
 
- Version: 3.2 Timestamp: Mon Sep 10 10:38:04 PDT 2012
+ Version: @@ver@@ Timestamp: @@timestamp@@
 
  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in
  compliance with the License. You may obtain a copy of the License in the LICENSE file, or at:
@@ -92,6 +92,14 @@
 
     nextUid=(function() { var counter=1; return function() { return counter++; }; }());
 
+    function escapeMarkup(markup) {
+        if (markup && typeof(markup) === "string") {
+            return markup.replace(/&/g, "&amp;");
+        } else {
+            return markup;
+        }
+    }
+
     function indexOf(value, array) {
         var i = 0, l = array.length, v;
 
@@ -162,7 +170,7 @@
         });
     }
 
-    $(document).delegate("body", "mousemove", function (e) {
+    $(document).delegate("*", "mousemove", function (e) {
         $.data(document, "select2-lastpos", {x: e.pageX, y: e.pageY});
     });
 
@@ -187,18 +195,13 @@
      *
      * @param quietMillis number of milliseconds to wait before invoking fn
      * @param fn function to be debounced
-     * @param ctx object to be used as this reference within fn
      * @return debounced version of fn
      */
-    function debounce(quietMillis, fn, ctx) {
-        ctx = ctx || undefined;
+    function debounce(quietMillis, fn) {
         var timeout;
         return function () {
-            var args = arguments;
             window.clearTimeout(timeout);
-            timeout = window.setTimeout(function() {
-                fn.apply(ctx, args);
-            }, quietMillis);
+            timeout = window.setTimeout(fn, quietMillis);
         };
     }
 
@@ -358,14 +361,10 @@
             }
 
             process = function(datum, collection) {
-                var group, attr;
+                var group;
                 datum = datum[0];
                 if (datum.children) {
-                    group = {};
-                    for (attr in datum) {
-                        if (datum.hasOwnProperty(attr)) group[attr]=datum[attr];
-                    }
-                    group.children=[];
+                    group = { text: text(datum), children: [] };
                     $(datum.children).each2(function(i, childDatum) { process(childDatum, group.children); });
                     if (group.children.length) {
                         collection.push(group);
@@ -494,7 +493,7 @@
      * also takes care of clicks on label tags that point to the source element
      */
     $(document).ready(function () {
-        $(document).delegate("body", "mousedown touchend", function (e) {
+        $(document).delegate("*", "mousedown touchend", function (e) {
             var target = $(e.target).closest("div.select2-container").get(0), attr;
             if (target) {
                 $(document).find("div.select2-container-active").each(function () {
@@ -568,7 +567,7 @@
             this.body = thunk(function() { return opts.element.closest("body"); });
 
             if (opts.element.attr("class") !== undefined) {
-                this.container.addClass(opts.element.attr("class").replace(/validate\[[\S ]+] ?/, ''));
+                this.container.addClass(opts.element.attr("class"));
             }
 
             this.container.css(evaluate(opts.containerCss));
@@ -692,7 +691,7 @@
 
                             result=results[i];
                             selectable=id(result) !== undefined;
-                            compound=result.children && result.children.length > 0;
+                            compound=("children" in result) && result.children.length > 0;
 
                             node=$("<li></li>");
                             node.addClass("select2-results-dept-"+depth);
@@ -706,7 +705,7 @@
 
                             formatted=opts.formatResult(result, label, query);
                             if (formatted!==undefined) {
-                                label.html(self.opts.escapeMarkup(formatted));
+                                label.html(escapeMarkup(formatted));
                             }
 
                             node.append(label);
@@ -822,7 +821,6 @@
          */
         // abstract
         triggerChange: function (details) {
-
             details = details || {};
             details= $.extend({}, details, { type: "change", val: this.val() });
             // prevents recursive triggering
@@ -833,11 +831,6 @@
             // some validation frameworks ignore the change event and listen instead to keyup, click for selects
             // so here we trigger the click event manually
             this.opts.element.click();
-
-            // ValidationEngine ignorea the change event and listens instead to blur
-            // so here we trigger the blur event manually if so desired
-            if (this.opts.blurOnChange)
-                this.opts.element.blur();
         },
 
 
@@ -872,24 +865,14 @@
                 dropHeight = this.dropdown.outerHeight(),
                 viewportBottom = $(window).scrollTop() + document.documentElement.clientHeight,
                 dropTop = offset.top + height,
-                dropLeft = offset.left,
                 enoughRoomBelow = dropTop + dropHeight <= viewportBottom,
                 enoughRoomAbove = (offset.top - dropHeight) >= this.body().scrollTop(),
                 aboveNow = this.dropdown.hasClass("select2-drop-above"),
-                bodyOffset,
                 above,
                 css;
 
             // console.log("below/ droptop:", dropTop, "dropHeight", dropHeight, "sum", (dropTop+dropHeight)+" viewport bottom", viewportBottom, "enough?", enoughRoomBelow);
             // console.log("above/ offset.top", offset.top, "dropHeight", dropHeight, "top", (offset.top-dropHeight), "scrollTop", this.body().scrollTop(), "enough?", enoughRoomAbove);
-
-            // fix positioning when body has an offset and is not position: static
-
-            if (this.body().css('position') !== 'static') {
-                bodyOffset = this.body().offset();
-                dropTop -= bodyOffset.top;
-                dropLeft -= bodyOffset.left;
-            }
 
             // always prefer the current above/below alignment, unless there is not enough room
 
@@ -913,7 +896,7 @@
 
             css = $.extend({
                 top: dropTop,
-                left: dropLeft,
+                left: offset.left,
                 width: width
             }, evaluate(this.opts.dropdownCss));
 
@@ -926,7 +909,7 @@
 
             if (this.opened()) return false;
 
-            event = $.Event("open");
+            event = jQuery.Event("open");
             this.opts.element.trigger(event);
             return !event.isDefaultPrevented();
         },
@@ -1020,7 +1003,7 @@
             this.results.empty();
             this.clearSearch();
 
-            this.opts.element.trigger($.Event("close"));
+            this.opts.element.trigger(jQuery.Event("close"));
         },
 
         // abstract
@@ -1191,7 +1174,7 @@
             }
 
             function render(html) {
-                results.html(self.opts.escapeMarkup(html));
+                results.html(escapeMarkup(html));
                 postRender();
             }
 
@@ -1254,7 +1237,7 @@
                 self.opts.populateResults.call(this, results, data.results, {term: search.val(), page: this.resultsPage, context:null});
 
                 if (data.more === true && checkFormatter(opts.formatLoadMore, "formatLoadMore")) {
-                    results.append("<li class='select2-more-results'>" + self.opts.escapeMarkup(opts.formatLoadMore(this.resultsPage)) + "</li>");
+                    results.append("<li class='select2-more-results'>" + escapeMarkup(opts.formatLoadMore(this.resultsPage)) + "</li>");
                     window.setTimeout(function() { self.loadMoreIfNeeded(); }, 10);
                 }
 
@@ -1638,7 +1621,7 @@
                 // check for a first blank option if attached to a select
                 if (this.select && this.select.find("option:first").text() !== "") return;
 
-                this.selection.find("span").html(this.opts.escapeMarkup(placeholder));
+                this.selection.find("span").html(escapeMarkup(placeholder));
 
                 this.selection.addClass("select2-default");
 
@@ -1697,7 +1680,7 @@
             container.empty();
             formatted=this.opts.formatSelection(data, container);
             if (formatted !== undefined) {
-                container.append(this.opts.escapeMarkup(formatted));
+                container.append(escapeMarkup(formatted));
             }
 
             this.selection.removeClass("select2-default");
@@ -1880,11 +1863,8 @@
 
             this.search.bind("keyup", this.bind(this.resizeSearch));
 
-            this.search.bind("blur", this.bind(function(e) {
+            this.search.bind("blur", this.bind(function() {
                 this.container.removeClass("select2-container-active");
-                this.search.removeClass("select2-focused");
-                this.clearSearch();
-                e.stopImmediatePropagation();
             }));
 
             this.container.delegate(selector, "mousedown", this.bind(function (e) {
@@ -2077,7 +2057,7 @@
                 formatted;
 
             formatted=this.opts.formatSelection(data, choice);
-            choice.find("div").replaceWith("<div>"+this.opts.escapeMarkup(formatted)+"</div>");
+            choice.find("div").replaceWith("<div>"+escapeMarkup(formatted)+"</div>");
             choice.find(".select2-search-choice-close")
                 .bind("mousedown", killEvent)
                 .bind("click dblclick", this.bind(function (e) {
@@ -2361,14 +2341,14 @@
             return markup.join("");
         },
         formatSelection: function (data, container) {
-            return data ? data.text : undefined;
+            return data.text;
         },
         formatResultCssClass: function(data) {return undefined;},
         formatNoMatches: function () { return "No matches found"; },
         formatInputTooShort: function (input, min) { return "Please enter " + (min - input.length) + " more characters"; },
-        formatSelectionTooBig: function (limit) { return "You can only select " + limit + " item" + (limit == 1 ? "" : "s"); },
+        formatSelectionTooBig: function (limit) { return "You can only select " + limit + " items"; },
         formatLoadMore: function (pageNumber) { return "Loading more results..."; },
-        formatSearching: function () { return "Searching..."; },
+	    formatSearching: function () { return "Searching..."; },
         minimumResultsForSearch: 0,
         minimumInputLength: 0,
         maximumSelectionSize: 0,
@@ -2378,14 +2358,7 @@
         },
         separator: ",",
         tokenSeparators: [],
-        tokenizer: defaultTokenizer,
-        escapeMarkup: function (markup) {
-            if (markup && typeof(markup) === "string") {
-                return markup.replace(/&/g, "&amp;");
-            }
-            return markup;
-        },
-        blurOnChange: false
+        tokenizer: defaultTokenizer
     };
 
     // exports

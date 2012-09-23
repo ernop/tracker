@@ -92,14 +92,16 @@ def savetmp(self):
     return out
 
 
-HOUR_CHOICES=zip('morning noon afternoon evening night midnight'.split(),[9,12,15,19,22,1])
-HOUR_CHOICES.append(('deep night',3))
-HOUR_CHOICES.append(('early morning',6))
+
+
+HOUR_CHOICES=zip([0,1,2,3,4,5], 'morning noon afternoon evening night midnight'.split())
+HOUR_CHOICES.append((6, 'deep night'))
+HOUR_CHOICES.append((7, 'early morning'))
 hour2name={}
 name2hour={}
 for a in HOUR_CHOICES:
-    hour2name[a[1]]=a[0]
-    name2hour[a[0]]=a[1]
+    name2hour[a[1]]=a[0]
+    hour2name[a[0]]=a[1]
     
 def r2r(template, request, context=None, lang=None):
     from django.conf import settings
@@ -142,7 +144,8 @@ def purchase2obj(p):
             'size':p.size,'cost':p.cost,'source':source2obj(p.source),
             'who_with':[per2obj(per) for per in p.who_with.all()],
             'note':p.note, 
-            'text':p.product.name,}
+            'text':p.product.name,
+            'product_id':p.product.id,}
 
 def per2obj(per):
     return {'id':per.id,'first_name':per.first_name,'last_name':per.last_name,'text':'%s %s'%(per.first_name, per.last_name),}

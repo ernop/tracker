@@ -4,6 +4,21 @@ $(document).ready(function(){
 	display_purch();
 });
 
+
+//function initHour(element, callback) {
+	//debugger;
+    //var data = [element.val()];
+	
+    ////var ids = element.val().split(",");
+    ////$(ids).each(function() {
+        ////var id=this;
+        ////$(full_notekinds).each(function() {
+            ////if (id.localeCompare(""+this.id)==0) data.push(this);
+        ////});
+    ////});
+    //callback(data);                   
+//}
+
 function setup_new_purch(){
     var pz=$(".purchase-zone");
     $("#product").select2({data:products});
@@ -77,5 +92,28 @@ function display_purch(){
 }
 
 function obj2row(purchase){
-	return '<div class="purchase">'+purchase.name+' '+purchase.cost+'元</div>';
+	console.log(purchase)
+	if (purchase.quantity!=1){
+		var count=' ('+purchase.quantity+')';
+	}else{
+		var count=''
+	}
+	return '<div class="purchase">'+pur_alink(purchase)+' - '+prod_purchases_clink(purchase)+' '+purchase.cost+'元'+count+'</div>';
+	//return '<div class="purchase">'+purchase.name+' '+purchase.cost+'元</div>';
+}
+
+function pur_alink(purch){//the direct purchase
+	return '<a href="/admin/buy/purchase/'+purch.id+'/">edit</a>'
+}
+
+function prod_alink(purch){//the product - useless
+	return '<a href="/admin/buy/product/'+purch.product_id+'/">'+purch.name+'</a>'
+}
+
+function pur_clink(purch){
+	return '<a href="/admin/buy/purchase/?id='+purch.id+'">this '+purch.name+'</a>'
+}
+
+function prod_purchases_clink(purch){
+	return '<a href="/admin/buy/purchase/?product__id='+purch.product_id+'">all '+purch.name+'</a>'
 }

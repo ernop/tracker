@@ -164,7 +164,7 @@ def aday(request, day):
     vals['sources']=[source2obj(s) for s in Source.objects.all()]
     vals['people']=[per2obj(p) for p in Person.objects.all()]
     vals['currencies']=[currency2obj(c) for c in Currency.objects.all()]
-    vals['hour']=datetime.datetime.now().hour
+    vals['hour']=name2hour[gethour()]
     vals['hours']=[{'id':9,'name':'morning','text':'morning',},
                    {'id':12,'name':'noon','text':'noon',},
                    {'id':15,'name':'afternoon','text':'afternoon',},

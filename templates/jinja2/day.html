@@ -44,18 +44,23 @@
     <div class="purchase-list">
     <h2>Purchases</h2>
     </div>
-    <br><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/purchase/add">add new</a>
     <div class="purchase-zone">
-        <input id="product"></input>
-        <input type=text style="width:30px;" id=cost></input>for
+        <table class="table"><tr>
+        <td><input id="product" style="width:160px;"></input>
+        <td><input type=text style="width:30px;" id=cost></input> for
         <input type=text id=quantity style="width:20px;" value=1></input>
-        <br>from <input id=source></input>
-        <br>hour<input type=text id=hour value="{{hour}}"></input>
-        <br>size<input type=text id=size  style="width:30px;"></input>
-        <br>with<input id=who_with></input>
-        <br>note<input type=text id=note></input>
-        <br>currency<input type=text id=currency></input>
-        <br><div class="btn make-purchase">Make</div>
+        
+        <tr><td>source <td><input id=source style="width:190px;"></input>
+        <tr><td>hour<td><input type=text id=hour style="width:190px;" value="{{hour}}"></input>
+        <tr><td>size<td><input type=text id=size  style="width:190px;"></input>
+        <tr><td>with who<td><input id=who_with></input>
+        <tr><td>note<td><input type=text id=note></input>
+        <tr><td>currency<td><input type=text id=currency></input>
+        <tr><td><div class="btn make-purchase">Make</div>
+        <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/source/add">add source</a>
+        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/product/add">add product</a>
+        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/person/add">add person</a>
+        </table>
     </div>
 </div></div>
 
