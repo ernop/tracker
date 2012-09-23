@@ -41,7 +41,7 @@ def ajax_make_purchase(request):
         product_id=dat['product_id']
         source_id=dat['source_id']
         cost=float(dat['cost'])
-        quantity=dat['quantity'] and int(dat['quantity']) or 1
+        quantity=dat['quantity'] and float(dat['quantity']) or 1
         size=dat['size']
         if 'who_with[]' in dat:
             who_with=dat['who_with[]']
