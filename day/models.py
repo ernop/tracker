@@ -97,7 +97,7 @@ class Note(DayModel):
         return ','.join([str(n.id) for n in self.kinds.all()])
     
     def getheight(self):
-        return (self.text and len(self.text)/3+100) or '120'
+        return (self.text and len(self.text)/4+80) or '250'
     
 class NoteKind(DayModel):
     name=models.CharField(max_length=100)
