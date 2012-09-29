@@ -175,7 +175,7 @@ class Measurement(WorkoutModel):
     created=models.DateField()
     
     def __unicode__(self):
-        return '%s %s: <b>%s</b>'%(self.place, self.created.strftime(DATE), rstripz(self.amount))#','.join([str(s) for s in self.sets.all()]),)
+        return '%s %s: %s'%(self.place, self.created.strftime(DATE), rstripz(self.amount))#','.join([str(s) for s in self.sets.all()]),)
     
     class Meta:
         db_table='measurement'

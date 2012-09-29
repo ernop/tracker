@@ -173,6 +173,9 @@ def aday(request, day):
                    {'id':1,'name':'midnight','text':'midnight',},
                    {'id':3,'name':'deep night','text':'deep night',},
                    {'id':6,'name':'early morning','text':'early morning',},]
+    from workout.models import MeasuringSpot
+    vals['measurement_places']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
+    
     return r2r('jinja2/day.html', request, vals)
 #('morning noon afternoon evening night midnight'.split(),[9,12,15,19,22,1])
 #HOUR_CHOICES.append(('deep night',3))

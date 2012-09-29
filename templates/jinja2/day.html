@@ -12,6 +12,7 @@
         var currencies={{currencies|jsonify|safe}};
         var hours={{hours|jsonify|safe}};
         var hour={{hour|jsonify|safe}};
+        var measurement_places={{measurement_places|jsonify|safe}};
     </script>
 {% endblock %}
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
@@ -46,16 +47,16 @@
     </div>
     <div class="purchase-zone">
         <table class="table"><tr>
-        <td><input id="product" style="width:160px;"></input>
-        <td><input type=text style="width:30px;" id=cost></input> for
-        <input type=text id=quantity style="width:20px;" value=1></input>
+        <td><input id="purchase-product" style="width:160px;"></input>
+        <td><input type=text style="width:30px;" id="purchase-cost"></input> for
+        <input type=text id=purchase-quantity style="width:20px;" value=1></input>
         
-        <tr><td>source <td><input id=source style="width:190px;"></input>
-        <tr><td>hour<td><input type=text id=hour style="width:190px;" value="{{hour}}"></input>
-        <tr><td>size<td><input type=text id=size  style="width:190px;"></input>
-        <tr><td>with who<td><input id=who_with></input>
-        <tr><td>note<td><input type=text id=note></input>
-        <tr><td>currency<td><input type=text id=currency></input>
+        <tr><td>source <td><input id="purchase-source" style="width:190px;"></input>
+        <tr><td>hour<td><input type=text id="purchase-hour" style="width:190px;" value="{{hour}}"></input>
+        <tr><td>size<td><input type=text id=purchase-size  style="width:190px;"></input>
+        <tr><td>with who<td><input id=purchase-who_with></input>
+        <tr><td>note<td><input type=text id=purchase-note></input>
+        <tr><td>currency<td><input type=text id=purchase-currency style="width:50px;"></input>
         <tr><td><div class="btn make-purchase">Make</div>
         <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/source/add">add source</a>
         <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/product/add">add product</a>
@@ -72,10 +73,18 @@
 </div></div>
 
 <div class="row"><div class="span8">
-    <h2>Measurements</h2>
-    {% for measurement in day.getmeasurements() %}
-    {{measurement.place.clink()|safe}} - {{measurement.amount}}<br>{% endfor %}
-    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/measurement/add">add new</a><br>
+    <div class="measurement-list">
+        <h2>Measurement</h2>
+    </div>
+    <div class="measurement-zone">
+        <table class="table"><tr>
+        <tr><td><input  id="measurement-place" style="width:160px;"></input>
+        <tr><td><input type=text id="measurement-amount"></input>
+        <tr><td><div class="btn make-measurement">Make</div>
+        <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/measurement/add">add new</a>
+        </table>
+    </div>
+    
 </div></div>
 
 

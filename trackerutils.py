@@ -147,6 +147,10 @@ def purchase2obj(p):
             'text':p.product.name,
             'product_id':p.product.id,}
 
+def measurement2obj(m):
+    return {'id':m.id, 'place_id':m.place.id, 'amount':m.amount,
+            'name':m.place.name,'text':m.place.name,}
+
 def per2obj(per):
     return {'id':per.id,'first_name':per.first_name,'last_name':per.last_name,'text':'%s %s'%(per.first_name, per.last_name),}
 

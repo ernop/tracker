@@ -2,51 +2,50 @@ $(document).ready(function(){
     
     setup_new_purch();
 	display_purch();
+	setup_new_measurement();
+	display_measurement();
 });
-
-
-//function initHour(element, callback) {
-	//debugger;
-    //var data = [element.val()];
-	
-    ////var ids = element.val().split(",");
-    ////$(ids).each(function() {
-        ////var id=this;
-        ////$(full_notekinds).each(function() {
-            ////if (id.localeCompare(""+this.id)==0) data.push(this);
-        ////});
-    ////});
-    //callback(data);                   
-//}
 
 function setup_new_purch(){
     var pz=$(".purchase-zone");
-    $("#product").select2({data:products});
-	$("#source").select2({data:sources});
-	$("#currency").select2({data:currencies});
-	$("#who_with").select2({data:people, multiple: true});
-	$("#hour").select2({data:hours});
-    pz.after('<div id="save-purchase" class="btn">save</div>');
+    $("#purchase-product").select2({data:products});
+	$("#purchase-source").select2({data:sources});
+	$("#purchase-currency").select2({data:currencies});
+	$("#purchase-who_with").select2({data:people, multiple: true});
+	$("#purchase-hour").select2({data:hours});
     $(".make-purchase").click(submit_purchase)
+}
+
+function setup_new_measurement(){
+    var pz=$(".measurement-zone");
+    $("#measurement-place").select2({data:measurement_places});
+    $(".make-measurement").click(submit_measurement)
 }
 
 var submitting=false;
 
 function get_purchase_data(){
 	var dat={};
-	dat['product_id']=$("#product").select2('data').id;
-	dat['source_id']=$("#source").select2('data').id;
-	dat['cost']=$("#cost").val();
-	dat['quantity']=$("#quantity").val();
-	dat['size']=$("#size").val();
-	dat['hour']=$("#hour").select2('data').id;
+	dat['product_id']=$("#purchase-product").select2('data').id;
+	dat['source_id']=$("#purchase-source").select2('data').id;
+	dat['cost']=$("#purchase-cost").val();
+	dat['quantity']=$("#purchase-quantity").val();
+	dat['size']=$("#purchase-size").val();
+	dat['hour']=$("#purchase-hour").select2('data').id;
 	var ids=[]
-	$.each($("#who_with").select2('data'), function(index, thing){
+	$.each($("#purchase-who_with").select2('data'), function(index, thing){
 		ids.push(thing.id);
 	});
 	dat['who_with']=ids;
-	dat['note']=$("#note").val();
-	dat['note']=$("#currency").val();
+	dat['note']=$("#purchase-note").val();
+	dat['currency']=$("#purchase-currency").val();
+	return dat;
+}
+
+function get_measurement_data(){
+	var dat={};
+	dat['place_id']=$("#measurement-place").select2('data').id;
+	dat['amount']=$("#measurement-amount").val();
 	return dat;
 }
 
@@ -70,6 +69,26 @@ function submit_purchase(){
 	submitting=false;
 };
 
+function submit_measurement(){
+	if (submitting){return}
+	submitting=true;
+	data=get_measurement_data();
+	data['today']=today;
+	$.ajax({
+		type:'POST',
+		url:'/ajax/make_measurement/',
+		data:data,
+		dataType:"json",
+		contentType: "application/json; charset=utf-8",
+		success:function(data){    
+			display_measurement();
+		},
+		error:function(a,b,c){
+		}
+	});
+	submitting=false;
+};
+
 function display_purch(){
     $.ajax({
 		type:'POST',
@@ -81,7 +100,7 @@ function display_purch(){
 			var pz=$(".purchase-list");
 			pz.find('.purchase').remove();
 			$.each(data['purchases'], function(index, thing){
-				var row=obj2row(thing);
+				var row=obj2purchase(thing);
 				pz.append(row);
 				$(row).slideDown();
 			});
@@ -91,15 +110,46 @@ function display_purch(){
 	});
 }
 
-function obj2row(purchase){
-	console.log(purchase)
+function display_measurement(){
+    $.ajax({
+		type:'POST',
+		url:'/ajax/get_measurements/',
+		data:{'today':today},
+		dataType:"json",
+		contentType: "application/json; charset=utf-8",
+		success:function(data){    
+			var pz=$(".measurement-list");
+			pz.find('.measurement').remove();
+			$.each(data['measurements'], function(index, thing){
+				var row=obj2measurement(thing);
+				pz.append(row);
+				$(row).slideDown();
+			});
+		},
+		error:function(a,b,c){
+		}
+	});
+}
+
+function obj2purchase(purchase){
 	if (purchase.quantity!=1){
 		var count=' ('+purchase.quantity+')';
 	}else{
 		var count=''
 	}
 	return '<div class="purchase">'+pur_alink(purchase)+' - '+prod_purchases_clink(purchase)+' '+purchase.cost+'元'+count+'</div>';
-	//return '<div class="purchase">'+purchase.name+' '+purchase.cost+'元</div>';
+}
+
+function obj2measurement(measurement){
+	return '<div class="measurement">'+m_clink(measurement)+' '+m_p_alink(measurement)+' '+ measurement.amount+'</div>';
+}
+
+function m_clink(m){
+	return '<a href="/admin/workout/measurement/?place__id='+m.place_id+'">all '+m.name+'</a>'
+}
+
+function m_p_alink(m){
+	return '<a href="/admin/workout/measuringspot/?id='+m.place_id+'">summary '+m.name+'</a>'
 }
 
 function pur_alink(purch){//the direct purchase
@@ -111,7 +161,7 @@ function prod_alink(purch){//the product - useless
 }
 
 function pur_clink(purch){
-	return '<a href="/admin/buy/purchase/?id='+purch.id+'">this '+purch.name+'</a>'
+	return '<a href="/admin/buy/purchase/?id='+purch.id+'">'+purch.name+'</a>'
 }
 
 function prod_purchases_clink(purch){
