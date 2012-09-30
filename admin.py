@@ -518,7 +518,7 @@ class NoteAdmin(OverriddenModelAdmin):
     list_display='text myaday mynotekinds'.split()
     list_filter=['kinds',]
     list_search=['kinds',]
-    date_hierarchy=['created',]
+    date_hierarchy='created'
     @debu
     def myaday(self, obj):
         return obj.day.vlink()
