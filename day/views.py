@@ -1,5 +1,4 @@
 # Create your views here.
-
 import datetime
 
 # Create your views here.
@@ -115,7 +114,6 @@ def index(request):
     return r2r('jinja2/day.html',request, vals)
 
 def today(request):
-    
     today=gettoday()
     return HttpResponseRedirect('/aday/%s'%str(today))
     #d,created=Day.objects.get_or_create(date=today)
@@ -138,6 +136,7 @@ def y2day(request):
 def aday(request, day):
     dtday=datetime.datetime.strptime(day, '%Y-%m-%d')
     vals={}
+    log.info('day is %s',day)
     vals['today']=day
     day,created=Day.objects.get_or_create(date=dtday)
     day.save()

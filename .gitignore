@@ -17,4 +17,4 @@ env
 src
 ipython
 *.stackdump
-logs
+logs/*.log
