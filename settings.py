@@ -69,31 +69,71 @@ INSTALLED_APPS = (
     'tracker.day',
 )
 
+
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s.py:%(lineno)d %(funcName)s() %(message)s',
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s',
+        },
+        'db':{
+            'format':'%(levelname)s %(duration)s %(sql)s %(params)s %(message)s',
         }
     },
     'handlers': {
-        'mail_admins': {
+        'file_log':{
+            'level':'INFO',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': DJANGO_BASE+'/logs/tracker.log',
+            'maxBytes': 500*1024**2, # 500 MB, dumb windows not being able to roll over...
+            'backupCount': 5,
+            'formatter':'verbose',            
+        },
+        'error_log':{
+            'level':'ERROR',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': DJANGO_BASE+'/logs/error.log',
+            'maxBytes': 500*1024**2, # 500 MB, dumb windows not being able to roll over...
+            'backupCount': 5,
+            'formatter':'verbose',            
+        },    
+        'null': {
+            'level':'DEBUG',
+            'class':'django.utils.log.NullHandler',
+        },
+        'console':{
+            'level':'INFO',
+            'class':'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'mail_admins': { #most loggers have this in addition to their normal file log.  if an error+ thing happens mail me too.
             'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter':'verbose',
         }
     },
     'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
+        '': {
+                'handlers': ['file_log','error_log','mail_admins',],
+                'level': 'INFO',
+                'propagate': True
+            },        
+        'django': {
+            'handlers':['null','console','file_log','mail_admins',],
             'propagate': True,
+            'level':'INFO',
+        },
+        'django.request': {
+            'handlers': ['mail_admins','file_log'],
+            'level': 'ERROR',
+            'propagate': False,
         },
     }
 }
-
 
 ADMIN_EXTERNAL_BASE='/admin'
 
