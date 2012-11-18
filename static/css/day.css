@@ -10,3 +10,11 @@
 .select2-container{width:300px;}
 
 .purchase{display:block;}
+
+.fixed-notification{
+    bottom:300px;
+    right:100px;
+    width:300px;
+    display:inline-block;
+    position:absolute;
+}

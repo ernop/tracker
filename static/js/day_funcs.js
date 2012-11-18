@@ -26,8 +26,16 @@ var submitting=false;
 
 function get_purchase_data(){
 	var dat={};
+	
 	dat['product_id']=$("#purchase-product").select2('data').id;
-	dat['source_id']=$("#purchase-source").select2('data').id;
+	var dd=$("#purchase-source").select2('data');
+	if (dd){
+		dat['source_id']=dd.id;
+	}
+	else{
+	notify('no source.',false);
+	return false;
+	}
 	dat['cost']=$("#purchase-cost").val();
 	dat['quantity']=$("#purchase-quantity").val();
 	dat['size']=$("#purchase-size").val();
@@ -42,6 +50,20 @@ function get_purchase_data(){
 	return dat;
 }
 
+function notify(msg, success){
+	if (success){
+		var klass='success'}
+	else{
+		var klass='failure';
+	}
+	var note=$('<div class="alert alert-'+klass+'">'+msg+'</div>');
+	var nzone=$(".fixed-notification notification");
+	if (nzone.length){
+		nzone.find('.alert').slideUp();
+		nzone.append(note);
+	}
+}
+
 function get_measurement_data(){
 	var dat={};
 	dat['place_id']=$("#measurement-place").select2('data').id;
@@ -53,19 +75,23 @@ function submit_purchase(){
 	if (submitting){return}
 	submitting=true;
 	data=get_purchase_data();
-	data['today']=today;
-	$.ajax({
-		type:'POST',
-		url:'/ajax/make_purchase/',
-		data:data,
-		dataType:"json",
-		contentType: "application/json; charset=utf-8",
-		success:function(data){    
-			display_purch();
-		},
-		error:function(a,b,c){
-		}
-	});
+	if (data){
+		data['today']=today;
+		$.ajax({
+			type:'POST',
+			url:'/ajax/make_purchase/',
+			data:data,
+			dataType:"json",
+			contentType: "application/json; charset=utf-8",
+			success:function(data){    
+				display_purch();
+			},
+			error:function(a,b,c){
+			}
+		});
+	}else{
+	1
+	}
 	submitting=false;
 };
 

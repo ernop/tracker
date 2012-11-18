@@ -49,7 +49,7 @@ def ajax_make_purchase(request):
         quantity=dat['quantity'] and float(dat['quantity']) or 1
         size=dat['size']
         if 'who_with[]' in dat:
-            who_with=dat['who_with[]']
+            who_with=dat.getlist('who_with[]')
         else:
             who_with=[]
         note=dat['note']
