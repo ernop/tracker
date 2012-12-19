@@ -438,7 +438,6 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
             mes=mes.exclude(amount=0)        
         if not mes:
             return
-        #import ipdb;ipdb.set_trace()
         mindate=None
         res={}
         for m in mes:
@@ -451,7 +450,6 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         trying=first
         res2=[]
         lastt=None
-        #import ipdb;ipdb.set_trace()
         while trying<now:
             if trying.strftime(DATE) in res:
                 lastt=res.get(trying.strftime(DATE))

@@ -54,7 +54,6 @@ class DayModel(models.Model):
         
 class MyJsReplacementBuy(models.Model):
     #def _media(self):
-        #import ipdb;ipdb.set_trace()
         #js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js', settings.MEDIA_URL + 'static/js/DjangoAjax.js',)
 
     #media=property(_media)

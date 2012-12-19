@@ -21,7 +21,6 @@ def ajax_day_data(request):
     vals['message']='start.'
     todo=request.POST
     kind=request.POST['kind']
-    import ipdb;ipdb.set_trace()
     if kind=='tagnames':
         day_id=request.POST['day_id']
         day=Day.objects.get(id=day_id)

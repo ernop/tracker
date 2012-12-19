@@ -129,13 +129,10 @@ class Workout(WorkoutModel):
         for s in self.sets.all():res[s.exweight.exercise].append(s)
         #res is dict of exercise => [exweights,]
         res2={}
-        #import ipdb;ipdb.set_trace()
         for exercise,zets in res.items():
-            #import ipdb;ipdb.set_trace()
             weights={}
             ct=0 #counter - merge sequential sets of the same weight.
             lastweight=None
-            #import ipdb;ipdb.set_trace()
             for zet in zets:
                 if lastweight and zet.exweight.weight==lastweight:
                     pass
@@ -146,7 +143,6 @@ class Workout(WorkoutModel):
                         weights[(ct, zet.exweight.weight, zet.exweight.side,)]=[]
                     else:
                         weights[(ct, zet.exweight.weight)]=[]
-                #import ipdb;ipdb.set_trace()
                 if exercise.barbell:
                     weights[(ct, zet.exweight.weight, zet.exweight.side,)].append(zet.count)
                 else:
