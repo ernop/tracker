@@ -8,7 +8,7 @@ from local_settings import *
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-#MANAGERS = ADMINS
+MANAGERS = ADMINS
 #DJANGO_BASE='d:/proj/tracker'
 
 # URL prefix for static files.
