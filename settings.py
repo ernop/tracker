@@ -8,7 +8,8 @@ from local_settings import *
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-MANAGERS = ADMINS
+#MANAGERS = ADMINS
+DJANGO_BASE='d:/proj/tracker'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -30,8 +31,8 @@ TEMPLATE_CONTEXT_PROCESSORS=(
     "django.core.context_processors.media",
     "django.core.context_processors.static",
     #"django.core.context_processors.request",
-    #"django.contrib.messages.context_processors.messages", 
-    "processors.static_url_processor", 
+    #"django.contrib.messages.context_processors.messages",
+    "processors.static_url_processor",
     #'django_notices.context_processors.notices',
     )
 
@@ -43,7 +44,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'tracker.urls'
+ROOT_URLCONF = 'urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'tracker.wsgi.application'
@@ -89,7 +90,7 @@ LOGGING = {
             'filename': DJANGO_BASE+'/logs/tracker.log',
             'maxBytes': 500*1024**2, # 500 MB, dumb windows not being able to roll over...
             'backupCount': 5,
-            'formatter':'verbose',            
+            'formatter':'verbose',
         },
         'error_log':{
             'level':'ERROR',
@@ -97,8 +98,8 @@ LOGGING = {
             'filename': DJANGO_BASE+'/logs/error.log',
             'maxBytes': 500*1024**2, # 500 MB, dumb windows not being able to roll over...
             'backupCount': 5,
-            'formatter':'verbose',            
-        },    
+            'formatter':'verbose',
+        },
         'null': {
             'level':'DEBUG',
             'class':'django.utils.log.NullHandler',
@@ -119,7 +120,7 @@ LOGGING = {
                 'handlers': ['file_log','error_log','mail_admins',],
                 'level': 'INFO',
                 'propagate': True
-            },        
+            },
         'django': {
             'handlers':['null','console','file_log','mail_admins',],
             'propagate': True,
