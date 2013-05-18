@@ -9,7 +9,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 #MANAGERS = ADMINS
-DJANGO_BASE='d:/proj/tracker'
+#DJANGO_BASE='d:/proj/tracker'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -44,7 +44,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'tracker.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'tracker.wsgi.application'
