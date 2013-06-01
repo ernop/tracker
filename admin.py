@@ -243,7 +243,6 @@ class DomainAdmin(OverriddenModelAdmin):
     def mysource(self, obj):
         """in the last month"""
         #-------------------------------source pie
-        #import ipdb;ipdb.set_trace()
         ss=Source.objects.filter(purchases__product__domain=obj).distinct()
 
         dat=[(s.total_spent(domain=obj), s.name) for s in ss]
@@ -492,9 +491,8 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
                 lastt=res.get(trying.strftime(DATE))
             res2.append(lastt)
             trying=datetime.timedelta(days=1)+trying
-        im=sparkline_discrete(results=res2, width=5, height=100)
-        tmp=savetmp(im)
-        return '<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
+        thang = new_sparkline(results=res2, width=2, height=100)
+        return '<div>%s</div>'% thang
 
 
     def mydomain(self, obj):
@@ -504,14 +502,17 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
     adminify( myhistory, mydomain, mysets, myname)
 
 class MeasurementAdmin(OverriddenModelAdmin):
-    list_display='id place mycreated amount'.split()
+    list_display='id myplace mycreated amount'.split()
     list_filter=['place',]
+
+    def myplace(self, obj):
+        return obj.place.clink()
 
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
 
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
-    adminify(mycreated)
+    adminify(mycreated, myplace)
     #fields='place amount created'.split()
     fields=(('place','amount','created',),)
 
