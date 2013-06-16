@@ -16,6 +16,7 @@ def adminify(*args):
                 name=func.__name__[2:]
             else:
                 name=func.__name__
+            name = name.replace('_', ' ')
         func.allow_tags=True
         func.short_description=name
 
@@ -58,7 +59,7 @@ def strip_html(text):
 def save_image_locally(url):
     """randomize name, and return name of image found at end of the url
     save it to static/aimg/name[0]/name"""
-    
+
     parts=urlparse.urlparse(url)
     f,ext=os.path.splitext(parts.path)
     rnd=str(uuid.uuid4())
@@ -85,7 +86,7 @@ def get_local_image_path(obj):
             log.error('obj has image url but no local image name.  weird. %s, id=%s',obj.image_url, obj.id)
         return ''
         #in the error case at least don't kill the template.  None is ok if not obj.image_url.
-    
+
 
 def stringify_children(node):
     from lxml.etree import tostring
@@ -115,7 +116,7 @@ def format_exception(maxTBlevel=10):
     #def checkout(self, dbapi_con, con_record, con_proxy):
         #import sqlalchemy
         #import sqlalchemy.interfaces
-        #import _mysql_exceptions        
+        #import _mysql_exceptions
         #try:
             #dbapi_con.cursor().execute('select now()')
         #except mysql_exceptions.OperationalError:
@@ -168,8 +169,8 @@ def group_required(*group_names):
     return user_passes_test(in_groups, login_url)
 
 def mk_default_field(vals):
-    """within a given klass (which is a subset of admin.ModelAdmin), 
-    return a function which, if assigned the name 'formfield_for_dbfield', 
+    """within a given klass (which is a subset of admin.ModelAdmin),
+    return a function which, if assigned the name 'formfield_for_dbfield',
     will make the fields listed in vals default to their value there - either the raw val
     or function call"""
     def inner(self, db_field, **kwargs):
@@ -185,7 +186,7 @@ def mk_default_field(vals):
                 ff.widget.attrs={'class':'vDateField'}
                 #omg, can't believe this works.
             return ff
-        return super(self.__class__, self).formfield_for_dbfield(db_field, **kwargs)        
+        return super(self.__class__, self).formfield_for_dbfield(db_field, **kwargs)
     return inner
 
 def mk_default_fkfield(vals):
@@ -196,7 +197,7 @@ def mk_default_fkfield(vals):
                 kwargs['initial']=th()
             else:
                 kwargs['initial']=th
-            return db_field.formfield(**kwargs)        
+            return db_field.formfield(**kwargs)
     return inner
 
 def nowdate():

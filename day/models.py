@@ -62,8 +62,6 @@ class Day(DayModel):
         except:
             return []
 
-
-
 class PersonDay(DayModel):
     person=models.ForeignKey(Person, related_name='persondays')
     day=models.ForeignKey('Day', related_name='persondays')

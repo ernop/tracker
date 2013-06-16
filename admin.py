@@ -296,7 +296,7 @@ class PersonAdmin(OverriddenModelAdmin):
 
     def myintroduced_to(self, obj):
         #import ipdb;ipdb.set_trace()
-        return ', '.join([p.clink() for p in obj.person_set.all()])
+        return mktable([(p.clink(), ) for p in obj.person_set.order_by('first_name', 'last_name')])
 
     def myspots(self, obj):
         #import ipdb;ipdb.set_trace()
@@ -353,6 +353,8 @@ class CurrencyAdmin(OverriddenModelAdmin):
 
 class SourceAdmin(OverriddenModelAdmin):
     list_display='name mytotal myproducts mywith mysummary'.split()
+    list_per_page = 10
+    search_fields = ['name', ]
 
     def myproducts(self, obj):
         products=Product.objects.filter(purchases__source=obj).distinct()

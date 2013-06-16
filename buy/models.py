@@ -15,38 +15,7 @@ def lnk(nodel, id, obj):
 def clink(nodel, id, obj):
     return '<a style="white-space:nowrap;" href="/admin/buy/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
 
-# Create your models here.
-
 from trackerutils import BuyModel
-
-#class SpanAverage(BuyModel):
-    #"""for a span of time, starting date, and given domain (not general enough...) what was the running average per day spent on it?"""
-    #"""not working"""
-    #domain=models.ForeignKey('Domain')
-    #start_date=models.DateField()
-    #span=models.CharField(max_length=1, choices=SPAN_CHOICES)
-    #value=models.FloatField()
-
-    #def calc(self):
-        #days=span2days[self.span]
-        #now=datetime.datetime.now()
-        #end=min(now, start_date+datetime.timedelta(days=days))
-        #partial=False
-        #if end==now:
-            #partial=True
-        #purch=Purchase.objects.filter(product__domain=self.domain, created__gt=self.start_date, created__lte=end)
-        #res=0
-        #for p in purch:
-            #res+=p.cost
-        #self.value=res
-        #self.save()
-
-    #def __unicode__(self):
-        #if self.value is None:
-            #self.calc()
-        #return '%0.1f/day for the %s starting %s'%(self.value, self.span, self.start_date)
-
-
 
 class Domain(BuyModel):
     """
@@ -96,11 +65,12 @@ class Source(BuyModel):
 
     def summary(self):
         if self.purchases.count():
-            #import ipdb;ipdb.set_trace()
             ptable = ''
             rowcosts = []
             for oo in Product.objects.filter(purchases__source=self).distinct():
                 link, count, cost, symbol = oo.summarydat(source=self)
+                if count == int(count):
+                    count = int(count)
                 pfilterlink = '<a href="/admin/buy/purchase/?product__id=%d&source__id=%d">filter</a>' % (oo.id, self.id)
                 rowcosts.append(('<tr><td>%s<td>%0.0f%s<td>%s<td>%s'% (link, cost, symbol, count, pfilterlink), cost))
             rowcosts = sorted(rowcosts, key=lambda x:-1*x[1])
@@ -149,9 +119,10 @@ class Product(BuyModel):
             count=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
         if not count:
             count = 0
-        if count==1:
-            count= 1
-        purches=Purchase.objects.filter(product=self)
+        if source:
+            purches=Purchase.objects.filter(product=self, source=source)
+        else:
+            purches=Purchase.objects.filter(product=self)
         try:
             symbol=purches[0].currency.symbol
         except:
@@ -231,3 +202,32 @@ class Person(BuyModel):
 
     def __unicode__(self):
         return '%s%s'%(self.first_name, self.last_name and ' %s' % self.last_name)
+
+
+
+#class SpanAverage(BuyModel):
+    #"""for a span of time, starting date, and given domain (not general enough...) what was the running average per day spent on it?"""
+    #"""not working"""
+    #domain=models.ForeignKey('Domain')
+    #start_date=models.DateField()
+    #span=models.CharField(max_length=1, choices=SPAN_CHOICES)
+    #value=models.FloatField()
+
+    #def calc(self):
+        #days=span2days[self.span]
+        #now=datetime.datetime.now()
+        #end=min(now, start_date+datetime.timedelta(days=days))
+        #partial=False
+        #if end==now:
+            #partial=True
+        #purch=Purchase.objects.filter(product__domain=self.domain, created__gt=self.start_date, created__lte=end)
+        #res=0
+        #for p in purch:
+            #res+=p.cost
+        #self.value=res
+        #self.save()
+
+    #def __unicode__(self):
+        #if self.value is None:
+            #self.calc()
+        #return '%0.1f/day for the %s starting %s'%(self.value, self.span, self.start_date)
