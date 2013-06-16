@@ -38,8 +38,19 @@ class Domain(BuyModel):
         return '<a href="/admin/buy/purchase/?product__domain__id__exact=%d">all purch</a>'%(self.id)
 
     def summary(self):
-        sums='<br>'.join([oo.summary() for oo in self.products.all() if oo.summary()])
-        ct=self.products.count()
+        rows = []
+        for pp in self.products.all():
+            link, count, cost, symbol = pp.summarydat()
+            if not cost:
+                continue
+            rows.append((link, count, '%s%s'%(cost, symbol), cost))
+        rows = sorted(rows, key=lambda x:x[3]*-1)
+        rows = [r[:3] for r in rows]
+        #sums=''.join([oo.summarydat() for oo in self.products.all() if oo.summary()])
+        #ct=self.products.count()
+
+        tbl = mktable(rows)
+        return tbl
         if ct:
             return '%d products (%s) (%s)<br>%s'%(ct,
 
@@ -48,7 +59,6 @@ class Domain(BuyModel):
                                                              sums,)
         else:
             return '%d products'%(ct,)
-
 
     def piechart(self):
         return clink('domain', self.id, self)
@@ -119,6 +129,10 @@ class Product(BuyModel):
             count=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
         if not count:
             count = 0
+        if count == int(count):
+            count = int(count)
+        else:
+            count = round(count, 2)
         if source:
             purches=Purchase.objects.filter(product=self, source=source)
         else:
@@ -128,6 +142,8 @@ class Product(BuyModel):
         except:
             symbol = None
         cost=self.total_spent(source=source)
+        if cost == int(cost):
+            cost = int(cost)
         plink = '<a href="/admin/buy/product/?id=%d">%s</a>'%(self.id, str(self))
         return plink, count, cost, symbol
 
