@@ -372,10 +372,6 @@ class SourceAdmin(OverriddenModelAdmin):
                 res[cl] = res.get(cl, 0) + 1
         tbl = mktable(sorted(res.items(), key=lambda x:(-1*x[1], x[0])))
         return tbl
-        res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
-        return res
-
-
 
     def mytotal(self, obj):
         #monthago=datetime.datetime.now()-datetime.timedelta(days=30)

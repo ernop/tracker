@@ -101,7 +101,7 @@ class Source(BuyModel):
             for oo in Product.objects.filter(purchases__source=self).distinct():
                 link, count, cost, symbol = oo.summarydat(source=self)
                 pfilterlink = '<a href="/admin/buy/purchase/?product__id=%d&source__id=%d">filter</a>' % (oo.id, self.id)
-                ptable +=   '<tr><td>%s<td>%0.1f<td>%s%s<td>%s'% (link, cost, count, symbol, pfilterlink)
+                ptable +=   '<tr><td>%s<td>%0.0f%s<td>%s<td>%s'% (link, cost, symbol, count, pfilterlink)
             ptable = '<table style="background-color:white;"  class="table">' + ptable + '</table>'
             return '%d purchases (%s)<br>%s'%(self.purchases.count(),
                 #self.all_products_link(),
@@ -150,7 +150,10 @@ class Product(BuyModel):
         if count==1:
             count= 1
         purches=Purchase.objects.filter(product=self)
-        symbol=purches[0].currency.symbol
+        try:
+            symbol=purches[0].currency.symbol
+        except:
+            symbol = None
         cost=self.total_spent(source=source)
         plink = '<a href="/admin/buy/product/?id=%d">%s</a>'%(self.id, str(self))
         return plink, count, cost, symbol
