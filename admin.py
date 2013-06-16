@@ -250,18 +250,19 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id first_name last_name birthday mymet_through myintroduced_to myspots'.split()
+    list_display='id first_name last_name birthday mymet_through myintroduced_to myspots mypurchases'.split()
     list_filter=['met_through',]
     list_editable=['birthday',]
     list_per_page = 40
+    search_fields = 'first_name last_name'.split()
 
     def mymet_through(self, obj):
-        return ','.join([p.clink() for p in obj.met_through.all()])
+        return ', '.join([p.clink() for p in obj.met_through.all()])
         #return '%s'%''.join([str(per) for per in obj.met_through.all()])
 
     def myintroduced_to(self, obj):
         #import ipdb;ipdb.set_trace()
-        return ','.join([p.clink() for p in obj.person_set.all()])
+        return ', '.join([p.clink() for p in obj.person_set.all()])
 
     def myspots(self, obj):
         #import ipdb;ipdb.set_trace()
@@ -273,7 +274,10 @@ class PersonAdmin(OverriddenModelAdmin):
         res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
         return res
 
-    adminify(mymet_through, myintroduced_to, myspots)
+    def mypurchases(self, obj):
+        return '<a href=/admin/buy/purchase/?who_with=%d>all</a>' % obj.id
+
+    adminify(mymet_through, myintroduced_to, myspots, mypurchases)
 
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name symbol mytotal my3months'.split()
