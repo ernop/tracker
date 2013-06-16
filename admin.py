@@ -69,7 +69,7 @@ def new_sparkline(results, width, height):
 
 class ProductAdmin(OverriddenModelAdmin):
     search_fields = ['name', ]
-    list_display='name mydomain mypurchases mypie myspark'.split()
+    list_display='name mydomain mypurchases mysourcepie myspark'.split()
     list_per_page = 10
 
     def mydomain(self, obj):
@@ -79,10 +79,15 @@ class ProductAdmin(OverriddenModelAdmin):
         #return obj.summary()
         links = '<br>'.join([p.clink() for p in Purchase.objects.filter(product=obj)])
         alllink = '<a class="btn" href="../purchase/?product_id=%d">all</a>' % obj.id
-        return links + '<br>' + alllink
+        filters = ''
+        ss = Source.objects.filter(purchases__product=obj).distinct()
+        filters = []
+        for s in ss:
+            filters.append('<a href="/admin/buy/purchase/?product__id=%d&source=%d">from %s</a>'%(obj.id, s.id, s.name))
+        filterzone = '<br>'.join(filters)
+        return links + '<br>' + alllink + '<br><br>' + filterzone
 
     def myspark(self, obj):
-
         purch=Purchase.objects.filter(product=obj)
         if not purch:
             spark= ''
@@ -112,7 +117,8 @@ class ProductAdmin(OverriddenModelAdmin):
             #tmp=savetmp(im)
             #spark='<img style="border:2px solid grey;"  src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
 
-    def mypie(self, obj):
+    @debu
+    def mysourcepie(self, obj):
         #return ''
         purch=Purchase.objects.filter(product=obj)
 
@@ -128,9 +134,16 @@ class ProductAdmin(OverriddenModelAdmin):
         lifevalues = ','.join([str(s[0]) for s in dat])
         lifeoffsets = ','.join(['%s (%s)'%(s[1], str(s[0])) for s in dat])
         liferes = '<h3>Sources</h3><div class="piespark" values="%s" labels="%s"></div>' % (lifevalues, lifeoffsets)
-        return liferes
 
-    adminify(mypie, mypurchases, mydomain, myspark)
+        res = {}
+        for p in purch:
+            cl = p.source.clink()
+            res[cl] = res.get(cl, 0) + 1
+        sourcefilters = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
+
+        return liferes + '<br>' + sourcefilters
+
+    adminify(mysourcepie, mypurchases, mydomain, myspark)
 
 class PurchaseAdmin(OverriddenModelAdmin):
     list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()

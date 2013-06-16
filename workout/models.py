@@ -23,7 +23,7 @@ def lnk(nodel, id, obj):
 
 def clink(nodel, id, obj):
     #a link to the object list display with a filter only showing this guy
-    return '<a href="/admin/workout/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
+    return '<a  style="white-space:nowrap;" href="/admin/workout/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
 
 from trackerutils import WorkoutModel
 class Exercise(WorkoutModel):
@@ -33,26 +33,26 @@ class Exercise(WorkoutModel):
     barbell=models.BooleanField()
     note=models.CharField(max_length=500, blank=True)
     created=models.DateField(auto_now_add=True)
-    
+
     class Meta:
-        db_table='exercise'    
+        db_table='exercise'
         ordering=['name',]
 
     def __unicode__(self):
         return self.name
-    
+
 
 class Muscle(WorkoutModel):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
-    
+
     class Meta:
         ordering=['name',]
-        db_table='muscle'    
-        
+        db_table='muscle'
+
     def __unicode__(self):
         return self.name
-    
+
     def adm(self):
         return lnk('muscle',self.id, self)
 
@@ -62,16 +62,16 @@ class Set(WorkoutModel):
     count=models.IntegerField(blank=True)
     note=models.CharField(max_length=500, blank=True)
     created=models.DateField(auto_now_add=True)
-    
+
     def __unicode__(self):
-        return '%s %s@%s lb'%(self.exweight.exercise, self.count, self.exweight.weight)            
+        return '%s %s@%s lb'%(self.exweight.exercise, self.count, self.exweight.weight)
 
 
     def save(self, *args, **kwargs):
         if not self.count:
-            self.count=5    
+            self.count=5
         super(Set, self).save(*args, **kwargs)
-        
+
     class Meta:
         ordering=['id',]
         db_table='set'
@@ -90,9 +90,9 @@ class ExWeight(WorkoutModel):
             else:
                 self.side=self.weight/2
         super(ExWeight, self).save(*args, **kwargs)
-        
+
     def __unicode__(self):
-        res='%s %s'%(self.exercise, self.weight)        
+        res='%s %s'%(self.exercise, self.weight)
         if self.exercise.barbell:
             res+=' (%0.1f)'%self.side
         return res
@@ -100,27 +100,27 @@ class ExWeight(WorkoutModel):
     class Meta:
         db_table='exweight'
         ordering=['exercise','weight',]
-        
+
     def adm(self):
         return lnk('exweight',self.id, self)
-        
+
 class Workout(WorkoutModel):
     exweights=models.ManyToManyField(ExWeight, through=Set, related_name='workout')
     created=models.DateTimeField()
     def __unicode__(self):
         return '%s'%(self.created.strftime(DATE), )#','.join([str(s) for s in self.sets.all()]),)
-    
+
     class Meta:
         db_table='workout'
         ordering=['-created',]
-        
+
     def adm(self):
         return lnk('workout',self.id, self)
-    
+
     def mysets(self):
         res={}
         preres={}
-        
+
         ex_order=[]
         for s in self.sets.all():
             res[s.exweight.exercise]=[]
@@ -163,20 +163,20 @@ class Workout(WorkoutModel):
             #res3+='%s %s'%(exercise, ' ,'.join(['%d'%s for s in summary]))
             res3+='<br>'
         return res3
-    
-    
+
+
 class Measurement(WorkoutModel):
     place=models.ForeignKey('MeasuringSpot', related_name='measurements')
     amount=models.FloatField()
     created=models.DateField()
-    
+
     def __unicode__(self):
         return '%s %s: %s'%(self.place, self.created.strftime(DATE), rstripz(self.amount))#','.join([str(s) for s in self.sets.all()]),)
-    
+
     class Meta:
         db_table='measurement'
         ordering=['-created',]
-        
+
 
 class MeasuringSpot(WorkoutModel):
     name=models.CharField(max_length=100, unique=True)
@@ -185,28 +185,27 @@ class MeasuringSpot(WorkoutModel):
     exclude_zeros=models.BooleanField()
     def __unicode__(self):
         return '%s'%(self.name, )
-        
+
     class Meta:
         db_table='measuringspot'
         ordering=['name',]
-        
-    
+
+
     def save(self):
         if not self.created:
             self.created=datetime.datetime.now()
         if not self.pk:
             self.created=datetime.datetime.now()
         super(MeasuringSpot, self).save()
-    
+
 class MeasurementSet(WorkoutModel):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
     measurement_spots=models.ManyToManyField(MeasuringSpot)
-    
+
     class Meta:
         db_table='measurementset'
-        
+
     def __unicode__(self):
         return u'MeasurementSet %s'%self.name
-    
-  
+

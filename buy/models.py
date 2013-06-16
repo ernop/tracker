@@ -13,7 +13,7 @@ def lnk(nodel, id, obj):
     return '<a href="/admin/buy/%s/%d/">%s</a>'%(nodel, id, str(obj))
 
 def clink(nodel, id, obj):
-    return '<a href="/admin/buy/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
+    return '<a style="white-space:nowrap;" href="/admin/buy/%s/?id=%d">%s</a>'%(nodel, id, str(obj))
 
 # Create your models here.
 

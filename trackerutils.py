@@ -18,40 +18,40 @@ def monthago():
 class WorkoutModel(models.Model):
     def clink(self, text=None):
         if not text:            text=self
-        return u'<a href="%s/workout/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
-    
+        return u'<a  style="white-space:nowrap;"  href="%s/workout/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+
     def alink(self, text=None):
         if not text:            text=self
-        return u'<a href="%s/workout/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+        return u'<a  style="white-space:nowrap;"  href="%s/workout/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     class Meta:
         app_label='workout'
         abstract=True
-        
+
 class BuyModel(models.Model):
     def clink(self, text=None):
         if not text:            text=self
-        return u'<a href="%s/buy/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
-    
+        return u'<a  style="white-space:nowrap;"  href="%s/buy/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+
     def alink(self, text=None):
         if not text:            text=self
-        return u'<a href="%s/buy/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+        return u'<a  style="white-space:nowrap;"  href="%s/buy/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     class Meta:
         app_label='buy'
         abstract=True
-        
+
 class DayModel(models.Model):
 
     def clink(self, text=None):
         if not text:            text=self
-        return u'<a class="btn" href="%s/day/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
-    
+        return u'<a class="btn"  style="white-space:nowrap;"  href="%s/day/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+
     def alink(self, text=None):
         if not text:            text=self
-        return u'<a class="btn" href="%s/day/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+        return u'<a class="btn"  style="white-space:nowrap;"  href="%s/day/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
     class Meta:
         app_label='day'
         abstract=True
-        
+
 class MyJsReplacementBuy(models.Model):
     #def _media(self):
         #js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js', settings.MEDIA_URL + 'static/js/DjangoAjax.js',)
@@ -101,7 +101,7 @@ name2hour={}
 for a in HOUR_CHOICES:
     name2hour[a[1]]=a[0]
     hour2name[a[0]]=a[1]
-    
+
 def r2r(template, request, context=None, lang=None):
     from django.conf import settings
     if not context:
@@ -133,7 +133,7 @@ def debu(func, *args, **kwgs):
             return func(*args, **kwgs)
             return None
     inner.__doc__=func.__doc__
-    inner.__name__=func.__name__    
+    inner.__name__=func.__name__
     return inner
 
 
@@ -142,7 +142,7 @@ def purchase2obj(p):
     return {'id':p.id, 'name':p.product.name, 'quantity':p.quantity,
             'size':p.size,'cost':p.cost,'source':source2obj(p.source),
             'who_with':[per2obj(per) for per in p.who_with.all()],
-            'note':p.note, 
+            'note':p.note,
             'text':p.product.name,
             'product_id':p.product.id,}
 
