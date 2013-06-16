@@ -158,3 +158,9 @@ def source2obj(source):
 
 def currency2obj(cur):
     return {'id':cur.id,'name':cur.name,'text':'%s %s'%(cur.symbol, cur.name),'symbol':cur.symbol,}
+
+def mktable(res):
+    rows = []
+    for row in res:
+        rows.append('<tr>%s</tr>'%(''.join(['<td>%s'%thing for thing in row])))
+    return '<table class="table" style="background-color:white;">%s</table>' % ''.join(rows)

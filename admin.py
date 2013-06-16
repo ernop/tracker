@@ -26,7 +26,7 @@ class PurchaseForm(forms.ModelForm):
         model = Purchase
 
 def chart_url(dat, size=None, text=None):
-    if not text:
+    if text is None:
         text = 'Sources'
     dat=[d for d in dat if d[0] > 0]
     dat.sort(key=lambda x:x[0])
@@ -71,7 +71,7 @@ def new_sparkline(results, width, height):
 
 class ProductAdmin(OverriddenModelAdmin):
     search_fields = ['name', ]
-    list_display='name mydomain mypurchases mysourcepie mywith myspark'.split()
+    list_display='name mydomain mypurchases mysources mywith myspark'.split()
     list_per_page = 10
 
     def mydomain(self, obj):
@@ -82,12 +82,8 @@ class ProductAdmin(OverriddenModelAdmin):
         links = '<br>'.join([p.clink() for p in Purchase.objects.filter(product=obj)])
         alllink = '<a class="btn" href="../purchase/?product_id=%d">all</a>' % obj.id
         filters = ''
-        ss = Source.objects.filter(purchases__product=obj).distinct()
-        filters = []
-        for s in ss:
-            filters.append('<a class="nb" href="/admin/buy/purchase/?product__id=%d&source=%d">from %s</a>'%(obj.id, s.id, s.name))
-        filterzone = '<br>'.join(filters)
-        return links + '<br><br>' + filterzone + '<br>' + alllink
+
+        return links + '<br><br>' + '<br>' + alllink
 
     def myspark(self, obj):
         purch=Purchase.objects.filter(product=obj)
@@ -126,11 +122,13 @@ class ProductAdmin(OverriddenModelAdmin):
             for person in p.who_with.all():
                 cl = person.clink()
                 res[cl] = res.get(cl, 0) + 1
-        res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
-        return res
+        tbl = mktable(sorted(res.items(), key=lambda x:(-1*x[1], x[0])))
+        return tbl
+        #res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
+        #return res
 
     @debu
-    def mysourcepie(self, obj):
+    def mysources(self, obj):
         #return ''
         purch=Purchase.objects.filter(product=obj)
 
@@ -149,13 +147,25 @@ class ProductAdmin(OverriddenModelAdmin):
 
         res = {}
         for p in purch:
-            cl = p.source.clink()
+            cl = p.source.id
             res[cl] = res.get(cl, 0) + 1
-        sourcefilters = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
 
-        return liferes + '<br>' + sourcefilters
+        ss = Source.objects.filter(purchases__product=obj).distinct()
+        filters = []
+        res = sorted(res.items(), key=lambda x:(-1*x[1], x[0]))
+        for n in range(len(res)):
+            source = Source.objects.get(id=res[n][0])
+            res[n] = res[n] + ('<a class="nb" href="/admin/buy/purchase/?product__id=%d&source=%d">filter</a>'%(obj.id, source.id), )
+            res[n] = (source.clink(), ) + res[n][1:]
 
-    adminify(mysourcepie, mypurchases, mydomain, myspark, mywith)
+
+
+        tbl = mktable(res)
+        #sourcefilters = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
+
+        return liferes + '<br>' + tbl
+
+    adminify(mysources, mypurchases, mydomain, myspark, mywith)
 
 class PurchaseAdmin(OverriddenModelAdmin):
     list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
@@ -295,8 +305,10 @@ class PersonAdmin(OverriddenModelAdmin):
         for p in ps:
             cl = p.source.clink()
             res[cl] = res.get(cl, 0) + 1
-        res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
-        return res
+        #res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
+        tbl = mktable(sorted(res.items(), key=lambda x:(-1*x[1], x[0])))
+        return tbl
+        #return res
 
     def mypurchases(self, obj):
         alllink = '<a href=/admin/buy/purchase/?who_with=%d>all</a>' % obj.id
@@ -305,8 +317,10 @@ class PersonAdmin(OverriddenModelAdmin):
         for p in purch:
             cl = p.product.clink()
             res[cl] = res.get(cl, 0) + 1
-        prods = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
-        return prods + '<br>' + alllink
+        tbl = mktable(sorted(res.items(), key=lambda x:(-1*x[1], x[0])))
+        return tbl
+        #prods = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
+        #return prods + '<br>' + alllink
 
     adminify(mymet_through, myintroduced_to, myspots, mypurchases)
 
@@ -338,16 +352,17 @@ class CurrencyAdmin(OverriddenModelAdmin):
     adminify(mytotal, my3months)
 
 class SourceAdmin(OverriddenModelAdmin):
-    list_display='name mytotal mypie mywith mysummary'.split()
+    list_display='name mytotal myproducts mywith mysummary'.split()
 
-    def mypie(self, obj):
+    def myproducts(self, obj):
         products=Product.objects.filter(purchases__source=obj).distinct()
         dat=[(oo.total_spent(source=obj),str(oo)) for oo in products]
-        return chart_url(dat, text='Products')
+        return chart_url(dat, text='')
 
     def mysummary(self, obj):
         return obj.summary()
 
+    @debu
     def mywith(self, obj):
         res = {}
         ps = Purchase.objects.filter(source=obj)
@@ -355,8 +370,12 @@ class SourceAdmin(OverriddenModelAdmin):
             for person in p.who_with.all():
                 cl = person.clink()
                 res[cl] = res.get(cl, 0) + 1
+        tbl = mktable(sorted(res.items(), key=lambda x:(-1*x[1], x[0])))
+        return tbl
         res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
         return res
+
+
 
     def mytotal(self, obj):
         #monthago=datetime.datetime.now()-datetime.timedelta(days=30)
@@ -367,9 +386,9 @@ class SourceAdmin(OverriddenModelAdmin):
 
         if total and earliest:
             dayrange=abs((datetime.datetime.now()-earliest).days)+1
-            return '%0.0f%s<br>%s%s /day<br>(%d days)'%(total, RMBSYMBOL, rstripz(total/dayrange), RMBSYMBOL, dayrange)
+            return '<div class="nb">%0.0f%s<br>%s%s /day<br>(%d days)</div>'%(total, RMBSYMBOL, rstripz(total/dayrange), RMBSYMBOL, dayrange)
 
-    adminify(mytotal, mysummary, mypie, mywith)
+    adminify(mytotal, mysummary, myproducts, mywith)
 
 class PMuscleInline(admin.StackedInline):
     model = Exercise.pmuscles.through

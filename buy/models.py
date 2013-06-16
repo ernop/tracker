@@ -93,11 +93,16 @@ class Source(BuyModel):
 
     def __unicode__(self):
             return self.name
+
     def summary(self):
         if self.purchases.count():
             #import ipdb;ipdb.set_trace()
-            ptable =   '\n'.join([('<tr><td>%s<td>%0.1f<td>%s%s'%oo.summarydat(source=self)) for oo in Product.objects.filter(purchases__source=self).distinct()])
-            ptable = '<table class="table">' + ptable + '</table>'
+            ptable = ''
+            for oo in Product.objects.filter(purchases__source=self).distinct():
+                link, count, cost, symbol = oo.summarydat(source=self)
+                pfilterlink = '<a href="/admin/buy/purchase/?product__id=%d&source__id=%d">filter</a>' % (oo.id, self.id)
+                ptable +=   '<tr><td>%s<td>%0.1f<td>%s%s<td>%s'% (link, cost, count, symbol, pfilterlink)
+            ptable = '<table style="background-color:white;"  class="table">' + ptable + '</table>'
             return '%d purchases (%s)<br>%s'%(self.purchases.count(),
                 #self.all_products_link(),
                 self.all_purchases_link(),
