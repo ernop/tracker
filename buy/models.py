@@ -95,11 +95,13 @@ class Source(BuyModel):
             return self.name
     def summary(self):
         if self.purchases.count():
-            #self.purchases.filter(currency__name='rmb').aggregate(Sum('quantity'))['quantity__sum']
+            #import ipdb;ipdb.set_trace()
+            ptable =   '\n'.join([('<tr><td>%s<td>%0.1f<td>%s%s'%oo.summarydat(source=self)) for oo in Product.objects.filter(purchases__source=self).distinct()])
+            ptable = '<table class="table">' + ptable + '</table>'
             return '%d purchases (%s)<br>%s'%(self.purchases.count(),
                 #self.all_products_link(),
                 self.all_purchases_link(),
-                '<br>'.join([oo.summary(source=self) for oo in Product.objects.filter(purchases__source=self).distinct()]),)
+                ptable,)
 
     def all_purchases_link(self):
         return '<a href="/admin/buy/purchase/?source__id=%d">all purch</a>'%(self.id)
@@ -129,20 +131,24 @@ class Product(BuyModel):
 
     def summary(self, source=None):
         """summary of all purchases of this product."""
+        plink, count, cost, symbol= self.summarydat(source=source)
+        return ' %s%s for %0.1f%s' % (plink, count != 1 and '(%d)' % count or '', cost, symbol)
+
+    def summarydat(self, source=None):
+        '''return link, count, cost,symbol'''
         if source:
             count=Purchase.objects.filter(product=self, source=source).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
         else:
             count=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
         if not count:
-            return ''
+            count = 0
         if count==1:
-            count=''
-        else:
-            count='('+str(count).rstrip('0').rstrip('.')+')'
+            count= 1
         purches=Purchase.objects.filter(product=self)
         symbol=purches[0].currency.symbol
         cost=self.total_spent(source=source)
-        return '<a href="/admin/buy/product/?id=%d">%s</a> %s for %s%s'%(self.id, str(self), count, ('%f'%cost).rstrip('0').rstrip('.'), symbol)
+        plink = '<a href="/admin/buy/product/?id=%d">%s</a>'%(self.id, str(self))
+        return plink, count, cost, symbol
 
     def total_spent(self, start=None, end=None, source=None):
         valid=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS)
@@ -154,8 +160,6 @@ class Product(BuyModel):
             valid=valid.filter(created__lt=end)
         cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
         return cost
-
-
 
 class Currency(BuyModel):
     """changed from currency; now, it represents an account i.e. cash, a specific bank acct, taobao"""
