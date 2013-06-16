@@ -6,13 +6,17 @@ import datetime
 #from coffin.shortcuts import *
 from django.forms.models import (modelform_factory, modelformset_factory, inlineformset_factory, BaseInlineFormSet)
 from django.shortcuts import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.decorators import login_required
+
 from trackerutils import *
 from day.models import *
 from buy.models import *
 from utils import *
 import logging
 log=logging.getLogger(__name__)
+
 from forms import DayForm
+@login_required
 @debu
 def ajax_day_data(request):
     log.info(request.POST)
@@ -102,22 +106,25 @@ def gettoday():
     today=datetime.date(year=now.year, day=now.day, month=now.month)
     return today
 
+@login_required
 def index(request):
     now=datetime.datetime.now()
     today=datetime.date(year=now.year, day=now.day, month=now.month)
     day, new=Day.objects.get_or_create(date=today)
     vals={}
-    
+
     vals['day']=day
     vals['df']=DayForm()
     return r2r('jinja2/day.html',request, vals)
 
+@login_required
 def today(request):
     today=gettoday()
     return HttpResponseRedirect('/aday/%s'%str(today))
     #d,created=Day.objects.get_or_create(date=today)
     return aday(request, d)
-    
+
+@login_required
 def yesterday(request):
     today=gettoday()
     yesterday=today-datetime.timedelta(days=1)
@@ -125,13 +132,15 @@ def yesterday(request):
     #d,created=Day.objects.get_or_create(date=yesterday)
     #return aday(request, d)
 
+@login_required
 def y2day(request):
     dtoday=gettoday()
     y2day=dtoday-datetime.timedelta(days=2)
     return HttpResponseRedirect('/day/%s'%str(y2today))
     #d,created=Day.objects.get_or_create(date=yesterday)
     #return aday(request, d)
-    
+
+@login_required
 def aday(request, day):
     dtday=datetime.datetime.strptime(day, '%Y-%m-%d')
     vals={}
@@ -142,12 +151,12 @@ def aday(request, day):
     day=Day.objects.get_or_create(date=dtday)[0]
     dtoday=gettoday()
     vals['day']=day
-    
+
     vals['recenttags']=Tag.objects.filter(created__gte=(dtoday-datetime.timedelta(days=30)))
     vals['exitags']=day.tags.all()
-    
+
     vals['alltags']=Tag.objects.all()
-    
+
     vals['exipeople']=set([pd.person for pd in day.persondays.all()])
     vals['allpeople']=Person.objects.all()
     vals['allpeople']=[]
@@ -173,12 +182,13 @@ def aday(request, day):
                    {'id':6,'name':'early morning','text':'early morning',},]
     from workout.models import MeasuringSpot
     vals['measurement_places']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
-    
+
     return r2r('jinja2/day.html', request, vals)
 #('morning noon afternoon evening night midnight'.split(),[9,12,15,19,22,1])
 #HOUR_CHOICES.append(('deep night',3))
 #HOUR_CHOICES.append(('early morning',6))
 
+@login_required
 def notekind(request, id=None, name=None):
     if id:
         nk=NoteKind.objects.get(id=id)

@@ -1,6 +1,5 @@
 function formatter(el,options,object){
     var res=el.$el.attr('labels').split(',')[object.offset];
-    debugger;
     return res;
 }
 

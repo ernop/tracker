@@ -1,0 +1,32 @@
+#!wing
+#!version=4.0
+##################################################################
+# Wing IDE project file                                          #
+##################################################################
+[project attributes]
+proj.directory-list = [{'dirloc': loc('static'),
+                        'excludes': [u'admin',
+                                     u'static',
+                                     u'sparklines'],
+                        'filter': '*',
+                        'include_hidden': False,
+                        'recursive': True,
+                        'watch_for_changes': True},
+                       {'dirloc': loc('.'),
+                        'excludes': [u'dist',
+                                     u'logs',
+                                     u'trackenv',
+                                     u'static/sparklines',
+                                     u'sp',
+                                     u'trackerenv',
+                                     u'static',
+                                     u'build',
+                                     u'env',
+                                     u'ipython',
+                                     u'soft',
+                                     u'tenv'],
+                        'filter': '*',
+                        'include_hidden': False,
+                        'recursive': True,
+                        'watch_for_changes': True}]
+proj.file-type = 'shared'

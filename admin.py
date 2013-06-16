@@ -18,32 +18,20 @@ from tracker.workout.models import *
 from tracker.day.models import *
 from tracker.utils import adminify, DATE, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
 from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
-from pygooglechart import PieChart2D
+#from pygooglechart import PieChart2D
 RMBSYMBOL=Currency.objects.get(id=1).symbol
 class PurchaseForm(forms.ModelForm):
     who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False), required=False)
     class Meta:
         model = Purchase
 
-def chart_url(data, size=None):
-    data.sort()
-    data=[d for d in data if d[0]]
-    if not size:
-        if len(data)<=1:
-            return ''
-        elif len(data)<3:
-            size=SM
-        elif len(data)<6:
-            size=MED
-        else:
-            size=LG
-    pc=PieChart2D(*size)
-    pc.add_data([d[0] for d in data])
-    pc.set_pie_labels(['%s (%0.0f)'%(d[1], d[0]) for d in data])
-    try:
-        return '<img src="%s">'%pc.get_url()
-    except:
-        return ''
+def chart_url(dat, size=None):
+    dat=[d for d in dat if d[0] > 0]
+    dat.sort(key=lambda x:x[0])
+    values = ','.join([str(s[0]) for s in dat])
+    offsets= ','.join(['%s (%s)'%(s[1], str(s[0])) for s in dat])
+    res = '<h3>Sources</h3><div class="piespark" values="%s" labels="%s"></div>' % (values, offsets)
+    return res
 
 class BetterDateWidget(admin.widgets.AdminDateWidget):
     def render(self, name, value, attrs=None):
@@ -80,6 +68,7 @@ def new_sparkline(results, width, height):
     return res
 
 class ProductAdmin(OverriddenModelAdmin):
+    search_fields = ['name', ]
     list_display='name mydomain mypurchases mypie myspark'.split()
     list_per_page = 10
 
@@ -145,11 +134,12 @@ class ProductAdmin(OverriddenModelAdmin):
 
 class PurchaseAdmin(OverriddenModelAdmin):
     list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
-    list_filter='source currency product__domain who_with'.split()
+    list_filter=' product__domain currency source who_with'.split()
     date_hierarchy='created'
     list_editable=['note',]
-    search_fields='product__name'.split()
+    search_fields= ['product__name']
     form=PurchaseForm
+    list_per_page = 20
     def mysource(self, obj):
         return obj.source.clink()
 
@@ -260,14 +250,30 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id first_name last_name birthday mymet_through'.split()
+    list_display='id first_name last_name birthday mymet_through myintroduced_to myspots'.split()
     list_filter=['met_through',]
     list_editable=['birthday',]
+    list_per_page = 40
 
     def mymet_through(self, obj):
-        return '%s'%''.join([str(per) for per in obj.met_through.all()])
+        return ','.join([p.clink() for p in obj.met_through.all()])
+        #return '%s'%''.join([str(per) for per in obj.met_through.all()])
 
-    adminify(mymet_through)
+    def myintroduced_to(self, obj):
+        #import ipdb;ipdb.set_trace()
+        return ','.join([p.clink() for p in obj.person_set.all()])
+
+    def myspots(self, obj):
+        #import ipdb;ipdb.set_trace()
+        res = {}
+        ps = Purchase.objects.filter(who_with=obj)
+        for p in ps:
+            cl = p.source.clink()
+            res[cl] = res.get(cl, 0) + 1
+        res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
+        return res
+
+    adminify(mymet_through, myintroduced_to, myspots)
 
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name symbol mytotal my3months'.split()
@@ -297,15 +303,26 @@ class CurrencyAdmin(OverriddenModelAdmin):
     adminify(mytotal, my3months)
 
 class SourceAdmin(OverriddenModelAdmin):
-    list_display='name mytotal mypie mysummary'.split()
+    list_display='name mytotal mypie mywith mysummary'.split()
 
     def mypie(self, obj):
         products=Product.objects.filter(purchases__source=obj).distinct()
         dat=[(oo.total_spent(source=obj),str(oo)) for oo in products]
         return chart_url(dat)
-
+    Person
     def mysummary(self, obj):
         return obj.summary()
+
+    def mywith(self, obj):
+        res = {}
+        ps = Purchase.objects.filter(source=obj)
+        for p in ps:
+            for person in p.who_with.all():
+                cl = person.clink()
+                res[cl] = res.get(cl, 0) + 1
+        res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
+        return res
+
 
     def mytotal(self, obj):
         #monthago=datetime.datetime.now()-datetime.timedelta(days=30)
@@ -318,7 +335,7 @@ class SourceAdmin(OverriddenModelAdmin):
             dayrange=abs((datetime.datetime.now()-earliest).days)+1
             return '%0.0f%s<br>%s%s /day<br>(%d days)'%(total, RMBSYMBOL, rstripz(total/dayrange), RMBSYMBOL, dayrange)
 
-    adminify(mytotal, mysummary, mypie)
+    adminify(mytotal, mysummary, mypie, mywith)
 
 class PMuscleInline(admin.StackedInline):
     model = Exercise.pmuscles.through
@@ -433,12 +450,6 @@ class WorkoutForm(forms.ModelForm):
         super(WorkoutForm, self).clean()
         return self.cleaned_data
 
-    #def save(self):
-        #if not self.date:
-            #self.date=datetime.datetime.now()
-        #super(WorkoutForm, self).save()
-
-
 class WorkoutAdmin(OverriddenModelAdmin):
     list_display='mycreated mysets'.split()
     inlines=[SetInline,]
@@ -451,7 +462,6 @@ class WorkoutAdmin(OverriddenModelAdmin):
         return obj.created.strftime(DATE)
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
     adminify(mycreated, mysets)
-
 
 linesample = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]
 class MeasuringSpotAdmin(OverriddenModelAdmin):

@@ -1,3 +1,4 @@
+
 import datetime
 
 from django.db import models
@@ -25,7 +26,7 @@ from trackerutils import BuyModel
     #start_date=models.DateField()
     #span=models.CharField(max_length=1, choices=SPAN_CHOICES)
     #value=models.FloatField()
-    
+
     #def calc(self):
         #days=span2days[self.span]
         #now=datetime.datetime.now()
@@ -79,7 +80,7 @@ class Domain(BuyModel):
         else:
             return '%d products'%(ct,)
 
-    
+
     def piechart(self):
         return clink('domain', self.id, self)
 
@@ -114,7 +115,7 @@ class Source(BuyModel):
         if end:
             valid=valid.filter(created__lt=end)
         cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
-        return cost        
+        return cost
 
 class Product(BuyModel):
     name=models.CharField(max_length=100, unique=True)
@@ -153,8 +154,8 @@ class Product(BuyModel):
             valid=valid.filter(created__lt=end)
         cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
         return cost
-    
-    
+
+
 
 class Currency(BuyModel):
     """changed from currency; now, it represents an account i.e. cash, a specific bank acct, taobao"""
@@ -194,7 +195,7 @@ class Purchase(BuyModel):
             res+='(%d)'%self.quantity
         res+=' for %s%s'%(rstripz(self.cost), self.currency.symbol)
         return res
-    
+
     def prodlink(self):
         return u'<a href="%s/buy/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.product.__class__.__name__.lower(), self.product.id, unicode(self))
 
@@ -208,14 +209,11 @@ class Person(BuyModel):
     last_name=models.CharField(max_length=100, blank=True, null=True)
     birthday=models.DateField(blank=True, null=True)
     met_through=models.ManyToManyField('Person', symmetrical=False, blank=True, null=True)
-    created=models.DateField(auto_now_add=True)
+    created=models.DateField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         db_table='person'
         ordering=['first_name','last_name',]
 
     def __unicode__(self):
-        return '%s %s'%(self.first_name, self.last_name)
-
-    
-
+        return '%s%s'%(self.first_name, self.last_name and ' %s' % self.last_name)

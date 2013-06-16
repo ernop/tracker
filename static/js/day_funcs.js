@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    
+
     setup_new_purch();
 	display_purch();
 	setup_new_measurement();
@@ -26,7 +26,7 @@ var submitting=false;
 
 function get_purchase_data(){
 	var dat={};
-	
+
 	dat['product_id']=$("#purchase-product").select2('data').id;
 	var dd=$("#purchase-source").select2('data');
 	if (dd){
@@ -83,7 +83,7 @@ function submit_purchase(){
 			data:data,
 			dataType:"json",
 			contentType: "application/json; charset=utf-8",
-			success:function(data){    
+			success:function(data){
 				display_purch();
 			},
 			error:function(a,b,c){
@@ -106,7 +106,7 @@ function submit_measurement(){
 		data:data,
 		dataType:"json",
 		contentType: "application/json; charset=utf-8",
-		success:function(data){    
+		success:function(data){
 			display_measurement();
 		},
 		error:function(a,b,c){
@@ -122,7 +122,7 @@ function display_purch(){
 		data:{'today':today},
 		dataType:"json",
 		contentType: "application/json; charset=utf-8",
-		success:function(data){    
+		success:function(data){
 			var pz=$(".purchase-list");
 			pz.find('.purchase').remove();
 			$.each(data['purchases'], function(index, thing){
@@ -143,7 +143,7 @@ function display_measurement(){
 		data:{'today':today},
 		dataType:"json",
 		contentType: "application/json; charset=utf-8",
-		success:function(data){    
+		success:function(data){
 			var pz=$(".measurement-list");
 			pz.find('.measurement').remove();
 			$.each(data['measurements'], function(index, thing){
@@ -171,7 +171,7 @@ function obj2measurement(measurement){
 }
 
 function m_clink(m){
-	return '<a href="/admin/workout/measurement/?place__id='+m.place_id+'">all '+m.name+'</a>'
+	return '<a href="/admin/workout/measurement/?place__id='+m.place_id+'">'+m.name+'</a>'
 }
 
 function m_p_alink(m){
@@ -191,5 +191,5 @@ function pur_clink(purch){
 }
 
 function prod_purchases_clink(purch){
-	return '<a href="/admin/buy/purchase/?product__id='+purch.product_id+'">all '+purch.name+'</a>'
+	return '<a href="/admin/buy/purchase/?product__id='+purch.product_id+'">'+purch.name+'</a>'
 }

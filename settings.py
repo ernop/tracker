@@ -137,3 +137,5 @@ LOGGING = {
 ADMIN_EXTERNAL_BASE='/admin'
 
 JINJA2_FILTERS=('filters.ipdbfilter','filters.jsonify')
+
+LOGIN_URL = '/admin/'
