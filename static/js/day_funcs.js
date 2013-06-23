@@ -4,12 +4,84 @@ $(document).ready(function(){
 	display_purch();
 	setup_new_measurement();
 	display_measurement();
+	setup_change_describer();
 });
+
+function setup_change_describer(){
+	$("#purchase-product").change(show_popular)
+}
+
+function show_popular(){
+	//for the current selection of the product, show the popular prices, sources, hour etc. for quick selection!
+	var thing=$("#purchase-product").select2('data');
+	if (!thing){
+		return
+	}
+
+	var data={'product_id':thing.id}
+	$.ajax({
+		type:'POST',
+		url:'/ajax/get_popular/',
+		data:data,
+		dataType:"json",
+		contentType: "application/json; charset=utf-8",
+		success:function(data){
+			display_popular(data);
+		},
+			error:function(a,b,c){
+		}
+	});
+}
+
+function display_popular(data){
+	$(".autochooser").remove();
+	$.each(data['prices'], function(index,thing){add_thing_to_price_zone(thing)});
+	$('.price-autochooser').click(function(e){set_price(e)});
+	$.each(data['sources'], function(index,thing){add_thing_to_source_zone(thing)})
+	$('.source-autochooser').click(function(e){set_source(e)});
+	$.each(data['who_with'], function(index,thing){add_thing_to_who_zone(thing)})
+}
+
+function add_thing_to_source_zone(thing){
+	var sz=$(".source-chooser");
+	var txt=$("<div class='source-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+"</div>");
+	sz.append(txt);
+}
+
+function add_thing_to_who_zone(thing){
+	//debugger;
+}
+
+function set_source(e){
+	$("#purchase-source").select2('val', $(e.target).attr('val_id'));
+}
+
+function set_price(e){
+	var thing=$(e.target);
+	$("#purchase-cost").val(thing.attr('val'))
+}
+
+function add_thing_to_price_zone(thing){
+	var pz=$(".price-chooser");
+	var txt=$("<div style='float:left;' class='autochooser price-autochooser' val="+thing[0]+">"+thing[0]+"</div>")
+	pz.append(txt);
+}
 
 function setup_new_purch(){
     var pz=$(".purchase-zone");
     $("#purchase-product").select2({data:products});
-	$("#purchase-source").select2({data:sources});
+	$("#purchase-source").select2({data:sources,initSelection: function (item, callback) {
+		//this is fucking retarded.  despite select2 having already read the whole sources list
+		//when you do .val(n) you have to explicitly tell it how to find that item again.
+			var to_be_selected=null;
+			$.each(sources,function(index,thing){
+				if (thing.id==item.val()){
+					to_be_selected=thing;
+					return
+				}
+			})
+            callback(to_be_selected);
+        },});
 	$("#purchase-currency").select2({data:currencies});
 	$("#purchase-who_with").select2({data:people, multiple: true});
 	$("#purchase-hour").select2({data:hours});
@@ -163,7 +235,7 @@ function obj2purchase(purchase){
 	}else{
 		var count=''
 	}
-	return '<div class="purchase">'+pur_alink(purchase)+' - '+prod_purchases_clink(purchase)+' '+purchase.cost+'元'+count+'</div>';
+	return '<div class="purchase">'+pur_alink(purchase)+' - '+prod_clink(purchase)+' '+purchase.cost+'元'+count+'</div>';
 }
 
 function obj2measurement(measurement){
@@ -192,4 +264,8 @@ function pur_clink(purch){
 
 function prod_purchases_clink(purch){
 	return '<a href="/admin/buy/purchase/?product__id='+purch.product_id+'">'+purch.name+'</a>'
+}
+
+function prod_clink(purch){
+	return '<a href="/admin/buy/product/?id='+purch.product_id+'">'+purch.name+'</a>'
 }

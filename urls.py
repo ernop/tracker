@@ -25,12 +25,14 @@ urlpatterns = patterns('',
     url(r'^notekind/(?P<name>[a-z]+)/$','tracker.day.views.notekind',name='notekind'),
 
     #-------------------------------------------AJAX-------------------------------------------
-    
+
     url(r'^ajax/get_purchases/$','tracker.day.ajax_views.ajax_get_purchases',name='ajax_get_purchases'),
+    url(r'^ajax/get_popular/$','tracker.day.ajax_views.ajax_get_popular',name='ajax_get_popular'),
     url(r'^ajax/make_purchase/$','tracker.day.ajax_views.ajax_make_purchase',name='ajax_make_purchase'),
-    
+
     url(r'^ajax/get_measurements/$','tracker.day.ajax_views.ajax_get_measurements',name='ajax_get_measurements'),
     url(r'^ajax/make_measurement/$','tracker.day.ajax_views.ajax_make_measurement',name='ajax_make_measurement'),
 )
+
 
 

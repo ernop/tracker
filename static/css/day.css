@@ -18,3 +18,16 @@
     display:inline-block;
     position:absolute;
 }
+
+.autochooser{
+    border:3px solid #88d;
+    padding:3px;
+    margin:1px;
+    cursor:pointer;
+    float:left;
+    border-radius:4px;
+}
+
+.autochooser:hover{
+    background:red;
+}

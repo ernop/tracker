@@ -28,6 +28,24 @@ def ajax_get_purchases(request):
     return r2j(res)
 
 @user_passes_test(staff_test)
+def ajax_get_popular(request):
+    res = {}
+    product_id = request.POST['product_id']
+    purches = Purchase.objects.filter(product__id=product_id)
+    prices = {}
+    sources = {}
+    who_with= {}
+    for p in purches:
+        prices[p.cost] = prices.get(p.cost, 0) + 1
+        sources[p.source] = sources.get(p.source, 0) + 1
+        for who in p.who_with.all():
+            who_with[who] = who_with.get(who, 0) + 1
+    res['prices'] = sorted(prices.items(), key=lambda x:-1*x[1])
+    res['sources'] = [((k[0].name, k[0].id), k[1]) for k in sorted(sources.items(), key=lambda x:-1*x[1])]
+    res['who_with'] = [((str(k[0]), k[0].id), k[1]) for k in sorted(who_with.items(), key=lambda x:-1*x[1])]
+    return r2j(res)
+
+@user_passes_test(staff_test)
 def ajax_get_measurements(request):
     day=request.POST['today']
     day=datetime.datetime.strptime(day, DATE)
@@ -64,7 +82,7 @@ def ajax_make_purchase(request):
         return r2j(res)
     except Exception, e:
         return r2j({'success':False,'message':'%s'%e})
-    
+
 @user_passes_test(staff_test)
 def ajax_make_measurement(request):
     try:

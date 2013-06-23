@@ -1716,7 +1716,6 @@
             }
 
             val = arguments[0];
-
             if (this.select) {
                 this.select
                     .val(val)
