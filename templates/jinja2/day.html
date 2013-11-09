@@ -47,19 +47,19 @@
     </div>
     <div class="purchase-zone">
         <table class="table"><tr>
-        <td><input id="purchase-product" style="width:160px;"></input>
-        <td><input type=text style="width:30px;" id="purchase-cost"></input> for
-        <input type=text id=purchase-quantity style="width:20px;" value=1></input><td><div class="price-chooser">
+        <td><input id="purchase-product" style="width:190px;"></input>
+        <td style="vertical-align:middle;"><input type=text style="width:30px;" id="purchase-cost"></input> for
+        <input type=text id=purchase-quantity style="width:28px;" value=1></input> moneys<td><div class="price-chooser">
         <tr><td>source <td><input id="purchase-source" style="width:190px;"></input><td><div class="source-chooser">
         <tr><td>hour<td><input type=text id="purchase-hour" style="width:190px;" value="{{hour}}"></input><td><div class="hour-chooser">
-        <tr><td>with who<td><input id=purchase-who_with></input><td><div class="who_with-chooser">
-        <tr><td>note<td><input type=text id=purchase-note></input>
-        <tr><td>currency<td><input type=text id=purchase-currency style="width:150px;"></input>
-        <tr><td>size<td><input type=text id=purchase-size  style="width:190px;"></input>
-        <tr><td><div class="btn make-purchase">Make</div>
-        <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/source/add">add source</a>
-        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/product/add">add product</a>
-        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/person/add">add person</a>
+        <tr><td>with who<td><input id=purchase-who_with style="width:190px;"></input><td><div class="who_with-chooser">
+        <tr><td>note<td><input type=text id=purchase-note style="width:180px;"></input>
+        <tr><td>currency<td><input type=text id=purchase-currency style="width:190px;"></input>
+        <tr><td>size<td><input type=text id=purchase-size  style="width:180px;"></input>
+        <tr><td><div class="btn make-purchase">Save</div>
+        <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/source/add"><i class="icon-plus"></i> source</a>
+        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/product/add"><i class="icon-plus"></i> product</a>
+        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/person/add"><i class="icon-plus"></i> person</a>
         </table>
     </div>
 </div></div>
@@ -68,7 +68,7 @@
 <h2>Workouts</h2>
     {% for workout in day.getworkouts() %}
     {{workout.mysets()|safe}}<br>{% endfor %}
-    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/workout/add">add new</a><br>
+    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/workout/add"><i class="icon-plus"></i> new</a><br>
 </div></div>
 
 <div class="row"><div class="span8">
@@ -77,10 +77,10 @@
     </div>
     <div class="measurement-zone">
         <table class="table"><tr>
-        <tr><td><input  id="measurement-place" style="width:160px;"></input>
-        <tr><td><input type=text id="measurement-amount"></input>
-        <tr><td><div class="btn make-measurement">Make</div>
-        <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/measurement/add">add new</a>
+        <tr><td><input  id="measurement-place" style="width:190px;"></input>
+        <tr><td><input type=text id="measurement-amount" style="width:190px;"></input>
+        <tr><td><div class="btn make-measurement">Save</div>
+        <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/measurement/add"><i class="icon-plus"></i>new</a>
         </table>
     </div>
 
@@ -95,7 +95,7 @@
     <button class="notekindselect" value=""></button></div></div></div>
 </div>
 
-<div class="notification fixed-notification">notification zone
+<div class="notification fixed-notification">
 </div>
 
 {% endblock %}

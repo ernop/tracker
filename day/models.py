@@ -31,10 +31,12 @@ class Day(DayModel):
     def __unicode__(self):
         return str(self.date)
 
-    def plus(self, days=None, years=None):
+    def plus(self, days=None, months=None, years=None):
         days=days or 0
+        months = months or 0
         years=years or 0
         newyear=self.date.year+years
+        days += months * 30
         t=self.date+datetime.timedelta(days=days)
         return str(datetime.date(newyear, day=t.day, month=t.month))
 

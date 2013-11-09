@@ -73,6 +73,7 @@ class ProductAdmin(OverriddenModelAdmin):
     search_fields = ['name', ]
     list_display='name mydomain mypurchases mysources mywith myspark'.split()
     list_per_page = 10
+    list_filter = ['domain', ]
 
     def mydomain(self, obj):
         return obj.domain.clink()

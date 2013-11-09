@@ -29,6 +29,7 @@ def ajax_get_purchases(request):
 
 @user_passes_test(staff_test)
 def ajax_get_popular(request):
+    '''only show sources which have more than 2...'''
     res = {}
     product_id = request.POST['product_id']
     purches = Purchase.objects.filter(product__id=product_id)
@@ -43,6 +44,9 @@ def ajax_get_popular(request):
     res['prices'] = sorted(prices.items(), key=lambda x:-1*x[1])
     res['sources'] = [((k[0].name, k[0].id), k[1]) for k in sorted(sources.items(), key=lambda x:-1*x[1])]
     res['who_with'] = [((str(k[0]), k[0].id), k[1]) for k in sorted(who_with.items(), key=lambda x:-1*x[1])]
+    res['sources'] = [k for k in res['sources'] if k[1] > 1]
+    res['prices'] = [k for k in res['prices'] if k[1] > 1]
+    import ipdb;ipdb.set_trace()
     return r2j(res)
 
 @user_passes_test(staff_test)

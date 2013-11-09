@@ -69,18 +69,6 @@ function setup_textarea(){
     });
 }
 
-function zplace_tags(array, all, target, alltarget){
-    $.each(array, function(index){
-        $("#"+target).append(tagify(array[index]));
-    });
-    $.each(all, function(index){
-        var identifier=all[index];
-        if (!($("#"+target).find('.tag[name="'+identifier+'"]').length)){
-            $("#"+alltarget).append(tagify(all[index]));
-        }
-    })
-}
-
 function place_tags(){
     $.each(exitags, function(index){
         $("#exitags").append(tagify(exitags[index]));
