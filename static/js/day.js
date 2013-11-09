@@ -18,24 +18,24 @@ myinitSelection = function(element, callback) {
             if (id.localeCompare(""+this.id)==0) data.push(this);
         });
     });
-    callback(data);                   
+    callback(data);
 }
 
 function setup_nkselect(){
     $.each($(".notekindselect.new"), function(index, thing){
         $(thing).removeClass("new");
-        console.log('doing',$(thing).closest('.note-row'));
-        
+        //console.log('doing',$(thing).closest('.note-row'));
+
         $.each(notekinds, function(index, nk){
             var th=$(thing);
             var option=$('<option value="'+index+'">'+nk+'</option>');
             th.append(option);
         });
-        $(thing).select2({data:full_notekinds, 
+        $(thing).select2({data:full_notekinds,
             multiple: true,
             initSelection: myinitSelection,
         });
-        
+
         $(".notekindselect").unbind('change').on('change', change_tag);
     });
     fix_links();
@@ -71,36 +71,36 @@ function setup_textarea(){
 
 function zplace_tags(array, all, target, alltarget){
     $.each(array, function(index){
-        $("#"+target).append(tagify(array[index]));   
+        $("#"+target).append(tagify(array[index]));
     });
     $.each(all, function(index){
         var identifier=all[index];
         if (!($("#"+target).find('.tag[name="'+identifier+'"]').length)){
-            $("#"+alltarget).append(tagify(all[index]));      
+            $("#"+alltarget).append(tagify(all[index]));
         }
     })
 }
 
 function place_tags(){
     $.each(exitags, function(index){
-        $("#exitags").append(tagify(exitags[index]));   
+        $("#exitags").append(tagify(exitags[index]));
     });
     $.each(alltags, function(index){
         var tagname=alltags[index];
         if (!($("#exitags").find('.tag[name="'+tagname+'"]').length)){
-            $("#alltags").append(tagify(alltags[index]));      
+            $("#alltags").append(tagify(alltags[index]));
         }
     })
 }
 
 function place_people(){
     $.each(exipeople, function(index){
-        $("#exipeople").append(tagify(exipeople[index]));   
+        $("#exipeople").append(tagify(exipeople[index]));
     });
     $.each(allpeople, function(index){
         var personname=allpeople[index];
         if (!($("#exipeople").find('.tag[name="'+personname+'"]').length)){
-            $("#allpeople").append(tagify(allpeople[index]));      
+            $("#allpeople").append(tagify(allpeople[index]));
         }
     })
 }
@@ -133,7 +133,7 @@ function toggle_tag(e){
     }
     tag.remove();
     data_changed(dtype);
-}   
+}
 
 function tagify(txt){
     return $("<div class='tag btn' name='"+txt+"'>"+txt+"</div>");
@@ -188,7 +188,7 @@ function send_data(data, target){
         },
         error:function(dat){
             $("#notification").find('.alert').slideUp().append($('<div class="alert alert-error">'+dat['message']+'</div>'));
-        }   
+        }
     });
 }
 
@@ -197,7 +197,7 @@ function add_note(){
     $(".notezone").prepend(newrow);
     newrow.show();
     newrow.find('.notekindselect').addClass('new');
-    setup_nkselect();    
+    setup_nkselect();
     setup_textarea();
     setup_savebutton();
 }
