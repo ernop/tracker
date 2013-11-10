@@ -9,76 +9,56 @@
     </script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script src="http://d3js.org/d3.v3.js"></script>
+	<style type="text/css">
 
+path.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}
 
+circle {
+  fill: #ccc;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
 
+text {
+  font: 10px sans-serif;
+  pointer-events: none;
+}
+
+text.shadow {
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-opacity: .8;
+}
+
+    </style>
     <script>
 	//
+	var force, svg
 	function draw(){
 	  var width = '2000';
 	  var height = '1200';
-	  var svg = d3.select("#people-graph").append("svg")
-		.attr("width", width)
-		.attr("height", height);
-	  var force = d3.layout.force()
-		.charge(-200)
-		.linkDistance(30)
-		.linkStrength(1.0)
-		.friction(0.95) // higher values = better untangling
-		.gravity(0.05)
-		.size([width, height]);
 
-	  var link = svg.selectAll(".link")
-		  .data(edges)
-		  .enter().append("line")
-		  .attr("class", "link")
-		  .style("stroke-width", function(d) { return '1px';});
-
-	  force.nodes(people)
-		.links(edges)
-		.start();
-
-	  var gnodes = svg.selectAll('g.gnode')
-		.data(people)
-	   .enter()
-		.append('g')
-		.classed('gnode', true);
-
-	  var node = gnodes.append("circle")
-		.attr("class", function(d) {return 'person-graph';return "node-"+d.type.name })
-		.attr("r", function(d) { var res=Math.sqrt(d.purchases_together)+5;console.log(d,res) ;
-			  if (isNaN(res)){return 0;}
-
-		return res})
-		.style("fill", function(d) {return 'lightblue';})
-		.call(force.drag)
-		.on('click',function(d){console.log(d)});
-
-	  node.append("title")
-		.text(function(d) {
-		  return d.name;return 'nodeid: ' + d.name + ', type: ' + d.type;
-		});
-
-	  var labels = gnodes.append("text")
-		.text(function(d) {
-		  return d.name;
-		})
-		.attr('class', 'd3-person-label')
-		.attr('transform', function(d){
-		  return 'translate('+[8,0]+')'
-		})
-
-	  force.on("tick", function() {
-		link.attr("x1", function(d) { return d.source.x; })
-		  .attr("y1", function(d) { return d.source.y; })
-		  .attr("x2", function(d) { return d.target.x; })
-		  .attr("y2", function(d) { return d.target.y; });
+	function tick() {
+		link.attr("x1", function(d) { return d.source.x; }).attr("y1", function(d) { return d.source.y; }).attr("x2", function(d) { return d.target.x; }).attr("y2", function(d) { return d.target.y; });
 		gnodes.attr("transform", function(d) {
 		  return 'translate(' + [d.x, d.y] + ')';
 		})
+	  }
+  	  force = d3.layout.force().charge(-200).linkDistance(30).linkStrength(1.0).friction(0.95).gravity(0.05).size([width, height]).nodes(people).links(edges).start().on("tick", tick)
+	  svg = d3.select("#people-graph").append("svg").attr("width", width).attr("height", height);
+	  svg.append("svg:defs").selectAll("marker").data(["start"]).enter().append("svg:marker").attr("id", String).attr("viewBox", "0 -5 10 10").attr("refX", 20).attr("refY", -1.5).attr("markerWidth", -8).attr("markerHeight", 6).attr("orient", "auto").append("svg:path").attr("d", "M0,-5L10,0L0,5");
+	  var link = svg.selectAll(".link").data(force.links()).enter().append("line").attr('class','link').attr("marker-start", "url(#start)");
+	  var gnodes = svg.selectAll('g.gnode').data(people).enter().append('g').classed('gnode', true);
+	  var node = gnodes.append("circle").attr("class", 'person-graph').attr("r", function(d) { var res=Math.sqrt(d.purchases_together)+5;if (isNaN(res)){return 0;}return res}).style("fill", 'lightblue').call(force.drag)
+	  var labels = gnodes.append("text").text(function(d) {return d.name;})
+		.attr('class', 'd3-person-label').attr('transform', function(d){
+		  return 'translate('+[8,0]+')'
+		})
 
-
-	  });
   };
 
 $(document).ready(function(){
@@ -86,11 +66,8 @@ $(document).ready(function(){
   })
 </script>
 
-
-
 {% endblock %}
 
-<script>
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
 <div id="people-graph"></div>
 {% endblock %}
