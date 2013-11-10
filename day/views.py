@@ -17,7 +17,6 @@ log=logging.getLogger(__name__)
 
 from forms import DayForm
 @login_required
-@debu
 def ajax_day_data(request):
     log.info(request.POST)
     vals={}
@@ -172,21 +171,11 @@ def aday(request, day):
     vals['people']=[per2obj(p) for p in Person.objects.all()]
     vals['currencies']=[currency2obj(c) for c in Currency.objects.all()]
     vals['hour']=name2hour[gethour()]
-    vals['hours']=[{'id':9,'name':'morning','text':'morning',},
-                   {'id':12,'name':'noon','text':'noon',},
-                   {'id':15,'name':'afternoon','text':'afternoon',},
-                   {'id':19,'name':'evening','text':'evening',},
-                   {'id':22,'name':'night','text':'night',},
-                   {'id':1,'name':'midnight','text':'midnight',},
-                   {'id':3,'name':'deep night','text':'deep night',},
-                   {'id':6,'name':'early morning','text':'early morning',},]
+    vals['hours'] = [{'id': id, 'name': name, 'text': name,} for name, id in name2hour.items()]
     from workout.models import MeasuringSpot
     vals['measurement_places']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
 
     return r2r('jinja2/day.html', request, vals)
-#('morning noon afternoon evening night midnight'.split(),[9,12,15,19,22,1])
-#HOUR_CHOICES.append(('deep night',3))
-#HOUR_CHOICES.append(('early morning',6))
 
 @login_required
 def notekind(request, id=None, name=None):

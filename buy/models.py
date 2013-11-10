@@ -113,6 +113,7 @@ class Product(BuyModel):
     class Meta:
         db_table='product'
         ordering=['name',]
+
     def __unicode__(self):
         return self.name
 

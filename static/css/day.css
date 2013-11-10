@@ -9,8 +9,6 @@
 
 .select2-container{width:300px;}
 
-.purchase{display:block;}
-
 .fixed-notification{
     bottom:300px;
     right:100px;
@@ -20,16 +18,20 @@
 }
 
 .autochooser{
-    border:3px solid #88d;
+    border:2px solid #88d;
     padding:3px;
     margin:1px;
     cursor:pointer;
     float:left;
     border-radius:4px;
+    -webkit-user-select:none;
+    -moz-user-select:none;
 }
 
 .autochooser:hover{
-    background:red;
+    background:#aae;
 }
 
 .dayfooter .btn{width:100px;}
+
+.nb {white-space:nowrap;}

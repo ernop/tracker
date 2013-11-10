@@ -4,6 +4,11 @@ $(document).ready(function(){
     //place_tags();
     //place_people();
     //setup_tag_clicks();
+	setup_new_purch();
+	display_purch();
+	setup_new_measurement();
+	display_measurement();
+	setup_change_describer();
     $(".add-note").click(add_note);
     $(".add-note").click();
 });

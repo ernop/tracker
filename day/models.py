@@ -10,7 +10,7 @@ class Tag(DayModel):
     name=models.CharField(max_length=100)
     created=models.DateTimeField(auto_now_add=True)
     days=models.ManyToManyField('Day', related_name='tags')
-    #day=models.ForeignKey('Day')
+
     class Meta:
         db_table='tag'
         ordering=['name',]
@@ -24,6 +24,7 @@ class Tag(DayModel):
 class Day(DayModel):
     date=models.DateField()
     created=models.DateTimeField(auto_now_add=True)
+
     class Meta:
         db_table='day'
         ordering=['date',]
@@ -36,9 +37,19 @@ class Day(DayModel):
         months = months or 0
         years=years or 0
         newyear=self.date.year+years
-        days += months * 30
-        t=self.date+datetime.timedelta(days=days)
-        return str(datetime.date(newyear, day=t.day, month=t.month))
+        tt=self.date+datetime.timedelta(days=days)
+        #just add the days
+
+        #if got a month, bump that.
+        newmonth = tt.month + months
+        newyear = tt.year
+        if newmonth == 0:
+            newmonth = 12
+            newyear = tt.year - 1
+        if newmonth > 12:
+            newyear = tt.year + 1
+            newmonth = newmonth % 12
+        return str(datetime.date(newyear, day=tt.day, month=newmonth))
 
     def vlink(self, text=None):
         if not text:
@@ -53,7 +64,8 @@ class Day(DayModel):
             from workout.models import Measurement
             nextday=self.date+datetime.timedelta(days=1)
             return Measurement.objects.filter(created__gte=self.date, created__lt=nextday).order_by('place__domain','place__name')
-        except:
+        except Exception, e:
+            print 'bad'
             return []
 
     def getworkouts(self):
@@ -61,7 +73,8 @@ class Day(DayModel):
             from workout.models import Workout
             nextday=self.date+datetime.timedelta(days=1)
             return Workout.objects.filter(created__gte=self.date, created__lt=nextday)
-        except:
+        except Exception, e:
+            print 'bad get workouts.'
             return []
 
 class PersonDay(DayModel):

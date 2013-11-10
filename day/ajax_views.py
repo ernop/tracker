@@ -18,6 +18,9 @@ from utils import *
 log=logging.getLogger(__name__)
 from forms import DayForm
 
+#@user_passes_test(staff_test)
+#def select2_people(request):
+
 
 @user_passes_test(staff_test)
 def ajax_get_purchases(request):
@@ -36,17 +39,19 @@ def ajax_get_popular(request):
     prices = {}
     sources = {}
     who_with= {}
+    hours= {}
     for p in purches:
         prices[p.cost] = prices.get(p.cost, 0) + 1
         sources[p.source] = sources.get(p.source, 0) + 1
         for who in p.who_with.all():
             who_with[who] = who_with.get(who, 0) + 1
+        hours[p.hour] = hours.get(p.hour, 0) + 1
     res['prices'] = sorted(prices.items(), key=lambda x:-1*x[1])
     res['sources'] = [((k[0].name, k[0].id), k[1]) for k in sorted(sources.items(), key=lambda x:-1*x[1])]
-    res['who_with'] = [((str(k[0]), k[0].id), k[1]) for k in sorted(who_with.items(), key=lambda x:-1*x[1])]
-    res['sources'] = [k for k in res['sources'] if k[1] > 1]
-    res['prices'] = [k for k in res['prices'] if k[1] > 1]
-    import ipdb;ipdb.set_trace()
+    res['who_with'] = [((str(k[0]), k[0].id), k[1]) for k in sorted(who_with.items(), key=lambda x:-1*x[1])][:15]
+    res['sources'] = [k for k in res['sources']][:15]
+    res['prices'] = sorted([k for k in res['prices']], key=lambda x:x[0])
+    res['hours'] = [((hour2name[k[0]], k[0]), k[1]) for k in sorted(hours.items(), key=lambda x:-1*x[1]) if k[0] is not None]
     return r2j(res)
 
 @user_passes_test(staff_test)

@@ -1,12 +1,3 @@
-$(document).ready(function(){
-
-    setup_new_purch();
-	display_purch();
-	setup_new_measurement();
-	display_measurement();
-	setup_change_describer();
-});
-
 function setup_change_describer(){
 	$("#purchase-product").change(show_popular)
 }
@@ -37,23 +28,47 @@ function display_popular(data){
 	$(".autochooser").remove();
 	$.each(data['prices'], function(index,thing){add_thing_to_price_zone(thing)});
 	$('.price-autochooser').click(function(e){set_price(e)});
+
 	$.each(data['sources'], function(index,thing){add_thing_to_source_zone(thing)})
 	$('.source-autochooser').click(function(e){set_source(e)});
+
 	$.each(data['who_with'], function(index,thing){add_thing_to_who_zone(thing)})
+	$('.who_with-autochooser').click(function(e){set_who_with(e)});
+
+	$.each(data['hours'], function(index,thing){add_thing_to_hour_zone(thing)})
+	$('.hour-autochooser').click(function(e){set_hour(e)});
 }
 
 function add_thing_to_source_zone(thing){
 	var sz=$(".source-chooser");
-	var txt=$("<div class='source-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+"</div>");
+	var txt=$("<div class='source-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+" ("+thing[1]+")</div>");
 	sz.append(txt);
 }
 
 function add_thing_to_who_zone(thing){
-	//debugger;
+	var wc=$(".who_with-chooser");
+	var txt=$("<div class='who_with-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+"</div>");
+	wc.append(txt);
+}
+
+function add_thing_to_hour_zone(thing){
+	var wc=$(".hour-chooser");
+	var txt=$("<div class='hour-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+"</div>");
+	wc.append(txt);
 }
 
 function set_source(e){
 	$("#purchase-source").select2('val', $(e.target).attr('val_id'));
+}
+
+function set_hour(e){
+	$("#purchase-hour").select2('val', $(e.target).attr('val_id'));
+}
+
+function set_who_with(e){
+	var list=$("#purchase-who_with").select2('val')
+	list.push($(e.target).attr('val_id'))
+	$("#purchase-who_with").select2('val', list);
 }
 
 function set_price(e){
@@ -199,8 +214,8 @@ function display_purch(){
 			pz.find('.purchase').remove();
 			$.each(data['purchases'], function(index, thing){
 				var row=obj2purchase(thing);
-				pz.append(row);
-				$(row).slideDown();
+				pz.prepend(row);
+				$(row).show();
 			});
 		},
 		error:function(a,b,c){
@@ -235,7 +250,23 @@ function obj2purchase(purchase){
 	}else{
 		var count=''
 	}
-	return '<div class="purchase">'+pur_alink(purchase)+' - '+prod_clink(purchase)+' '+purchase.cost+'元'+count+'</div>';
+	return '<tr class="purchase"><td>'+pur_alink(purchase)+'<td>'+prod_clink(purchase)+'<td class="nb">'+purchase.cost+'元<td>'+count+'<td>'+source_clink(purchase)+'<td>'+purchase.hour+'<td>'+who_with_clinks(purchase)+'</tr>';
+}
+
+function source_clink(purchase){
+	return '<a href="/admin/buy/source/?id='+purchase.source.id+'">'+purchase.source.name+'</a>'
+}
+
+function who_with_clink(guy){
+	return '<a href="/admin/buy/person/?id='+guy.id+'">'+guy.text+'</a>'
+}
+
+function who_with_clinks(purchase){
+	var res=''
+	$.each(purchase.who_with, function(index,guy){
+		res+='<td class="nb">'+who_with_clink(guy);
+	})
+	return res
 }
 
 function obj2measurement(measurement){
@@ -251,7 +282,7 @@ function m_p_alink(m){
 }
 
 function pur_alink(purch){//the direct purchase
-	return '<a href="/admin/buy/purchase/'+purch.id+'/">edit</a>'
+	return '<a href="/admin/buy/purchase/'+purch.id+'/">'+purch.id+'</a>'
 }
 
 function prod_alink(purch){//the product - useless

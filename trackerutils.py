@@ -136,15 +136,18 @@ def debu(func, *args, **kwgs):
     inner.__name__=func.__name__
     return inner
 
-
-
 def purchase2obj(p):
-    return {'id':p.id, 'name':p.product.name, 'quantity':p.quantity,
-            'size':p.size,'cost':p.cost,'source':source2obj(p.source),
+    return {'id':p.id,
+            'name':p.product.name,
+            'quantity':p.quantity,
+            'size':p.size,
+            'cost':p.cost,
+            'source':source2obj(p.source),
             'who_with':[per2obj(per) for per in p.who_with.all()],
             'note':p.note,
             'text':p.product.name,
-            'product_id':p.product.id,}
+            'product_id':p.product.id,
+            'hour': hour2name[p.hour],}
 
 def measurement2obj(m):
     return {'id':m.id, 'place_id':m.place.id, 'amount':m.amount,

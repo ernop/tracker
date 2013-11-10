@@ -11,7 +11,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls),),
-    url(r'^/?$', lambda x:HttpResponseRedirect('/admin/'), name='redir'),
+
     url(r'^do_measurementset/$', 'tracker.workout.views.do_measurementset', name='do_set'),
     url(r'^do_measurementset/(?P<measurementset_id>[0-9]+)/$', 'tracker.workout.views.do_measurementset', name='do_set_id'),
     url(r'^make_workout','tracker.workout.views.make_workout',name='make_workout'),
@@ -32,6 +32,7 @@ urlpatterns = patterns('',
 
     url(r'^ajax/get_measurements/$','tracker.day.ajax_views.ajax_get_measurements',name='ajax_get_measurements'),
     url(r'^ajax/make_measurement/$','tracker.day.ajax_views.ajax_make_measurement',name='ajax_make_measurement'),
+    url(r'^/?$', lambda x:HttpResponseRedirect('/admin/'), name='redir'),
 )
 
 
