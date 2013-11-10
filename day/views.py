@@ -209,8 +209,8 @@ def people_connections(request, exclude_disabled=False):
     vals['edges'] = [{'target': person.met_through.get().id, 'source': person.id, 'value': 1,} for person in people if person.met_through.exists()]
     rawnodes = {}
     for person in people:
-        rawnodes[person.id] = person
-    #rawnodes = {person.id: {'id': person.id, 'name': namefunc(person), 'created': person.created.strftime(DATE_DASH_REV), 'purchases_together': Purchase.objects.filter(who_with=person).count(),} for person in people}
+        rawnodes[person.id] = {'id': person.id, 'name': namefunc(person), 'created': person.created.strftime(DATE_DASH_REV), 'purchases_together': Purchase.objects.filter(who_with=person).count(),}
+    #rawnodes = {person.id: for person in people}
     #OK = [1, 2]
     #vals['edges'] = [e for e in vals['edges'] if e['target'] in OK and e['source'] in OK]
     #import ipdb;ipdb.set_trace()
