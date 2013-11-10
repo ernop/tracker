@@ -17,6 +17,11 @@
     position:absolute;
 }
 
+.price-autochooser{
+    width:28px;
+    text-align:center;
+}
+
 .autochooser{
     border:2px solid #88d;
     padding:3px;
@@ -35,3 +40,18 @@
 .dayfooter .btn{width:100px;}
 
 .nb {white-space:nowrap;}
+
+.link{
+    stroke:#999;
+    stroke-opacity:0.5;
+}
+
+.people-graph{border:1px solid grey;}
+
+.d3-person-label{
+    background:white;
+    border-radius:3px;
+	font-family:Calibri;
+	font-size: 1.4em;
+	border:2px solid blue;
+}

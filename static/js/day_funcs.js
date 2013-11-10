@@ -47,13 +47,13 @@ function add_thing_to_source_zone(thing){
 
 function add_thing_to_who_zone(thing){
 	var wc=$(".who_with-chooser");
-	var txt=$("<div class='who_with-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+"</div>");
+	var txt=$("<div class='who_with-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+" ("+thing[1]+")</div>");
 	wc.append(txt);
 }
 
 function add_thing_to_hour_zone(thing){
 	var wc=$(".hour-chooser");
-	var txt=$("<div class='hour-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+"</div>");
+	var txt=$("<div class='hour-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+" ("+thing[1]+")</div>");
 	wc.append(txt);
 }
 

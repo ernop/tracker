@@ -2,7 +2,7 @@ import datetime
 
 from django.db import models
 from buy.models import Domain
-from tracker.utils import DATE
+DATE='%Y-%m-%d'
 
 from django.db import models
 from django.conf import settings

@@ -1,0 +1,98 @@
+{% extends 'jinja2/people_base.html' %}
+{% block title %}Connections{% endblock %}
+{% block head %}
+    {{super()}}
+    <script>
+
+        var people={{nodes|jsonify|safe}};
+        var edges={{edges|jsonify|safe}};
+    </script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.js"></script>
+
+
+
+    <script>
+	//
+	function draw(){
+	var width = '2000';
+	var height = '2000';
+	var svg = d3.select("#people-graph").append("svg")
+	  .attr("width", width)
+	  .attr("height", height);
+	var force = d3.layout.force()
+	  .charge(-200)
+	  .linkDistance(60)
+	  .linkStrength(1.0)
+	  .friction(0.95) // higher values = better untangling
+	  .gravity(0.05)
+	  .size([width, height]);
+
+	var link = svg.selectAll(".link")
+		.data(edges)
+		.enter().append("line")
+		.attr("class", "link")
+		.style('position','relateive')
+		.style('left','5px')
+		.style("stroke-width", function(d) { return '1px';return Math.sqrt(d.value); });
+
+	force.nodes(people)
+	  .links(edges)
+	  .start();
+
+	var gnodes = svg.selectAll('g.gnode')
+	  .data(people)
+	 .enter()
+	  .append('g')
+	  .classed('gnode', true);
+
+	var node = gnodes.append("circle")
+		  //FIXME.  previously assigned class with just d.type but sth is wrong upstream.
+	  .attr("class", function(d) {return 'person-graph';return "node-"+d.type.name })
+	  .attr("r", function(d) { return Math.sqrt(d.purchases_together)+5;return d.type.name == "city" ? 30 : 20 })
+	  .style("fill", function(d) {return 'lightblue';color[d.player_id]; })
+	  .call(force.drag);
+
+	node.append("title")
+	  .text(function(d) {
+		return d.name;return 'nodeid: ' + d.name + ', type: ' + d.type;
+	  });
+
+	var labels = gnodes.append("text")
+	  .text(function(d) {
+		return d.name;
+	  })
+	  .attr('class', 'd3-person-label')
+	  .attr('transform', function(d){
+		return 'translate('+[8,0]+')'
+	  })
+
+	force.on("tick", function() {
+	  link.attr("x1", function(d) { return d.source.x; })
+		.attr("y1", function(d) { return d.source.y; })
+		.attr("x2", function(d) { return d.target.x; })
+		.attr("y2", function(d) { return d.target.y; });
+	  gnodes.attr("transform", function(d) {
+		return 'translate(' + [d.x, d.y] + ')';
+	  })
+
+
+	});
+  };
+
+$(document).ready(function(){
+  draw()
+  })
+</script>
+
+
+
+{% endblock %}
+
+<script>
+{% block content %}{% if LOCAL %}LOCAL{% endif %}
+aaa
+<div id="people-graph"></div>
+{% endblock %}
+{% block footer %}{{super()}}
+{% endblock %}

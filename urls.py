@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     url(r'^yesterday/$','tracker.day.views.yesterday',name='yesterday'),
     url(r'^y2day/$','tracker.day.views.y2day',name='y2day'),
     url(r'^aday/(?P<day>[0-9\-]+)/$','tracker.day.views.aday',name='aday'),
+    url(r'^people_connections/$','tracker.day.views.people_connections',name='people_connections'),
     url(r'^notekind/(?P<id>[0-9]+)/$','tracker.day.views.notekind',name='notekind'),
     url(r'^notekind/(?P<name>[a-z]+)/$','tracker.day.views.notekind',name='notekind'),
 

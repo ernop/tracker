@@ -212,6 +212,7 @@ class Person(BuyModel):
     birthday=models.DateField(blank=True, null=True)
     met_through=models.ManyToManyField('Person', symmetrical=False, blank=True, null=True)
     created=models.DateField(auto_now_add=True, blank=True, null=True)
+    disabled = models.BooleanField()  #if they're gone forever / probably never meet again, just remove them form most convenience functions.
 
     class Meta:
         db_table='person'

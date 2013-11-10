@@ -12,6 +12,7 @@ from trackerutils import *
 from day.models import *
 from buy.models import *
 from utils import *
+from choices import *
 import logging
 log=logging.getLogger(__name__)
 
@@ -168,7 +169,7 @@ def aday(request, day):
     from buy.models import Product
     vals['products']=[{'id':p.id,'text':p.name} for p in Product.objects.all()]
     vals['sources']=[source2obj(s) for s in Source.objects.all()]
-    vals['people']=[per2obj(p) for p in Person.objects.all()]
+    vals['people']=[per2obj(p) for p in Person.objects.exclude(disabled=True)]
     vals['currencies']=[currency2obj(c) for c in Currency.objects.all()]
     vals['hour']=name2hour[gethour()]
     vals['hours'] = [{'id': id, 'name': name, 'text': name,} for name, id in name2hour.items()]
@@ -190,3 +191,48 @@ def notekind(request, id=None, name=None):
     vals['notes']=nk.notes.all().order_by('-day__date')
     vals['allnks']=NoteKind.objects.all()
     return r2r('jinja2/notekind.html', request, vals)
+
+@login_required
+def people_connections(request, exclude_disabled=False):
+    vals = {}
+    people = Person.objects.all()
+    if exclude_disabled:
+        people = people.exclude(disabled=True)
+    def namefunc(person):
+        res = ''
+        if person.first_name:
+            res += person.first_name[0].upper()
+        if person.last_name:
+            res += person.last_name[0].upper()
+        return res
+    namefunc = lambda x:x.first_name.title()
+    vals['edges'] = [{'target': person.met_through.get().id, 'source': person.id, 'value': 1,} for person in people if person.met_through.exists()]
+    rawnodes = {person.id: {'id': person.id, 'name': namefunc(person), 'created': person.created.strftime(DATE_DASH_REV), 'purchases_together': Purchase.objects.filter(who_with=person).count(),} for person in people}
+    #OK = [1, 2]
+    #vals['edges'] = [e for e in vals['edges'] if e['target'] in OK and e['source'] in OK]
+    #import ipdb;ipdb.set_trace()
+    #vals['nodes'] = {pp['id']: pp for pp in vals['nodes'].values() if pp['id'] in OK}
+    #vals['nodes'] = [pp for pp in vals['nodes'].values()]
+    #vals['nodes'] = []
+    #apparently d3 wants a list of nodes, because it will use the edge to/from as positional arguments rather than ID lookups!
+    #so it's like, edge 4,5 means an edge from position 4 to 5 objects, not from object id 4 to 5.  wtf.
+    #this all works fine except when you have missing ID numbers (Which will actually be most real world cases... ugh.)
+    maxnodeid = max([n['id'] for n in rawnodes.values()])
+    vals['nodes'] = []
+    for nodeid in range(maxnodeid+1):
+        if nodeid in rawnodes:
+            vals['nodes'].append(rawnodes[nodeid])
+        else:
+            vals['nodes'].append({})
+    #vals['edges'] = [{'source': 1, 'target': 2,}]
+    #vals['edges'] = []
+    #import ipdb;ipdb.set_trace()
+    #nodeids = [n['id'] for n in vals['nodes']]
+    #for ee in vals['edges']:
+        #if ee['target'] not in nodeids:
+            #import ipdb;ipdb.set_trace()
+        #if ee['source'] not in nodeids:
+            #import ipdb;ipdb.set_trace()
+        #if not ee['source'] or not ee['target']:
+            #import ipdb;ipdb.set_trace()
+    return r2r('jinja2/people_connections.html', request, vals)

@@ -6,8 +6,6 @@ from django.template import RequestContext
 
 import json
 
-DATE='%Y-%m-%d'
-
 def adminify(*args):
     for func in args:
         name=None

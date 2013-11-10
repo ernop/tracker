@@ -15,6 +15,7 @@ from trackerutils import *
 import logging
 from django.contrib.auth.decorators import login_required, user_passes_test
 from utils import *
+from choices import *
 log=logging.getLogger(__name__)
 from forms import DayForm
 

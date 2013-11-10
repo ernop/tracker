@@ -1,7 +1,7 @@
 import datetime, tempfile, shutil, os
 
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.conf import settings
 from django.db.models import Sum
 from django.forms.models import BaseModelFormSet, BaseInlineFormSet
@@ -16,7 +16,8 @@ from trackerutils import *
 from tracker.buy.models import *
 from tracker.workout.models import *
 from tracker.day.models import *
-from tracker.utils import adminify, DATE, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
+from tracker.utils import adminify, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
+from choices import DATE
 from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
 #from pygooglechart import PieChart2D
 RMBSYMBOL=Currency.objects.get(id=1).symbol
@@ -285,11 +286,18 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id first_name last_name birthday mymet_through myintroduced_to myspots mypurchases'.split()
+    list_display='id disabled first_name last_name birthday mymet_through myintroduced_to myspots mypurchases'.split()
     list_filter=['met_through',]
-    list_editable=['birthday',]
+    list_editable=['birthday', 'last_name', 'disabled', ]
     list_per_page = 40
     search_fields = 'first_name last_name'.split()
+    actions = ['disable']
+
+    def disable(self, request, queryset):
+        for pp in queryset:
+            pp.disabled = True
+            pp.save()
+            messages.info(request, 'disabled %s'%pp)
 
     def mymet_through(self, obj):
         return ', '.join([p.clink() for p in obj.met_through.all()])
