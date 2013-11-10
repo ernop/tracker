@@ -289,7 +289,7 @@ class PersonAdmin(OverriddenModelAdmin):
     list_display='id disabled first_name last_name birthday mymet_through myintroduced_to myspots mypurchases'.split()
     list_filter=['met_through',]
     list_editable=['birthday', 'last_name', 'disabled', ]
-    list_per_page = 40
+    list_per_page = 10
     search_fields = 'first_name last_name'.split()
     actions = ['disable']
 
