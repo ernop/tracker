@@ -285,13 +285,33 @@ class DomainAdmin(OverriddenModelAdmin):
         return obj.created.strftime(DATE)
     adminify(myproducts, mysource, mycreated, mypie)
 
+from admin_helpers import *
+
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id disabled first_name last_name birthday mymet_through myintroduced_to myspots mypurchases'.split()
-    list_filter=['met_through',]
-    list_editable=['birthday', 'last_name', 'disabled', ]
+    list_display='id myinfo disabled birthday mymet_through myintroduced_to myspots mypurchases'.split()
+    list_filter=['met_through',GenderFilter]
+    list_editable=['birthday',  'disabled', ]
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
-    actions = ['disable']
+    actions = ['disable','male','female']
+
+    def organization(self,request,queryset):
+        for pp in queryset:
+            pp.gender=3
+            pp.save()
+
+    def male(self,request,queryset):
+        for pp in queryset:
+            pp.gender=1
+            pp.save()
+
+    def female(self,request,queryset):
+        for pp in queryset:
+            pp.gender=2
+            pp.save()
+
+    def myinfo(self,obj):
+        return '%s %s %s'%(obj.first_name, obj.last_name, obj.get_gender())
 
     def disable(self, request, queryset):
         for pp in queryset:

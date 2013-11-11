@@ -213,6 +213,7 @@ class Person(BuyModel):
     met_through=models.ManyToManyField('Person', symmetrical=False, blank=True, null=True)
     created=models.DateField(auto_now_add=True, blank=True, null=True)
     disabled = models.BooleanField()  #if they're gone forever / probably never meet again, just remove them form most convenience functions.
+    gender=models.IntegerField() #1 male 2 female 3 organization 0 undefined
 
     class Meta:
         db_table='person'
@@ -221,6 +222,11 @@ class Person(BuyModel):
     def __unicode__(self):
         return '%s%s'%(self.first_name, self.last_name and ' %s' % self.last_name)
 
+    def get_gender(self):
+        if self.gender==1:return 'male'
+        if self.gender==2:return 'female'
+        if self.gender==3:return 'org'
+        return 'undef'
 
 
 #class SpanAverage(BuyModel):

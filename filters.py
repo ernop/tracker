@@ -12,7 +12,7 @@ def jsonify(obj):
     return mark_safe(simplejson.dumps(obj))
 
 register.filter('jsonify', jsonify)
-jsonify.is_safe = True   
+jsonify.is_safe = True
 
 def ipdbfilter(element):
     """{{var|ipdbfilter}} in a template to see it!  awesome!"""
