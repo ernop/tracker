@@ -289,11 +289,11 @@ from admin_helpers import *
 
 class PersonAdmin(OverriddenModelAdmin):
     list_display='id myinfo disabled birthday mymet_through myintroduced_to myspots mypurchases'.split()
-    list_filter=['met_through',GenderFilter]
+    list_filter=[GenderFilter,'met_through']
     list_editable=['birthday',  'disabled', ]
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
-    actions = ['disable','male','female']
+    actions = ['disable','male','female','organization',]
 
     def organization(self,request,queryset):
         for pp in queryset:

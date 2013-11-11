@@ -19,9 +19,15 @@ class GenderFilter(SimpleListFilter):
         return (
             ('male', 'male'),
             ('female', 'female'),
+            ('org', 'org'),
+            ('none', 'none'),
         )
     def queryset(self, request, queryset):
         if self.value()=='male':
             return queryset.filter(gender=1)
-        if self.value()=='female':
-            return queryset.filter(gender=0)
+        elif self.value()=='female':
+            return queryset.filter(gender=2)
+        elif self.value()=='org':
+            return queryset.filter(gender=3)
+        elif self.value()=='none':
+            return queryset.filter(gender=None)
