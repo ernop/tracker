@@ -26,6 +26,21 @@ class AnyPurchaseFilter(SimpleListFilter):
         elif self.value()=='no':
             return queryset.filter(purchases=None)
 
+class KnownSinceLongAgo(SimpleListFilter):
+    title = 'Known Since Long Ago'
+    parameter_name = 'known_long'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    def queryset(self, request, queryset):
+        from django.conf import settings
+        if self.value()=='yes':
+            return queryset.filter(created=settings.LONG_AGO)
+        elif self.value()=='no':
+            return queryset.exclude(created=settings.LONG_AGO)
+
 class GenderFilter(SimpleListFilter):
     title = 'gender'
     parameter_name = 'gender'
