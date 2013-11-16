@@ -1,54 +1,38 @@
 import os
 
 LOCAL=os.path.exists('local')
+#controls whether debugging will stop the server or be skipped
 from local_settings import *
-
-# Django settings for tracker project.
+#you should put the db settings in there.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 MANAGERS = ADMINS
-#DJANGO_BASE='d:/proj/tracker'
-
-# URL prefix for static files.
-# Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
-# Additional locations of static files
-
-# List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS=(
-    "django.contrib.auth.context_processors.auth",
-    ##"django.core.context_processors.debug",
-    #"django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    #"django.core.context_processors.request",
-    #"django.contrib.messages.context_processors.messages",
-    "processors.static_url_processor",
-    #'django_notices.context_processors.notices',
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'processors.static_url_processor',
     )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
 ROOT_URLCONF = 'tracker.urls'
 
-# Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'tracker.wsgi.application'
-
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -59,14 +43,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
     'tracker',
-    'tracker.buy',
-    'tracker.workout',
     'tracker.day',
 )
-
 
 LOGGING = {
     'version': 1,
@@ -138,3 +117,8 @@ ADMIN_EXTERNAL_BASE='/admin'
 JINJA2_FILTERS=('filters.ipdbfilter','filters.jsonify')
 
 LOGIN_URL = '/admin/'
+
+#the date you start using this.  everyone/thing from before this date doesn't have accurate time tracking.  and as you fill in old info, just set them to longago so that
+#time sequence stuff doesn't get messed up if you added it out of order.
+import datetime
+LONG_AGO = datetime.date(year=2012, month=1, day=1)

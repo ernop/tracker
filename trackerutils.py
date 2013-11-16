@@ -15,30 +15,6 @@ log=logging.getLogger(__name__)
 def monthago():
     return datetime.datetime.now()-datetime.timedelta(days=30)
 
-class WorkoutModel(models.Model):
-    def clink(self, text=None):
-        if not text:            text=self
-        return u'<a  style="white-space:nowrap;"  href="%s/workout/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
-
-    def alink(self, text=None):
-        if not text:            text=self
-        return u'<a  style="white-space:nowrap;"  href="%s/workout/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
-    class Meta:
-        app_label='workout'
-        abstract=True
-
-class BuyModel(models.Model):
-    def clink(self, text=None):
-        if not text:            text=self
-        return u'<a  style="white-space:nowrap;"  href="%s/buy/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
-
-    def alink(self, text=None):
-        if not text:            text=self
-        return u'<a  style="white-space:nowrap;"  href="%s/buy/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
-    class Meta:
-        app_label='buy'
-        abstract=True
-
 class DayModel(models.Model):
 
     def clink(self, text=None):
@@ -48,18 +24,9 @@ class DayModel(models.Model):
     def alink(self, text=None):
         if not text:            text=self
         return u'<a class="btn"  style="white-space:nowrap;"  href="%s/day/%s/%d/">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+
     class Meta:
         app_label='day'
-        abstract=True
-
-class MyJsReplacementBuy(models.Model):
-    #def _media(self):
-        #js = (settings.MEDIA_URL + 'static/admin/js/admin/DateTimeShortcuts.js', settings.MEDIA_URL + 'static/js/DjangoAjax.js',)
-
-    #media=property(_media)
-
-    class Meta:
-        app_label='buy'
         abstract=True
 
 def gethour(hour=None):
@@ -83,15 +50,6 @@ def gethour(hour=None):
         res='midnight'
     log.info('hour %d res %s',hour, res)
     return res
-
-def savetmp(self):
-    out=tempfile.NamedTemporaryFile(dir=settings.SPARKLINES_DIR, delete=False)
-    self.save(out,'png')
-    os.chmod(out.name, 0644)
-    return out
-
-
-
 
 HOUR_CHOICES=zip([0,1,2,3,4,5], 'morning noon afternoon evening night midnight'.split())
 HOUR_CHOICES.append((6, 'deep night'))
@@ -167,3 +125,5 @@ def mktable(res):
     for row in res:
         rows.append('<tr>%s</tr>'%(''.join(['<td>%s'%thing for thing in row])))
     return '<table class="table" style="background-color:white;">%s</table>' % ''.join(rows)
+
+

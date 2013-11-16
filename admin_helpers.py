@@ -12,6 +12,20 @@ from django.contrib.admin.views.main import SuspiciousOperation, ImproperlyConfi
 from django.contrib.admin.util import lookup_needs_distinct
 from django.db.models import Q, Count
 
+class AnyPurchaseFilter(SimpleListFilter):
+    title = 'Any Purchase?'
+    parameter_name = 'any_purchase'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            return queryset.exclude(purchases=None)
+        elif self.value()=='no':
+            return queryset.filter(purchases=None)
+
 class GenderFilter(SimpleListFilter):
     title = 'gender'
     parameter_name = 'gender'

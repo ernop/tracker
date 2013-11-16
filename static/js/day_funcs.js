@@ -254,11 +254,11 @@ function obj2purchase(purchase){
 }
 
 function source_clink(purchase){
-	return '<a href="/admin/buy/source/?id='+purchase.source.id+'">'+purchase.source.name+'</a>'
+	return '<a href="/admin/day/source/?id='+purchase.source.id+'">'+purchase.source.name+'</a>'
 }
 
 function who_with_clink(guy){
-	return '<a href="/admin/buy/person/?id='+guy.id+'">'+guy.text+'</a>'
+	return '<a href="/admin/day/person/?id='+guy.id+'">'+guy.text+'</a>'
 }
 
 function who_with_clinks(purchase){
@@ -274,29 +274,29 @@ function obj2measurement(measurement){
 }
 
 function m_clink(m){
-	return '<a href="/admin/workout/measurement/?place__id='+m.place_id+'">'+m.name+'</a>'
+	return '<a href="/admin/day/measurement/?place__id='+m.place_id+'">'+m.name+'</a>'
 }
 
 function m_p_alink(m){
-	return '<a href="/admin/workout/measuringspot/?id='+m.place_id+'">summary '+m.name+'</a>'
+	return '<a href="/admin/day/measuringspot/?id='+m.place_id+'">summary '+m.name+'</a>'
 }
 
 function pur_alink(purch){//the direct purchase
-	return '<a href="/admin/buy/purchase/'+purch.id+'/">'+purch.id+'</a>'
+	return '<a href="/admin/day/purchase/'+purch.id+'/">'+purch.id+'</a>'
 }
 
 function prod_alink(purch){//the product - useless
-	return '<a href="/admin/buy/product/'+purch.product_id+'/">'+purch.name+'</a>'
+	return '<a href="/admin/day/product/'+purch.product_id+'/">'+purch.name+'</a>'
 }
 
 function pur_clink(purch){
-	return '<a href="/admin/buy/purchase/?id='+purch.id+'">'+purch.name+'</a>'
+	return '<a href="/admin/day/purchase/?id='+purch.id+'">'+purch.name+'</a>'
 }
 
 function prod_purchases_clink(purch){
-	return '<a href="/admin/buy/purchase/?product__id='+purch.product_id+'">'+purch.name+'</a>'
+	return '<a href="/admin/day/purchase/?product__id='+purch.product_id+'">'+purch.name+'</a>'
 }
 
 function prod_clink(purch){
-	return '<a href="/admin/buy/product/?id='+purch.product_id+'">'+purch.name+'</a>'
+	return '<a href="/admin/day/product/?id='+purch.product_id+'">'+purch.name+'</a>'
 }

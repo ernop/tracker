@@ -1,10 +1,6 @@
-import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime
-
+import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime, json
 
 from django.template import RequestContext
-
-
-import json
 
 def adminify(*args):
     for func in args:
@@ -139,7 +135,6 @@ def is_valid_password(pw):
         return False,_('password contains forbidden characters')+ '%s'%''.join(forbidden)+'. '+_('Passwords may only contain the following characters: ')+'%s'%OK_PASSWORD_CHARS
     return True,''
 
-
 def group_required(*group_names):
     """Requires user membership in at least one of the groups passed in."""
     def in_groups(u):
@@ -226,3 +221,97 @@ def r2j(res):
     from django.shortcuts import HttpResponse, HttpResponseRedirect
     return HttpResponse(json.dumps(res), mimetype='application/json')
 
+def humanize_date(dt, nopast=False):
+    '''if nopast, then for past days just always give the date.
+    this also shows the year if it's in not the current app year.'''
+    from choices import HUMANIZE_DATE, HUMANIZE_DATE_YEAR, HOUR_MIN_M
+    if type(dt) == datetime.date:
+        dt = datetime.datetime(year=dt.year, day=dt.day, month=dt.month)
+    if dt:
+        age=datetime.datetime.now()-dt
+        if age.days<1 and (nopast and age.days>0):
+            hours=age.seconds/3600
+            if hours>0:
+                if hours==1:
+                    return '%d hour ago'%hours
+                else:
+                    return '%d hours ago'%hours
+            minutes=age.seconds/60
+            if minutes>0:
+                if minutes==1:
+                    return '%d minute ago'%minutes
+                else:
+                    return '%d minutes ago'%minutes
+            else:
+                return 'Just Now'
+            return dt.strftime(HOUR_MIN_M)
+        else:
+            res=dt.strftime(HUMANIZE_DATE_YEAR)
+            if res[-2]=='0':
+                res=res[:-2]+res[-1]
+            return res
+    else:
+        return ''
+
+def get_nested_objects(obj):
+    from django.contrib.admin.util import NestedObjects
+    collector = NestedObjects(using='default')
+    collector.collect([obj])
+    return collector.nested()
+
+def ipdb():
+    import inspect
+    try:
+        par = inspect.stack()[1]
+        desc = '%s line:%s' % (par[1], [par[2]])
+    except:
+        log.error('failed to inspect stack.')
+        import ipdb;ipdb.set_trace()
+        desc='failed to inspect stack.'
+    if settings.LOCAL:
+        log.error('missed ipdb call. %s', desc)
+        import ipdb;ipdb.set_trace()
+    else:
+        log.error('missed ipdb call. %s', desc)
+
+
+def get_contenttype(model):
+    from django.contrib.contenttypes.models import ContentType
+    return ContentType.objects.get_for_model(model)
+
+def make_le(request, obj, change_message, action_flag=2):
+    from django.contrib.admin.models import LogEntry
+    from day.models import User
+    '''make logentry.'''
+    try:
+        if request is None:
+            user = User.objects.filter(username='ernie')[0]
+            ip=''
+            if not obj:
+                class Bag():
+                    pass
+                obj=Bag()
+                obj.id=None
+            if obj.__class__ == user.__class__:
+                user = obj
+            #just user ernie
+            content_type=None
+        else:
+            user = request.user
+            ip = request.META['REMOTE_ADDR']
+            content_type = get_contenttype(obj.__class__)
+        if user.is_anonymous():
+            log.info('anon user did an action, saving as ernie.')
+            user = User.objects.get(username='ernie')
+        object_id = obj.id
+        object_repr = str(obj)
+        le = LogEntry(user=user, content_type=content_type, object_id=object_id, object_repr=object_repr, action_flag=action_flag, change_message=change_message)
+        le.save()
+    except Exception, e:
+        log.error(e)
+        ipdb()
+
+def sqlp(statement):
+    import sqlparse
+    res = sqlparse.format(statement, reindent=True)
+    print res

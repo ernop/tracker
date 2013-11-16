@@ -57,9 +57,9 @@
         <tr><td>currency<td><input type=text id=purchase-currency style="width:190px;"></input>
         <tr><td>size<td><input type=text id=purchase-size  style="width:180px;"></input>
         <tr><td><div class="btn make-purchase">Save</div>
-        <tr><td style="width:250px;"><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/source/add"><i class="icon-plus"></i> source</a>
-        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/product/add"><i class="icon-plus"></i> product</a>
-        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/buy/person/add"><i class="icon-plus"></i> person</a>
+        <tr><td style="width:250px;"><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/source/add"><i class="icon-plus"></i> source</a>
+        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/product/add"><i class="icon-plus"></i> product</a>
+        <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/person/add"><i class="icon-plus"></i> person</a>
         </table>
     </div>
 </div></div>
@@ -68,7 +68,7 @@
 <h2>Workouts</h2>
     {% for workout in day.getworkouts() %}
     {{workout.mysets()|safe}}<br>{% endfor %}
-    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/workout/add"><i class="icon-plus"></i> new</a><br>
+    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/day/add"><i class="icon-plus"></i> new</a><br>
 </div></div>
 
 <div class="row"><div class="span8">
@@ -80,7 +80,7 @@
         <tr><td><input  id="measurement-place" style="width:190px;"></input>
         <tr><td><input type=text id="measurement-amount" style="width:190px;"></input>
         <tr><td><div class="btn make-measurement">Save</div>
-        <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/workout/measurement/add"><i class="icon-plus"></i>new</a>
+        <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/measurement/add"><i class="icon-plus"></i>new</a>
         </table>
     </div>
 

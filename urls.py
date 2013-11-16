@@ -11,10 +11,9 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls),),
-
-    url(r'^do_measurementset/$', 'tracker.workout.views.do_measurementset', name='do_set'),
-    url(r'^do_measurementset/(?P<measurementset_id>[0-9]+)/$', 'tracker.workout.views.do_measurementset', name='do_set_id'),
-    url(r'^make_workout','tracker.workout.views.make_workout',name='make_workout'),
+    url(r'^do_measurementset/$', 'tracker.day.views.do_measurementset', name='do_set'),
+    url(r'^do_measurementset/(?P<measurementset_id>[0-9]+)/$', 'tracker.day.views.do_measurementset', name='do_set_id'),
+    url(r'^make_workout','tracker.day.views.make_workout',name='make_workout'),
     url(r'^ajax/day_data/$','tracker.day.views.ajax_day_data',name='ajax_day_data'),
     url(r'^day/$','tracker.day.views.index',name='day'),
     url(r'^today/$','tracker.day.views.today',name='today'),

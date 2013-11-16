@@ -9,8 +9,6 @@ from django.forms.models import (modelform_factory, modelformset_factory, inline
 from django.shortcuts import HttpResponseRedirect, HttpResponse
 from trackerutils import *
 from day.models import *
-from buy.models import Person, Purchase, Source
-from workout.models import Measurement
 from trackerutils import *
 import logging
 from django.contrib.auth.decorators import login_required, user_passes_test

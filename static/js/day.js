@@ -29,8 +29,6 @@ myinitSelection = function(element, callback) {
 function setup_nkselect(){
     $.each($(".notekindselect.new"), function(index, thing){
         $(thing).removeClass("new");
-        //console.log('doing',$(thing).closest('.note-row'));
-
         $.each(notekinds, function(index, nk){
             var th=$(thing);
             var option=$('<option value="'+index+'">'+nk+'</option>');
@@ -66,9 +64,7 @@ function setup_savebutton(){
 
 function setup_textarea(){
     $(".textarea").live('keyup', function(e){
-        console.log('up');
         clearTimeout(save_timeout);
-        console.log('target is ',$(e.target));
         tar=$(e.target);
         save_timeout=setTimeout(function(e){data_changed(tar, 'note_text')}, 700);
     });
@@ -163,7 +159,6 @@ function data_changed(target, kind){
 }
 
 function send_data(data, target){
-    console.log(data);
     $.ajax({
         url:'/ajax/day_data/',
         type:'POST',

@@ -1,22 +1,22 @@
-# Create your views here.
 import datetime
 
-# Create your views here.
-
-#from coffin.shortcuts import *
-from django.forms.models import (modelform_factory, modelformset_factory, inlineformset_factory, BaseInlineFormSet)
+from django.forms.models import modelform_factory, modelformset_factory, inlineformset_factory, BaseInlineFormSet
 from django.shortcuts import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.template import RequestContext
+from django.forms.formsets import formset_factory
+from django import forms
+from day.models import *
 
 from trackerutils import *
-from day.models import *
-from buy.models import *
 from utils import *
 from choices import *
+
 import logging
 log=logging.getLogger(__name__)
 
 from forms import DayForm
+
 @login_required
 def ajax_day_data(request):
     log.info(request.POST)
@@ -129,16 +129,12 @@ def yesterday(request):
     today=gettoday()
     yesterday=today-datetime.timedelta(days=1)
     return HttpResponseRedirect('/day/%s'%str(yesterdaytoday))
-    #d,created=Day.objects.get_or_create(date=yesterday)
-    #return aday(request, d)
 
 @login_required
 def y2day(request):
     dtoday=gettoday()
     y2day=dtoday-datetime.timedelta(days=2)
     return HttpResponseRedirect('/day/%s'%str(y2today))
-    #d,created=Day.objects.get_or_create(date=yesterday)
-    #return aday(request, d)
 
 @login_required
 def aday(request, day):
@@ -166,14 +162,14 @@ def aday(request, day):
     vals['purchases']=Purchase.objects.filter(created__gte=day.date, created__lt=nextday).order_by('hour')
     vals['full_notekinds']=[{'id':n.id,'text':n.name} for n in NoteKind.objects.order_by('name')]
     vals['notekinds']=[n.name for n in NoteKind.objects.order_by('name')]
-    from buy.models import Product
+    from day.models import Product
     vals['products']=[{'id':p.id,'text':p.name} for p in Product.objects.all()]
     vals['sources']=[source2obj(s) for s in Source.objects.all()]
     vals['people']=[per2obj(p) for p in Person.objects.exclude(disabled=True)]
     vals['currencies']=[currency2obj(c) for c in Currency.objects.all()]
     vals['hour']=name2hour[gethour()]
     vals['hours'] = [{'id': id, 'name': name, 'text': name,} for name, id in name2hour.items()]
-    from workout.models import MeasuringSpot
+    from day.models import MeasuringSpot
     vals['measurement_places']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
 
     return r2r('jinja2/day.html', request, vals)
@@ -205,21 +201,15 @@ def people_connections(request, exclude_disabled=False):
         if person.last_name:
             res += person.last_name[0].upper()
         return res
-    namefunc = lambda x:x.first_name.title()
-    vals['edges'] = [{'target': person.met_through.get().id, 'source': person.id, 'value': 1,} for person in people if person.met_through.exists()]
+    namefunc = lambda x:x.first_name.title().replace('\'S', '\'s')
+    vals['edges'] = []
+    for person in people:
+        if person.met_through.exists():
+            for operson in person.met_through.all():
+                vals['edges'].append({'target': operson.id, 'source': person.id, 'value': 1,})
     rawnodes = {}
     for person in people:
         rawnodes[person.id] = {'gender':person.gender,'id': person.id, 'reflexive':False, 'left': True, 'right': False,'name': namefunc(person), 'created': person.created.strftime(DATE_DASH_REV), 'purchases_together': Purchase.objects.filter(who_with=person).count(),}
-    #rawnodes = {person.id: for person in people}
-    #OK = [1, 2]
-    #vals['edges'] = [e for e in vals['edges'] if e['target'] in OK and e['source'] in OK]
-    #import ipdb;ipdb.set_trace()
-    #vals['nodes'] = {pp['id']: pp for pp in vals['nodes'].values() if pp['id'] in OK}
-    #vals['nodes'] = [pp for pp in vals['nodes'].values()]
-    #vals['nodes'] = []
-    #apparently d3 wants a list of nodes, because it will use the edge to/from as positional arguments rather than ID lookups!
-    #so it's like, edge 4,5 means an edge from position 4 to 5 objects, not from object id 4 to 5.  wtf.
-    #this all works fine except when you have missing ID numbers (Which will actually be most real world cases... ugh.)
     maxnodeid = max([n['id'] for n in rawnodes.values()])
     vals['nodes'] = []
     for nodeid in range(maxnodeid+1):
@@ -227,15 +217,50 @@ def people_connections(request, exclude_disabled=False):
             vals['nodes'].append(rawnodes[nodeid])
         else:
             vals['nodes'].append({})
-    #vals['edges'] = [{'source': 1, 'target': 2,}]
-    #vals['edges'] = []
-    #import ipdb;ipdb.set_trace()
-    #nodeids = [n['id'] for n in vals['nodes']]
-    #for ee in vals['edges']:
-        #if ee['target'] not in nodeids:
-            #import ipdb;ipdb.set_trace()
-        #if ee['source'] not in nodeids:
-            #import ipdb;ipdb.set_trace()
-        #if not ee['source'] or not ee['target']:
-            #import ipdb;ipdb.set_trace()
     return r2r('jinja2/people_connections.html', request, vals)
+
+@login_required
+def days(request):
+    sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
+    total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(created__gte=sixmonthago).aggregate(Sum('cost'))['cost__sum']
+    ear=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).order_by('created')
+    earliest=None
+    if ear:
+        earliest=datetime.datetime.combine(ear[0].created, datetime.time())
+    else:
+        return ''
+    now=datetime.datetime.now()
+    dayrange=(abs((now-earliest).days))+1
+    return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
+
+
+def do_measurementset(request, measurementset_id=None):
+    vals={}
+    if request.method=='POST':
+        formset=modelformset_factory(Measurement)
+        ff=formset(request.POST)
+        ff.save()
+        #that's it!
+        return HttpResponseRedirect('/admin/day/')
+    else:
+        ms=MeasurementSet.objects.get(id=measurementset_id)
+        msids=[]
+        for spot in ms.measurement_spots.all():
+            m=Measurement(place=spot, created=datetime.datetime.now(), amount=0)
+            m.save()
+            msids.append(m.id)
+        qs=Measurement.objects.filter(id__in=msids)
+    formset=modelformset_factory(Measurement, extra=0)
+    vals['formset']=formset(queryset=qs)
+    return render_to_response('many.html',vals,RequestContext(request))
+
+class WorkoutForm(forms.ModelForm):
+    class Meta:
+        model=ExWeight
+
+
+
+def make_workout(request):
+    vals={}
+    vals['form']=WorkoutForm()
+    return render_to_response('make_workout.html',vals,RequestContext(request))

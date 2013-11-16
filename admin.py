@@ -13,13 +13,11 @@ MED=[340,200]
 SM=[200,100]
 from choices import *
 from trackerutils import *
-from tracker.buy.models import *
-from tracker.workout.models import *
-from tracker.day.models import *
-from tracker.utils import adminify, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
-from choices import DATE
-from tracker.buy.models import HOUR_CHOICES, hour2name, name2hour
-#from pygooglechart import PieChart2D
+from utils import *
+from day.models import *
+#from tracker.utils import adminify, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
+from admin_helpers import *
+
 RMBSYMBOL=Currency.objects.get(id=1).symbol
 class PurchaseForm(forms.ModelForm):
     who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False), required=False)
@@ -65,6 +63,20 @@ class OverriddenModelAdmin(admin.ModelAdmin):
         return med
 
     media=property(_media)
+
+    def changelist_view(self, request, extra_context=None):
+        #the way searches work in django is fucking stupid.
+        #when you view by ID and then apply a filter/search it doesn't cancel the previous ID.  so you get no results
+        #and confuse yourself.
+        if request.GET.has_key('id'):
+            #delete id parameter if there are other filters! yes!
+            real_keys = [k for k in request.GET.keys() if k not in getattr(self, 'not_count_filters', [])]
+            if len(real_keys) != 1:
+                q = request.GET.copy()
+                del q['id']
+                request.GET = q
+                request.META['QUERY_STRING'] = request.GET.urlencode()
+        return super(OverriddenModelAdmin,self).changelist_view(request, extra_context=extra_context)
 
 def new_sparkline(results, width, height):
     res = '<div class="sparkline-data">%s</div>'%(','.join([str(s) for s in results]))
@@ -157,7 +169,7 @@ class ProductAdmin(OverriddenModelAdmin):
         res = sorted(res.items(), key=lambda x:(-1*x[1], x[0]))
         for n in range(len(res)):
             source = Source.objects.get(id=res[n][0])
-            res[n] = res[n] + ('<a class="nb" href="/admin/buy/purchase/?product__id=%d&source=%d">filter</a>'%(obj.id, source.id), )
+            res[n] = res[n] + ('<a class="nb" href="/admin/day/purchase/?product__id=%d&source=%d">filter</a>'%(obj.id, source.id), )
             res[n] = (source.clink(), ) + res[n][1:]
 
 
@@ -181,7 +193,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
         return obj.source.clink()
 
     def mycreated(self, obj):
-        return '<a href="/admin/buy/purchase/?created__day=%d&created__month=%d&created__year=%d">%s</a>'%(obj.created.day, obj.created.month, obj.created.year, obj.created.strftime(DATE))
+        return '<a href="/admin/day/purchase/?created__day=%d&created__month=%d&created__year=%d">%s</a>'%(obj.created.day, obj.created.month, obj.created.year, obj.created.strftime(DATE))
 
     def mycost(self, obj):
         costper=''
@@ -198,7 +210,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
         return ', '.join([per.clink() for per in obj.who_with.all()])
 
     def mydomain(self, obj):
-        return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.product.domain.id, obj.product.domain)
+        return '<a href=/admin/day/domain/?id=%d>%s</a>'%(obj.product.domain.id, obj.product.domain)
 
     adminify(mycost, myproduct, mywho_with, mydomain, mycreated, mysource)
     mywho_with.display_name='Who With'
@@ -285,15 +297,18 @@ class DomainAdmin(OverriddenModelAdmin):
         return obj.created.strftime(DATE)
     adminify(myproducts, mysource, mycreated, mypie)
 
-from admin_helpers import *
-
 class PersonAdmin(OverriddenModelAdmin):
     list_display='id myinfo disabled birthday mymet_through myintroduced_to myspots mypurchases'.split()
-    list_filter=[GenderFilter,'met_through']
+    list_filter=[GenderFilter, AnyPurchaseFilter, 'met_through']
     list_editable=['birthday',  'disabled', ]
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
-    actions = ['disable','male','female','organization',]
+    actions = ['disable','male','female','organization', 'set_longago', ]
+
+    def set_longago(self, request, queryset):
+        for person in queryset:
+            person.created = settings.LONG_AGO
+            person.save()
 
     def organization(self,request,queryset):
         for pp in queryset:
@@ -311,7 +326,11 @@ class PersonAdmin(OverriddenModelAdmin):
             pp.save()
 
     def myinfo(self,obj):
-        return '%s %s %s'%(obj.first_name, obj.last_name, obj.get_gender())
+        if obj.created == settings.LONG_AGO:
+            known_for = 'long ago'
+        else:
+            known_for = humanize_date(obj.created)
+        return '%s %s %s<br>known since %s'%(obj.first_name, obj.last_name, obj.get_gender(), known_for)
 
     def disable(self, request, queryset):
         for pp in queryset:
@@ -340,7 +359,7 @@ class PersonAdmin(OverriddenModelAdmin):
         #return res
 
     def mypurchases(self, obj):
-        alllink = '<a href=/admin/buy/purchase/?who_with=%d>all</a>' % obj.id
+        alllink = '<a href=/admin/day/purchase/?who_with=%d>all</a>' % obj.id
         purch = Purchase.objects.filter(who_with=obj)
         res = {}
         for p in purch:
@@ -351,7 +370,7 @@ class PersonAdmin(OverriddenModelAdmin):
         #prods = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
         #return prods + '<br>' + alllink
 
-    adminify(mymet_through, myintroduced_to, myspots, mypurchases)
+    adminify(mymet_through, myintroduced_to, myspots, mypurchases, myinfo)
 
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name symbol mytotal my3months'.split()
@@ -428,7 +447,7 @@ class SetInline(admin.StackedInline):
     extra=12
 
 class ExerciseAdmin(OverriddenModelAdmin):
-    list_display='id name myhistory myspark barbell'.split()
+    list_display='id name myhistory barbell'.split()
     inlines=[
         PMuscleInline,
         SMuscleInline,
@@ -442,29 +461,29 @@ class ExerciseAdmin(OverriddenModelAdmin):
         kwargs.setdefault('form', ApplicantForm)
         return super(ApplicantAdmin, self).get_changelist_form(request, **kwargs)
 
-    def myspark(self, obj):
-        past=[]
-        res={}
-        mindate=None
-        zets=Set.objects.filter(exweight__exercise=obj).order_by('-workout__created')
-        if not zets:
-            return ''
-        for zet in zets:
-            #past.append((zet.workout.date, zet.count, zet.exweight.weight))
-            date=zet.workout.created.strftime(DATE)
-            res[date]=max(res.get(date, 0), zet.exweight.weight)
-            if not mindate or date<mindate:
-                mindate=date
-        first=datetime.datetime.strptime(mindate, DATE)
-        now=datetime.datetime.now()
-        trying=first
-        res2=[]
-        while trying<now:
-            res2.append((res.get(trying.strftime(DATE), 0)))
-            trying=datetime.timedelta(days=1)+trying
-        im=sparkline_discrete(results=res2, width=5, height=200)
-        tmp=savetmp(im)
-        return '<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
+    #def myspark(self, obj):
+        #past=[]
+        #res={}
+        #mindate=None
+        #zets=Set.objects.filter(exweight__exercise=obj).order_by('-workout__created')
+        #if not zets:
+            #return ''
+        #for zet in zets:
+            ##past.append((zet.workout.date, zet.count, zet.exweight.weight))
+            #date=zet.workout.created.strftime(DATE)
+            #res[date]=max(res.get(date, 0), zet.exweight.weight)
+            #if not mindate or date<mindate:
+                #mindate=date
+        #first=datetime.datetime.strptime(mindate, DATE)
+        #now=datetime.datetime.now()
+        #trying=first
+        #res2=[]
+        #while trying<now:
+            #res2.append((res.get(trying.strftime(DATE), 0)))
+            #trying=datetime.timedelta(days=1)+trying
+        #im=sparkline_discrete(results=res2, width=5, height=200)
+        ##tmp=savetmp(im)
+        #return '<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
 
 
     def myhistory(self, obj):
@@ -483,7 +502,7 @@ class ExerciseAdmin(OverriddenModelAdmin):
             res+='%d@<b>%d</b> '%(p[1], p[2])
         return res
 
-    adminify(mymuscles, myhistory, myspark)
+    adminify(mymuscles, myhistory)
 
 class SetAdmin(OverriddenModelAdmin):
     list_display='exweight count workout note'.split()
@@ -586,7 +605,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
 
 
     def mydomain(self, obj):
-        return '<a href=/admin/buy/domain/?id=%d>%s</a>'%(obj.domain.id, obj.domain)
+        return '<a href=/admin/day/domain/?id=%d>%s</a>'%(obj.domain.id, obj.domain)
     def mysets(self, obj):
         return ' | '.join([ms.clink() for ms in obj.measurementset_set.all()])
     adminify( myhistory, mydomain, mysets, myname)
