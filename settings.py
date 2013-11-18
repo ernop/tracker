@@ -121,4 +121,4 @@ LOGIN_URL = '/admin/'
 #the date you start using this.  everyone/thing from before this date doesn't have accurate time tracking.  and as you fill in old info, just set them to longago so that
 #time sequence stuff doesn't get messed up if you added it out of order.
 import datetime
-LONG_AGO = datetime.date(year=2012, month=1, day=1)
+LONG_AGO = datetime.date(year=2012, month=5, day=1)

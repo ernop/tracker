@@ -17,6 +17,35 @@ log=logging.getLogger(__name__)
 
 from forms import DayForm
 
+def do_measurementset(request, measurementset_id=None):
+    vals={}
+    if request.method=='POST':
+        formset=modelformset_factory(Measurement)
+        ff=formset(request.POST)
+        ff.save()
+        #that's it!
+        return HttpResponseRedirect('/admin/day/')
+    else:
+        ms=MeasurementSet.objects.get(id=measurementset_id)
+        msids=[]
+        for spot in ms.measurement_spots.all():
+            m=Measurement(place=spot, created=datetime.datetime.now(), amount=0)
+            m.save()
+            msids.append(m.id)
+        qs=Measurement.objects.filter(id__in=msids)
+    formset=modelformset_factory(Measurement, extra=0)
+    vals['formset']=formset(queryset=qs)
+    return render_to_response('many.html',vals,RequestContext(request))
+
+class WorkoutForm(forms.ModelForm):
+    class Meta:
+        model=ExWeight
+
+def make_workout(request):
+    vals={}
+    vals['form']=WorkoutForm()
+    return render_to_response('make_workout.html',vals,RequestContext(request))
+
 @login_required
 def ajax_day_data(request):
     log.info(request.POST)
@@ -209,14 +238,25 @@ def people_connections(request, exclude_disabled=False):
                 vals['edges'].append({'target': operson.id, 'source': person.id, 'value': 1,})
     rawnodes = {}
     for person in people:
-        rawnodes[person.id] = {'gender':person.gender,'id': person.id, 'reflexive':False, 'left': True, 'right': False,'name': namefunc(person), 'created': person.created.strftime(DATE_DASH_REV), 'purchases_together': Purchase.objects.filter(who_with=person).count(),}
+        rawnodes[person.id] = {'id': person.id,
+                               'gender':person.gender,
+                               'reflexive':False,
+                               'left': True,
+                               'right': False,
+                               'name': namefunc(person),
+                               'created': person.created.strftime(DATE_DASH_REV),
+                               'purchases_together': Purchase.objects.filter(who_with=person).count(),
+                               'weight': 1,
+                               'spent_together': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).aggregate(Sum('cost'))['cost__sum'] or 0,}
     maxnodeid = max([n['id'] for n in rawnodes.values()])
-    vals['nodes'] = []
-    for nodeid in range(maxnodeid+1):
-        if nodeid in rawnodes:
-            vals['nodes'].append(rawnodes[nodeid])
-        else:
-            vals['nodes'].append({})
+    vals['rawnodes'] = rawnodes
+    vals['nodes'] = rawnodes
+    #vals['nodes'] = []
+    #for nodeid in range(maxnodeid+1):
+        #if nodeid in rawnodes:
+            #vals['nodes'].append(rawnodes[nodeid])
+        #else:
+            #vals['nodes'].append({})
     return r2r('jinja2/people_connections.html', request, vals)
 
 @login_required
@@ -233,34 +273,3 @@ def days(request):
     dayrange=(abs((now-earliest).days))+1
     return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
 
-
-def do_measurementset(request, measurementset_id=None):
-    vals={}
-    if request.method=='POST':
-        formset=modelformset_factory(Measurement)
-        ff=formset(request.POST)
-        ff.save()
-        #that's it!
-        return HttpResponseRedirect('/admin/day/')
-    else:
-        ms=MeasurementSet.objects.get(id=measurementset_id)
-        msids=[]
-        for spot in ms.measurement_spots.all():
-            m=Measurement(place=spot, created=datetime.datetime.now(), amount=0)
-            m.save()
-            msids.append(m.id)
-        qs=Measurement.objects.filter(id__in=msids)
-    formset=modelformset_factory(Measurement, extra=0)
-    vals['formset']=formset(queryset=qs)
-    return render_to_response('many.html',vals,RequestContext(request))
-
-class WorkoutForm(forms.ModelForm):
-    class Meta:
-        model=ExWeight
-
-
-
-def make_workout(request):
-    vals={}
-    vals['form']=WorkoutForm()
-    return render_to_response('make_workout.html',vals,RequestContext(request))

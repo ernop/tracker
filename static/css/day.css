@@ -1,3 +1,5 @@
+html {height:99%;}
+
 .notification-zone{display:inline-block;height:70px;}
 
 .footer{position:fixed; bottom:100px;right:100px;}
@@ -46,7 +48,7 @@
     stroke-opacity:0.5;
 }
 
-.people-graph{border:1px solid grey;}
+#people-graph{border:1px solid grey;display:inline-block;}
 
 .d3-person-label{
     background:white;
@@ -54,4 +56,13 @@
 	font-family:Calibri;
 	font-size: 1.4em;
 	border:2px solid blue;
+}
+
+#control-area{
+	display:inline-block;
+	float:right;
+	border:2px solid lightblue;
+	border-radius:4px;
+	height:1000px;
+	width:260px;
 }

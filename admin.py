@@ -300,6 +300,7 @@ class DomainAdmin(OverriddenModelAdmin):
 class PersonAdmin(OverriddenModelAdmin):
     list_display='id myinfo disabled birthday mymet_through myintroduced_to myspots mypurchases'.split()
     list_filter=[GenderFilter, AnyPurchaseFilter,KnownSinceLongAgo, 'met_through']
+    date_hierarchy = 'created'
     list_editable=['birthday',  'disabled', ]
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
