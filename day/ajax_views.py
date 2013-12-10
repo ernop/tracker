@@ -79,9 +79,16 @@ def ajax_make_purchase(request):
         else:
             who_with=[]
         note=dat['note']
+        currency = 1
+        if 'currency' in dat and dat['currency']:
+            currency = Currency.objects.get(id=dat['currency'])
+        else:
+            source = Source.objects.get(id=source_id)
+            if source.region and source.region.currency:
+                currency = source.region.currency
         cur_id='currency' in dat and dat['currency'] or 1
-        hour_id=name2hour[gethour(hour)]
-        purch=Purchase(hour=hour_id, created=dt, product_id=product_id, source_id=source_id, cost=cost, quantity=quantity, size=size, note=note, currency_id=cur_id)
+        #hour_id=name2hour[gethour(hour)]
+        purch=Purchase(hour=hour, created=dt, product_id=product_id, source_id=source_id, cost=cost, quantity=quantity, size=size, note=note, currency=currency)
         purch.save()
         for ww in who_with:
             purch.who_with.add(Person.objects.get(id=ww))

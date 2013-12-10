@@ -250,7 +250,7 @@ function obj2purchase(purchase){
 	}else{
 		var count=''
 	}
-	return '<tr class="purchase"><td>'+pur_alink(purchase)+'<td>'+prod_clink(purchase)+'<td class="nb">'+purchase.cost+'元<td>'+count+'<td>'+source_clink(purchase)+'<td>'+purchase.hour+'<td>'+who_with_clinks(purchase)+'</tr>';
+	return '<tr class="purchase"><td>'+pur_alink(purchase)+'<td>'+prod_clink(purchase)+'<td class="nb">'+purchase.cost+purchase.cur_symbol+'<td>'+count+'<td>'+source_clink(purchase)+'<td>'+purchase.hour+'<td>'+who_with_clinks(purchase)+'</tr>';
 }
 
 function source_clink(purchase){

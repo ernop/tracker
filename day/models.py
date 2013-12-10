@@ -146,8 +146,6 @@ class NoteKind(DayModel):
             text='%s (%d)'%(self.name, self.notes.count())
         return '<a class="btn"  href="/notekind/%s/">%s </a>'%(self.id, text)
 
-
-
 class Exercise(DayModel):
     name=models.CharField(max_length=100, unique=True)
     pmuscles=models.ManyToManyField('Muscle', related_name='primary_exercises')
@@ -162,7 +160,6 @@ class Exercise(DayModel):
 
     def __unicode__(self):
         return self.name
-
 
 class Muscle(DayModel):
     name=models.CharField(max_length=100)
@@ -286,7 +283,6 @@ class Workout(DayModel):
             res3+='<br>'
         return res3
 
-
 class Measurement(DayModel):
     place=models.ForeignKey('MeasuringSpot', related_name='measurements')
     amount=models.FloatField()
@@ -298,7 +294,6 @@ class Measurement(DayModel):
     class Meta:
         db_table='measurement'
         ordering=['-created',]
-
 
 class MeasuringSpot(DayModel):
     name=models.CharField(max_length=100, unique=True)
@@ -330,8 +325,6 @@ class MeasurementSet(DayModel):
 
     def __unicode__(self):
         return u'MeasurementSet %s'%self.name
-
-
 
 class Domain(DayModel):
     """
@@ -379,9 +372,21 @@ class Domain(DayModel):
     def piechart(self):
         return clink('domain', self.id, self)
 
+class Region(DayModel):
+    '''geographical region'''
+    name=models.CharField(max_length=100)
+    created=models.DateField(auto_now_add=True)
+    currency = models.ForeignKey('Currency')
+    class Meta:
+        db_table='region'
+
+    def __unicode__(self):
+            return self.name
+
 class Source(DayModel):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
+    region = models.ForeignKey(Region, blank=True, null=True)
     class Meta:
         db_table='source'
         ordering=['name',]
@@ -421,6 +426,13 @@ class Source(DayModel):
             valid=valid.filter(created__lt=end)
         cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
         return cost
+
+    def save(self, *args, **kwargs):
+        if not self.region:
+            if Region.objects.filter(name='beijing').exists():
+                beijing = Region.objects.get(name='beijing')
+                self.region = beijing
+        super(Source, self).save(*args, **kwargs)
 
 class Product(DayModel):
     name=models.CharField(max_length=100, unique=True)

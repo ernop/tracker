@@ -400,10 +400,27 @@ class CurrencyAdmin(OverriddenModelAdmin):
 
     adminify(mytotal, my3months)
 
-class SourceAdmin(OverriddenModelAdmin):
-    list_display='name mytotal myproducts mywith mysummary'.split()
+class RegionAdmin(OverriddenModelAdmin):
+    list_display = 'name currency mysources'.split()
     list_per_page = 10
     search_fields = ['name', ]
+
+    def mysources(self, obj):
+        myobjs = Source.objects.filter(region=obj)
+        links = ', '.join([source.clink() for source in myobjs[:10]])
+        return '%s (%d total)' % (links, myobjs.count())
+
+    adminify(mysources)
+
+class SourceAdmin(OverriddenModelAdmin):
+    list_display='name mytotal myproducts mywith mysummary myregion'.split()
+    list_per_page = 10
+    search_fields = ['name', ]
+
+    def myregion(self, obj):
+        if obj.region:
+            return obj.region.clink()
+        return ''
 
     def myproducts(self, obj):
         products=Product.objects.filter(purchases__source=obj).distinct()
@@ -435,7 +452,7 @@ class SourceAdmin(OverriddenModelAdmin):
             dayrange=abs((datetime.datetime.now()-earliest).days)+1
             return '<div class="nb">%0.0f%s<br>%s%s /day<br>(%d days)</div>'%(total, RMBSYMBOL, rstripz(total/dayrange), RMBSYMBOL, dayrange)
 
-    adminify(mytotal, mysummary, myproducts, mywith)
+    adminify(mytotal, mysummary, myproducts, mywith, myregion)
 
 class PMuscleInline(admin.StackedInline):
     model = Exercise.pmuscles.through
@@ -687,6 +704,7 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(Domain, DomainAdmin)
 admin.site.register(Purchase, PurchaseAdmin)
 admin.site.register(Source, SourceAdmin)
+admin.site.register(Region, RegionAdmin)
 admin.site.register(Currency, CurrencyAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Exercise, ExerciseAdmin)

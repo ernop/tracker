@@ -1,2 +1,2 @@
-source trackenv/bin/activate
+source activate
 python manage.py shell

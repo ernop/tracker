@@ -98,6 +98,7 @@ def purchase2obj(p):
     return {'id':p.id,
             'name':p.product.name,
             'quantity':p.quantity,
+            'cur_symbol': p.currency.symbol,
             'size':p.size,
             'cost':p.cost,
             'source':source2obj(p.source),
