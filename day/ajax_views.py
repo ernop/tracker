@@ -79,7 +79,7 @@ def ajax_make_purchase(request):
         else:
             who_with=[]
         note=dat['note']
-        currency = 1
+        currency = Currency.objects.get(id=1)
         if 'currency' in dat and dat['currency']:
             currency = Currency.objects.get(id=dat['currency'])
         else:
