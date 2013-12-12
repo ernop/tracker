@@ -7,7 +7,7 @@ $(document).ready(function(){
   height=window.innerHeight-10
   nodes=all_nodes;
   edges=all_edges;
-  filter_edges()
+  //filter_edges()
   setup_dicts();
   fix_nodes();
   fix_edges();
