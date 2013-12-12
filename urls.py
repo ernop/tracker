@@ -32,7 +32,7 @@ urlpatterns = patterns('',
 
     url(r'^ajax/get_measurements/$','tracker.day.ajax_views.ajax_get_measurements',name='ajax_get_measurements'),
     url(r'^ajax/make_measurement/$','tracker.day.ajax_views.ajax_make_measurement',name='ajax_make_measurement'),
-    url(r'^/?$', lambda x:HttpResponseRedirect('/admin/'), name='redir'),
+    url(r'^/?$', lambda x:HttpResponseRedirect('/today/'), name='redir'),
 )
 
 

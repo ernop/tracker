@@ -60,9 +60,8 @@ html {height:99%;}
 
 #control-area{
 	display:inline-block;
-	float:right;
+	float:left;
 	border:2px solid lightblue;
 	border-radius:4px;
-	height:1000px;
-	width:260px;
+	width:100px;
 }

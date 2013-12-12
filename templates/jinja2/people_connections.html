@@ -4,12 +4,12 @@
     {{super()}}
     <script type="text/javascript" src="/static/js/jquery.min.js"></script>
     <script src="/static/js/d3.v3.js"></script>
+	<script src="/static/js/day-d3.utils.js"></script>
 	<script src="/static/js/day-d3.js"></script>
 	<link rel="stylesheet" type="text/css" href="/static/css/day-d3.css" />
 	<script>
-        var nodes={{nodes|jsonify|safe}};
-		//var rawnodes={{rawnodes|jsonify|safe}};
-        var edges={{edges|jsonify|safe}};
+        var all_nodes={{nodes|jsonify|safe}};
+        var all_edges={{edges|jsonify|safe}};
     </script>
 
 {% endblock %}

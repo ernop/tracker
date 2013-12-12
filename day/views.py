@@ -217,28 +217,36 @@ def notekind(request, id=None, name=None):
     vals['allnks']=NoteKind.objects.all()
     return r2r('jinja2/notekind.html', request, vals)
 
+def simple_namefunc(person):
+    res = ''
+    if person.first_name:
+        res += person.first_name[0].upper()
+    if person.last_name:
+        res += person.last_name[0].upper()
+    return res
+
 @login_required
 def people_connections(request, exclude_disabled=False):
     vals = {}
     people = Person.objects.all()
     if exclude_disabled:
         people = people.exclude(disabled=True)
-    def namefunc(person):
-        res = ''
-        if person.first_name:
-            res += person.first_name[0].upper()
-        if person.last_name:
-            res += person.last_name[0].upper()
-        return res
     namefunc = lambda x:x.first_name.title().replace('\'S', '\'s')
-    vals['edges'] = []
+    edges = []
+    nodes = {}
     for person in people:
+        nodes[person.id] = person2obj(person, namefunc=namefunc)
         if person.met_through.exists():
             for operson in person.met_through.all():
-                vals['edges'].append({'target': operson.id, 'source': person.id, 'value': 1,})
-    rawnodes = {}
-    for person in people:
-        rawnodes[person.id] = {'id': person.id,
+                edges.append({'target': operson.id, 'source': person.id, 'value': 1,})
+    vals['nodes'] = nodes
+    vals['edges'] = edges
+    return r2r('jinja2/people_connections.html', request, vals)
+
+def person2obj(person, namefunc=None):
+    if not namefunc:
+        namefunc = simple_namefunc
+    return {'id': person.id,
                                'gender':person.gender,
                                'reflexive':False,
                                'left': True,
@@ -248,16 +256,6 @@ def people_connections(request, exclude_disabled=False):
                                'purchases_together': Purchase.objects.filter(who_with=person).count(),
                                'weight': 1,
                                'spent_together': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).aggregate(Sum('cost'))['cost__sum'] or 0,}
-    maxnodeid = max([n['id'] for n in rawnodes.values()])
-    vals['rawnodes'] = rawnodes
-    vals['nodes'] = rawnodes
-    #vals['nodes'] = []
-    #for nodeid in range(maxnodeid+1):
-        #if nodeid in rawnodes:
-            #vals['nodes'].append(rawnodes[nodeid])
-        #else:
-            #vals['nodes'].append({})
-    return r2r('jinja2/people_connections.html', request, vals)
 
 @login_required
 def days(request):
