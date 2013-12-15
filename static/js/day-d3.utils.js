@@ -5,6 +5,11 @@ function gendercolor(d){
 	return 'grey'
 }
 
+function push_out(height, width, oldx,oldy, mult){
+  var x=oldx-width/2;
+  var y=oldy-height/2;
+  return [x*mult+width/2,y*mult+height/2]
+}
 
 function filter(objs, func){
   var res=[]
@@ -13,7 +18,7 @@ function filter(objs, func){
 	  res.push(obj)
 	}
   })
-return res
+  return res
 }
 
 function male(obj){return obj.gender==1}
@@ -36,10 +41,9 @@ function fix_nodes(){
   for (ii=0;ii<Math.max.apply(null, exi_ids)+1;ii++){
 	exinode=id2node[ii]
 	if (exinode){
-	  exinode['x']=500+((exinode.id%20)-10)*10*(Math.pow(-1,(exinode.id/2)%2))
-	  exinode['y']=500+((exinode.id%20)-10)*10*(Math.pow(-1,exinode.id%2))
-	  exinode['x']=width/2
-	  exinode['y']=height/2
+	  exinode['x']=ii
+	  exinode['y']=ii
+	  console.log(exinode)
 	  if (exinode.name=='Existence'){
 		exinode['fixed']=true
 		exinode['x']=width/2

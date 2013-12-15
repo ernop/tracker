@@ -15,7 +15,13 @@
 {% endblock %}
 
 {% block content %}
-<div id="control-area">{% if LOCAL %}LOCAL{% endif %}</div>
+<div id="control-area">{% if LOCAL %}LOCAL{% endif %}
+
+	<div class="button btn" id="perturb">perturb</div>
+	<div class="button btn" id="untangle">untangle</div>
+
+</div>
+
 <div id="people-graph"></div>
 
 {% endblock %}
