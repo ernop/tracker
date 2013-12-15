@@ -194,6 +194,7 @@ def mk_default_fkfield(vals):
     return inner
 
 def nowdate():
+    from choices import DATE
     return datetime.datetime.now().strftime(DATE)
 
 def rstripz(x, bold=False):
