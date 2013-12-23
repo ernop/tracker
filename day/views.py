@@ -253,6 +253,7 @@ def person2obj(person, namefunc=None):
                                'right': False,
                                'name': namefunc(person),
                                'created': person.created.strftime(DATE_DASH_REV),
+                               'last_purchase': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).order_by('-created')[0].created.strftime(DATE_DASH_REV) or '2011-01-01',
                                'purchases_together': Purchase.objects.filter(who_with=person).count(),
                                'weight': 1,
                                'spent_together': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).aggregate(Sum('cost'))['cost__sum'] or 0,}

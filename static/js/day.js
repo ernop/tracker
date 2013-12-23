@@ -101,7 +101,6 @@ function setup_tag_clicks(){
 function toggle_tag(e){
     var tag=$(e.target)
     var tagname=tag.attr('name')
-    console.log("toggle tag"+tagname);
     var par=tag.parent();
     var zone=tag.closest('.zone');
     if (zone.hasClass('tagzone')){

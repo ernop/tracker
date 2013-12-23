@@ -298,17 +298,22 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id myinfo disabled birthday mymet_through myintroduced_to myspots mypurchases'.split()
+    list_display='id myinfo disabled birthday created mymet_through myintroduced_to myspots mypurchases'.split()
     list_filter=[GenderFilter, AnyPurchaseFilter,KnownSinceLongAgo, 'met_through']
     date_hierarchy = 'created'
-    list_editable=['birthday',  'disabled', ]
+    list_editable=['birthday',  'disabled']
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
-    actions = ['disable','male','female','organization', 'set_longago', ]
+    actions = ['disable','male','female','organization', 'set_longago', 'set_today', ]
 
     def set_longago(self, request, queryset):
         for person in queryset:
             person.created = settings.LONG_AGO
+            person.save()
+
+    def set_today(self, request, queryset):
+        for person in queryset:
+            person.created = datetime.datetime.today()
             person.save()
 
     def organization(self,request,queryset):

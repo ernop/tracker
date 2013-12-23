@@ -34,38 +34,49 @@ function edge_either(func, edges){
   return res
 }
 
-function fix_nodes(){
+function fix_nodes(filter){
   //fucking d3
-  var newnodes=[]
-  var exi_ids=Object.keys(id2node)
+  var newnodes=[];
+  var use_ids=[];
+  var exi_ids=Object.keys(id2node);
   for (ii=0;ii<Math.max.apply(null, exi_ids)+1;ii++){
 	exinode=id2node[ii]
-	if (exinode){
+
+	if (exinode && filter(exinode)){
 	  exinode['x']=ii
 	  exinode['y']=ii
-	  console.log(exinode)
 	  if (exinode.name=='Existence'){
 		exinode['fixed']=true
 		exinode['x']=width/2
 		exinode['y']=height/2
 	  }
 	  newnodes.push(exinode)
+	  use_ids.push(ii)
 	}else{
 	  newnodes.push({})
+
 	}
   }
   nodes=newnodes
+  return use_ids;
 }
 
-function fix_edges(){
+function inlist(list, val){
+  if (list.indexOf(val)!=-1){return true}
+  return false;
+}
+
+function fix_edges(node_ids){
   var newedges=[]
   $.each(edges, function(index,edge){
-	var newedge={'source':id2node[edge['source']],'target':id2node[edge['target']],'value':edge['value']}
-	if (newedge['source'] && newedge['target']){
-	newedges.push(newedge)}
-  })
-  edges=newedges
+	if (inlist(node_ids,edge['source']) && inlist(node_ids, edge['target'])){
+	  var newedge={'source':id2node[edge['source']],'target':id2node[edge['target']],'value':edge['value']}
+	  if (newedge['source'] && newedge['target']){
+	  newedges.push(newedge)}}
+	})
+  return newedges
 }
+
 var id2node={};
 
 function setup_dicts(){

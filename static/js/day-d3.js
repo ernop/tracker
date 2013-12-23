@@ -1,4 +1,6 @@
 var force, svg, link, gnodes
+var edges
+var nodes;
 var width = 2200;
 var height = 1300;
 $(document).ready(function(){
@@ -9,11 +11,54 @@ $(document).ready(function(){
   edges=all_edges;
   //filter_edges()
   setup_dicts();
-  fix_nodes();
-  fix_edges();
-  draw()
+  do_filter(together_last_year_filter);
+  draw();
   setup_buttons()
   })
+
+function do_filter(filter){
+  var use_node_ids=fix_nodes(filter);
+  nodes=[]
+  $.each(use_node_ids, function(index,guy){
+	nodes.push(id2node[guy])
+  })
+  edges=fix_edges(use_node_ids);
+  edges=filter_edges(target_last_year_filter)
+}
+
+function together_last_year_filter(n){
+  return n.gender==3 || n.last_purchase>'2013-01-01'
+}
+
+function filter_edges(filter){
+  var newedges=[]
+  $.each(edges, function(index,guy){
+	if (filter(guy)){
+	  newedges.push(guy)
+	}
+  })
+  return newedges
+}
+
+function target_last_year_filter(e){
+  return e.source.created>'2013-01-01'
+}
+
+function make_datefilter(date){
+  function filter(d){
+
+  }
+}
+
+function tog(d){return d.purchases_together>1}
+
+function year2013(d){
+  return (d.created>='2013-01-01' && d.created<'2014-01-01')
+}
+
+function malefilter(n){return (n.gender==1)}
+
+function allfilter(n){return true}
 
 function setup_buttons(){
   $('#perturb').click(function(){
@@ -25,22 +70,22 @@ function setup_buttons(){
 		var outpos=push_out(height,width,d.x,d.y,1.03)
 		d.x=outpos[0];
 		d.y=outpos[1];
-	  }else{console.log(d.gender)}
+	  }else{}
 	})
 	force.resume();
 	})
   }
 
 
-function filter_edges(){
-  var new_edges=[];
-  edges.forEach(function (e){
-	if (Math.random()>0.5){
-	  new_edges.push(e)
-	}
-  })
-  edges=new_edges;
-}
+//function filter_edges(){
+  //var new_edges=[];
+  //edges.forEach(function (e){
+	//if (Math.random()>0.5){
+	  //new_edges.push(e)
+	//}
+  //})
+  //edges=new_edges;
+//}
 
 function distance_function(d){
   return 25;
@@ -59,10 +104,11 @@ function charge_func(d){ return -200}
 
 function tick() {
 	link.attr("x1", function(d) { return d.source.x; }).attr("y1", function(d) { return d.source.y; }).attr("x2", function(d) { return d.target.x; }).attr("y2", function(d) { return d.target.y; });
-	console.log('tick')
 	gnodes.attr("transform", function(d) {
 	  	  return 'translate(' + [d.x, d.y] + ')';
 	})}
+
+
 
 function draw(){
   svg = d3.select("#people-graph").append("svg").attr("width", width).attr("height", height);
