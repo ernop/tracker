@@ -234,11 +234,24 @@ def people_connections(request, exclude_disabled=False):
     namefunc = lambda x:x.first_name.title().replace('\'S', '\'s')
     edges = []
     nodes = {}
+    linked_ids = set()
     for person in people:
-        nodes[person.id] = person2obj(person, namefunc=namefunc)
         if person.met_through.exists():
+            #if person.gender == 3:
+                #import ipdb;ipdb.set_trace()
             for operson in person.met_through.all():
                 edges.append({'target': operson.id, 'source': person.id, 'value': 1,})
+            for operson in person.person_set.all():
+                if operson.purchases.exists():
+                    linked_ids.add(operson.id)
+                    linked_ids.add(person.id)
+            if person.purchases.exists():
+                linked_ids.add(person.id)
+    for person in people:
+        if (not person.purchases.exists()) and person.id not in linked_ids:
+            print 'skipping', person
+            continue
+        nodes[person.id] = person2obj(person, namefunc=namefunc)
     vals['nodes'] = nodes
     vals['edges'] = edges
     return r2r('jinja2/people_connections.html', request, vals)
