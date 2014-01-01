@@ -51,6 +51,8 @@ class Day(DayModel):
         return str(self.date)
 
     def plus(self, days=None, months=None, years=None):
+        if years:
+            return str(datetime.date(self.date.year+years, day=self.date.day, month=self.date.month))
         from utils import add_months
         if months:
             return str(add_months(self.date, months))
