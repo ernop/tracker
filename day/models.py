@@ -51,6 +51,9 @@ class Day(DayModel):
         return str(self.date)
 
     def plus(self, days=None, months=None, years=None):
+        from utils import add_months
+        if months:
+            return str(add_months(self.date, months))
         days=days or 0
         months = months or 0
         years=years or 0
@@ -59,6 +62,7 @@ class Day(DayModel):
         #just add the days
 
         #if got a month, bump that.
+        #import ipdb;ipdb.set_trace()
         newmonth = tt.month + months
         newyear = tt.year
         if newmonth == 0:
@@ -67,6 +71,7 @@ class Day(DayModel):
         if newmonth > 12:
             newyear = tt.year + 1
             newmonth = newmonth % 12
+        return str()
         return str(datetime.date(newyear, day=tt.day, month=newmonth))
 
     def vlink(self, text=None):

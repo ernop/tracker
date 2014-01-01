@@ -1,4 +1,4 @@
-import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime, json
+import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime, json, calendar
 
 from django.template import RequestContext
 
@@ -316,3 +316,11 @@ def sqlp(statement):
     import sqlparse
     res = sqlparse.format(statement, reindent=True)
     print res
+
+
+def add_months(sourcedate,months):
+    month = sourcedate.month - 1 + months
+    year = sourcedate.year + month / 12
+    month = month % 12 + 1
+    day = min(sourcedate.day,calendar.monthrange(year,month)[1])
+    return datetime.date(year,month,day)
