@@ -71,7 +71,6 @@ class Day(DayModel):
         if newmonth > 12:
             newyear = tt.year + 1
             newmonth = newmonth % 12
-        return str()
         return str(datetime.date(newyear, day=tt.day, month=newmonth))
 
     def vlink(self, text=None):
