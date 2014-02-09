@@ -237,6 +237,7 @@ def amonth(request, month):
     vals['pastmonth'] = add_months(mm, -1)
     vals['nextmonth'] = add_months(mm, 1)
     vals['monthtotal'] = monthtotal
+    vals['SALARY'] = settings.SALARY
     return r2r('jinja2/month.html', request, vals)
 
 def mkinfobox(title, content):

@@ -13,7 +13,7 @@
 {{domaintable|safe}}
 
 <h2>{% if monthtotal<0%}Saved  {{monthtotal}}{% else %}Spent {{monthtotal}}{% endif %}</h2>
-<h3>{{100.0-((20000+monthtotal)/20000.0*100)}}% saving</h3>
+<h3>{{100.0-((SALARY+monthtotal)/(1.0*SALARY)*100)}}% saving</h3>
 
 <table class="table thintable">
 <tr><td style="width:50px;">day<td>tags{% for spot in spots %}<td class="leftborder middle">{{spot.name}}{% endfor %}
