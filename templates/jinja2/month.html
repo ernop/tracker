@@ -1,0 +1,29 @@
+{% extends 'jinja2/day_base.html' %}
+{% block title %}{{start}} - {{end}}{% endblock %}
+{% block head %}
+    {{super()}}
+    <script>
+    </script>
+{% endblock %}
+{% block content %}{% if LOCAL %}LOCAL{% endif %}
+
+<h2>{{start}}</h2>
+
+
+{{domaintable|safe}}
+
+<h2>{{monthtotal}}</h2>
+#purchases summary by domain
+
+#notes
+
+#possibly prompts & direct links to update shit?
+
+
+
+<div class="notification fixed-notification">
+</div>
+
+{% endblock %}
+{% block footer %}{{super()}}{% include "jinja2/monthfooter.html" %}
+{% endblock %}

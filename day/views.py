@@ -167,7 +167,7 @@ def y2day(request):
 
 @login_required
 def aday(request, day):
-    dtday=datetime.datetime.strptime(day, '%Y-%m-%d')
+    dtday=datetime.datetime.strptime(day, DATE_DASH_YEARFIRST)
     vals={}
     log.info('day is %s',day)
     vals['today']=day
@@ -202,6 +202,33 @@ def aday(request, day):
     vals['measurement_places']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
 
     return r2r('jinja2/day.html', request, vals)
+
+@login_required
+def amonth(request, month):
+    mm = datetime.datetime.strptime(month, DATE_DASH_YEARFIRST)
+    start = datetime.datetime(year=mm.year, month=mm.month, day=1)
+    end = add_months(start, months=1)
+    vals = {}
+    vals['start'] = start
+    vals['end'] = end
+    bits = []
+    monthtotal = 0
+    FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()
+    for dd in Domain.objects.all():
+        dinfo = dd.spent_history(start=start, end=end)
+        if dd.name not in FORCE_DOMAINS and not dinfo['counts']:
+            continue
+        #import ipdb;ipdb.set_trace()
+        bits.append([dd.name, dinfo['total_cost'], '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, dinfo['total_quantity'])])
+        monthtotal += dinfo['total_cost']
+    domaintable = mktable(bits)
+    #purchases summary by domain
+    vals['domaintable'] = domaintable
+    vals['month'] = mm
+    vals['pastmonth'] = add_months(mm, -1)
+    vals['nextmonth'] = add_months(mm, 1)
+    vals['monthtotal'] = monthtotal
+    return r2r('jinja2/month.html', request, vals)
 
 @login_required
 def notekind(request, id=None, name=None):

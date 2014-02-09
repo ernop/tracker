@@ -463,8 +463,22 @@ class RegionAdmin(OverriddenModelAdmin):
 class SourceAdmin(OverriddenModelAdmin):
     list_display='name mytotal myproducts mywith mysummary mydomains myregion'.split()
     list_per_page = 10
+    list_filter = ['region', ]
     search_fields = ['name', ]
     actions = []
+
+    actions = ['set_beijing', 'set_tokyo', 'set_slo']
+
+    def make_assign_function(region_name):
+        def func(self, request, queryset):
+            for obj in queryset:
+                obj.region = Region.objects.get(name=region_name)
+                obj.save()
+        return func
+
+    set_beijing = make_assign_function('beijing')
+    set_tokyo= make_assign_function('tokyo')
+    set_slo = make_assign_function('slo')
 
     def myregion(self, obj):
         if obj.region:
@@ -473,12 +487,7 @@ class SourceAdmin(OverriddenModelAdmin):
 
     #_g = globals()
     #import ipdb;ipdb.set_trace()
-    #def make_assign_function(region):
-        #def func(self, request, queryset):
-            #for obj in queryset:
-                #obj.region = region
-                #obj.save()
-        #return func
+
 
     #for region in Region.objects.all():
         #funcname = 'assign_to_%s'%region.name.lower()
@@ -521,7 +530,7 @@ class SourceAdmin(OverriddenModelAdmin):
                 res[cl] = res.get(cl, 0) + 1
         tbl = mktable(sorted(res.items(), key=lambda x:(-1*x[1], x[0])))
         return tbl
-
+    @debu
     def mytotal(self, obj):
         #monthago=datetime.datetime.now()-datetime.timedelta(days=30)
         purchases=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).order_by('created')

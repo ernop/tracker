@@ -352,6 +352,24 @@ class Domain(DayModel):
     def all_purchases_link(self):
         return '<a href="/admin/day/purchase/?product__domain__id__exact=%d">all purch</a>'%(self.id)
 
+    def spent_history(self, start, end):
+        counts = {}
+        costs = {}
+        res = {}
+        ps = Purchase.objects.filter(product__domain=self, created__gte=start, created__lt=end)
+        total_quantity = 0
+        total_cost = 0
+        for p in ps:
+            total_cost += p.cost
+            total_quantity += p.quantity
+            costs[p.product.id] = costs.get(p.product.id, 0) + p.cost
+            counts[p.product.id] = counts.get(p.product.id, 0) + p.quantity
+        res['costs'] = costs
+        res['counts'] = counts
+        res['total_quantity'] = total_quantity
+        res['total_cost'] = total_cost
+        return res
+
     def summary(self):
         rows = []
         for pp in self.products.all():
