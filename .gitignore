@@ -19,3 +19,4 @@ ipython
 *.stackdump
 logs/*.log
 *.sql
+*.sql.gz
