@@ -1,5 +1,5 @@
 {% extends 'jinja2/day_base.html' %}
-{% block title %}{{start}} - {{end}}{% endblock %}
+{% block title %}{{startshow}} - {{endshow}}{% endblock %}
 {% block head %}
     {{super()}}
     <script>
@@ -7,7 +7,7 @@
 {% endblock %}
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
 
-<h2>{{start}}</h2>
+<h2>{{startshow}}</h2>
 
 
 {{domaintable|safe}}

@@ -211,6 +211,8 @@ def amonth(request, month):
     vals = {}
     vals['start'] = start
     vals['end'] = end
+    vals['startshow'] = start.strftime(DATE_DASH_YEARFIRST)
+    vals['endshow'] = end.strftime(DATE_DASH_YEARFIRST)
     bits = []
     monthtotal = 0
     FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()
