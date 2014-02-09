@@ -360,9 +360,9 @@ class Domain(DayModel):
         total_quantity = 0
         total_cost = 0
         for p in ps:
-            total_cost += p.cost
+            total_cost += p.get_cost()
             total_quantity += p.quantity
-            costs[p.product.id] = costs.get(p.product.id, 0) + p.cost
+            costs[p.product.id] = costs.get(p.product.id, 0) + p.get_cost()
             counts[p.product.id] = counts.get(p.product.id, 0) + p.quantity
         res['costs'] = costs
         res['counts'] = counts
@@ -500,6 +500,7 @@ class Product(DayModel):
             count=Purchase.objects.filter(product=self, source=source).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
         else:
             count=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
+            #we only count RMB stuff here cause it's freaking annoying otherwise.
         if not count:
             count = 0
         if count == int(count):
@@ -536,6 +537,7 @@ class Currency(DayModel):
     name=models.CharField(max_length=100, unique=True)
     symbol=models.CharField(max_length=10)
     created=models.DateField(auto_now_add=True)
+    rmb_value = models.FloatField()  #how many rmb one of these babies is worth. used by purchase.get_cost
     class Meta:
         db_table='currency'
         ordering=['name',]
@@ -577,6 +579,15 @@ class Purchase(DayModel):
         if not self.created:
             self.created=datetime.datetime.now()
         super(Purchase, self).save(*args, **kwargs)
+
+    def get_cost(self):
+        '''because costs are stored in the local currency, sometimes you have to convert them.
+
+        lots of things directly access cost which isn't really right. '''
+
+        if self.currency.name != 'rmb':
+            return self.currency.rmb_value * self.cost
+        return cost
 
 class Person(DayModel):
     first_name=models.CharField(max_length=100)

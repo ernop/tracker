@@ -100,7 +100,7 @@ def purchase2obj(p):
             'quantity':p.quantity,
             'cur_symbol': p.currency.symbol,
             'size':p.size,
-            'cost':p.cost,
+            'cost':p.cost,  #ok not to use get_cost here because it includes currency.
             'source':source2obj(p.source),
             'who_with':[per2obj(per) for per in p.who_with.all()],
             'note':p.note,

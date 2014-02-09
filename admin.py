@@ -110,7 +110,7 @@ class ProductAdmin(OverriddenModelAdmin):
             for pu in purch:
                 date=pu.created.strftime(DATE)
                 res[date]=res.get(date, 0)+pu.quantity
-                costres[date] = costres.get(date, 0) + pu.cost
+                costres[date] = costres.get(date, 0) + pu.get_cost()
                 if not mindate or date<mindate:
                     mindate=date
             first=datetime.datetime.strptime(mindate, DATE)
@@ -262,7 +262,7 @@ class DomainAdmin(OverriddenModelAdmin):
             res={}
             for pu in purch:
                 date=pu.created.strftime(DATE)
-                res[date]=res.get(date, 0)+pu.cost
+                res[date]=res.get(date, 0)+pu.get_cost()
                 if not mindate or date<mindate:
                     mindate=date
             first=datetime.datetime.strptime(mindate, DATE)
@@ -361,7 +361,7 @@ class PersonAdmin(OverriddenModelAdmin):
             togethercount = p.who_with.count()
             for person in p.who_with.exclude(id=obj.id):
                 counts[person.id] = counts.get(person.id, 0) + 1
-                costs[person.id] = costs.get(person.id, 0) + (p.cost / togethercount)
+                costs[person.id] = costs.get(person.id, 0) + (p.get_cost() / togethercount)
         bits = [(Person.objects.get(id=p).clink(), counts[p], '%0.1f' % costs[p]) for p in counts.keys()]
         tbl = mktable(sorted(bits, key=lambda x:-1*x[1]))
         return tbl

@@ -40,7 +40,7 @@ def ajax_get_popular(request):
     who_with= {}
     hours= {}
     for p in purches:
-        prices[p.cost] = prices.get(p.cost, 0) + 1
+        prices[p.get_cost()] = prices.get(p.get_cost(), 0) + 1
         sources[p.source] = sources.get(p.source, 0) + 1
         for who in p.who_with.all():
             who_with[who] = who_with.get(who, 0) + 1
