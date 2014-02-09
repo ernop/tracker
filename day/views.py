@@ -322,9 +322,5 @@ def days(request):
     now=datetime.datetime.now()
     dayrange=(abs((now-earliest).days))+1
     return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
-
-
-
 def redir(request):
-    import ipdb;ipdb.set_trace()
     return HttpResponseRedirect('/today/')

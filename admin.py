@@ -84,7 +84,8 @@ def new_sparkline(results, width, height):
 
 class ProductAdmin(OverriddenModelAdmin):
     search_fields = ['name', ]
-    list_display='name mydomain mypurchases mysources mywith myspark'.split()
+    list_display='name domain mydomain mypurchases mysources mywith myspark'.split()
+    list_editable = ['domain', ]
     list_per_page = 10
     list_filter = ['domain', ]
 
