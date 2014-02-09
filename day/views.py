@@ -228,10 +228,10 @@ def amonth(request, month):
         monthtotal += dinfo['total_cost']
     domaintable = mktable(bits, rights=[1, 2], bigs=[1, 2])
     #purchases summary by domain
-    measurements = Measurement.objects.filter(created__gte=start, created__lt=end)
+    measurements = Measurement.objects.filter(created__gte=start, created__lt=end).exclude(amount=None)
     spots = [MeasuringSpot.objects.get(id=ms) for ms in list(set([ms[0] for ms in measurements.values_list('place__id').distinct()]))]
-    vals['spots'] = spots
-    vals['days'] = Day.objects.filter(date__gte=start, date__lt=end).reverse()
+    vals['spots'] = sorted(spots, key=lambda x:(x.domain.name, x.name))
+    vals['days'] = [d for d in Day.objects.filter(date__gte=start, date__lt=end).reverse() if d.notes.exists() or d.getmeasurements().exclude(amount=None).exists()]
     vals['domaintable'] = domaintable
     vals['month'] = mm
     vals['pastmonth'] = add_months(mm, -1)

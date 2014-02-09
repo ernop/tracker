@@ -223,6 +223,7 @@ class Measurement(DayModel):
         try:
             if int(self.amount) == self.amount:
                 return int(self.amount)
+            return self.amount
         except:
             return self.amount
 

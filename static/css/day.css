@@ -68,3 +68,5 @@ html {height:99%;}
 
 .big{font-size:1.3em;}
 .thintable .right{text-align:right;}
+
+.thintable .rightborder{border-left:2px dotted grey;}
