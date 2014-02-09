@@ -121,10 +121,18 @@ def source2obj(source):
 def currency2obj(cur):
     return {'id':cur.id,'name':cur.name,'text':'%s %s'%(cur.symbol, cur.name),'symbol':cur.symbol,}
 
-def mktable(res):
+def mktable(res, rights=None, bigs=None):
     rows = []
     for row in res:
-        rows.append('<tr>%s</tr>'%(''.join(['<td>%s'%thing for thing in row])))
+        res = '<tr>'
+        for ii, thing in enumerate(row):
+            klasses = []
+            if ii in rights:
+                klasses.append('right')
+            if ii in bigs:
+                klasses.append('big')
+            res += '<td class="%s">%s</td>' % (' '.join(klasses), thing)
+        rows.append(res+'</tr>')
     return '<table class="table thintable" style="background-color:white;">%s</table>' % ''.join(rows)
 
 

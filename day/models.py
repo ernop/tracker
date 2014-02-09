@@ -368,6 +368,13 @@ class Domain(DayModel):
         res['counts'] = counts
         res['total_quantity'] = total_quantity
         res['total_cost'] = total_cost
+        tops = costs.items()
+        tops.sort(key=lambda x:-1*x[1])
+        res['top_purchases_html'] = '<div class="top-purchases">'+', '.join(['%s (%d)'%(Product.objects.get(id=top[0]).name, top[1]) for top in tops[:3]])+'</div>'
+        if len(tops) > 3:
+            res['all_purchases_html'] = '<div class="all-purchases">' + '<br> '.join(['%s (%d)'%(Product.objects.get(id=top[0]).name, top[1]) for top in tops[:3]])+'</div>'
+        else:
+            res['all_purchases_html'] = ''
         return res
 
     def summary(self):

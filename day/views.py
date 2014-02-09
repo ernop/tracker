@@ -218,10 +218,13 @@ def amonth(request, month):
         dinfo = dd.spent_history(start=start, end=end)
         if dd.name not in FORCE_DOMAINS and not dinfo['counts']:
             continue
-        #import ipdb;ipdb.set_trace()
-        bits.append([dd.name, dinfo['total_cost'], '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, dinfo['total_quantity'])])
+        if dinfo['all_purchases_html']:
+            summary = mkinfobox(title=dinfo['top_purchases_html'], content=dinfo['all_purchases_html'])
+        else:
+            summary = dinfo['top_purchases_html']
+        bits.append([dd.name, str(int(dinfo['total_cost'])), '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, str(int(dinfo['total_quantity']))), summary])
         monthtotal += dinfo['total_cost']
-    domaintable = mktable(bits)
+    domaintable = mktable(bits, rights=[1, 2], bigs=[1, 2])
     #purchases summary by domain
     vals['domaintable'] = domaintable
     vals['month'] = mm
@@ -229,6 +232,11 @@ def amonth(request, month):
     vals['nextmonth'] = add_months(mm, 1)
     vals['monthtotal'] = monthtotal
     return r2r('jinja2/month.html', request, vals)
+
+def mkinfobox(title, content):
+    '''makes an html infobox which lists the title with a "more" button on the right that expands it inline and also hoveralbe'''
+    #not implemented
+    return title
 
 @login_required
 def notekind(request, id=None, name=None):

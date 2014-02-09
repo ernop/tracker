@@ -12,7 +12,7 @@
 
 {{domaintable|safe}}
 
-<h2>{{monthtotal}}</h2>
+<h2>{% if monthtotal<0%}Saved  {{monthtotal}}{% else %}Spent {{monthtotal}}{% endif %}</h2>
 #purchases summary by domain
 
 #notes
