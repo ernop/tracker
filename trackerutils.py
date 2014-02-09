@@ -127,9 +127,9 @@ def mktable(res, rights=None, bigs=None):
         res = '<tr>'
         for ii, thing in enumerate(row):
             klasses = []
-            if ii in rights:
+            if rights and ii in rights:
                 klasses.append('right')
-            if ii in bigs:
+            if bigs and ii in bigs:
                 klasses.append('big')
             res += '<td class="%s">%s</td>' % (' '.join(klasses), thing)
         rows.append(res+'</tr>')
