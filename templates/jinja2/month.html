@@ -15,6 +15,27 @@
 <h2>{% if monthtotal<0%}Saved  {{monthtotal}}{% else %}Spent {{monthtotal}}{% endif %}</h2>
 #purchases summary by domain
 
+<table class="table thintable">
+<tr><td>day<td>tags{% for spot in spots %}<td>{{spot.name}}{% endfor %}
+{% for day in days %}
+<tr><td>{{day.vlink()|safe}}
+<td>{% for note in day.notes.all()%}
+    {% for nk in note.kinds.all()%}
+        {{nk.name}}
+    {% endfor %}
+{% endfor %}
+{% for spot in spots %}
+    {% set ments=day.getmeasurements().filter(place=spot) %}
+    {% if ments %}<td>
+    {% for ment in ments %}{{ment.amount}}{% endfor %}
+    {% endif %}
+
+{% endfor %}
+</tr>
+{% endfor %}
+</table>
+
+
 #notes
 
 #possibly prompts & direct links to update shit?
