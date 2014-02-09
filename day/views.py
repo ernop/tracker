@@ -194,7 +194,7 @@ def aday(request, day):
     from day.models import Product
     vals['products']=[{'id':p.id,'text':p.name} for p in Product.objects.all()]
     vals['sources']=[source2obj(s) for s in Source.objects.all()]
-    vals['people']=[per2obj(p) for p in Person.objects.exclude(disabled=True)]
+    vals['people']=[per2obj(p) for p in Person.objects.exclude(disabled=True).order_by('-rough_purchase_count')]
     vals['currencies']=[currency2obj(c) for c in Currency.objects.all()]
     vals['hour']=name2hour[gethour()]
     vals['hours'] = [{'id': id, 'name': name, 'text': name,} for name, id in name2hour.items()]

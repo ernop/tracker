@@ -306,7 +306,13 @@ class PersonAdmin(OverriddenModelAdmin):
     list_editable=['birthday',  'disabled']
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
-    actions = ['disable','male','female','organization', 'set_longago', 'set_today', ]
+    actions = ['disable','male','female','organization', 'set_longago', 'set_today', 'update_rough_purchase_counts', ]
+
+    def update_rough_purchase_counts(self, request, queryset):
+        sixmonths = datetime.datetime.now() - datetime.timedelta(days=180)
+        for person in Person.objects.all():
+            person.rough_purchase_count = person.purchases.filter(created__gt=sixmonths).count()
+            person.save()
 
     def set_longago(self, request, queryset):
         for person in queryset:

@@ -33,20 +33,30 @@ def ajax_get_purchases(request):
 def ajax_get_popular(request):
     '''only show sources which have more than 2...'''
     res = {}
-    product_id = request.POST['product_id']
-    purches = Purchase.objects.filter(product__id=product_id)
+    if 'product_id' in request.POST:
+        product_id = request.POST['product_id']
+        purches = Purchase.objects.filter(product__id=product_id)
+    elif 'source_id' in request.POST:
+        source_id = request.POST['source_id']
+        purches = Purchase.objects.filter(source__id=source_id)
     prices = {}
+    products = {}
     sources = {}
     who_with= {}
     hours= {}
     for p in purches:
-        prices[p.get_cost()] = prices.get(p.get_cost(), 0) + 1
+        cost = round(p.get_cost(), 1)
+        prices[cost] = prices.get(cost, 0) + 1
         sources[p.source] = sources.get(p.source, 0) + 1
+        products[p.product] = products.get(p.product, 0) + 1
+
         for who in p.who_with.all():
             who_with[who] = who_with.get(who, 0) + 1
         hours[p.hour] = hours.get(p.hour, 0) + 1
-    res['prices'] = sorted(prices.items(), key=lambda x:-1*x[1])
-    res['sources'] = [((k[0].name, k[0].id), k[1]) for k in sorted(sources.items(), key=lambda x:-1*x[1])]
+
+    res['prices'] = [k for k in sorted(prices.items(), key=lambda x:-1*x[1])  if k[1] > 1]
+    res['sources'] = [((k[0].name, k[0].id), k[1]) for k in sorted(sources.items(), key=lambda x:-1*x[1]) if k[1] > 1]
+    res['products'] =[((k[0].name, k[0].id), k[1]) for k in sorted(products.items(), key=lambda x:-1*x[1]) if k[1] > 1]
     res['who_with'] = [((str(k[0]), k[0].id), k[1]) for k in sorted(who_with.items(), key=lambda x:-1*x[1])][:15]
     res['sources'] = [k for k in res['sources']][:15]
     res['prices'] = sorted([k for k in res['prices']], key=lambda x:x[0])

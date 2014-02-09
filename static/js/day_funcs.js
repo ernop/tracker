@@ -1,8 +1,9 @@
 function setup_change_describer(){
-	$("#purchase-product").change(show_popular)
+	$("#purchase-product").change(show_popular_from_product)
+	$("#purchase-source").change(show_popular_from_source)
 }
 
-function show_popular(){
+function show_popular_from_product(){
 	//for the current selection of the product, show the popular prices, sources, hour etc. for quick selection!
 	var thing=$("#purchase-product").select2('data');
 	if (!thing){
@@ -24,6 +25,29 @@ function show_popular(){
 	});
 }
 
+
+function show_popular_from_source(){
+	//for the current selection of the product, show the popular prices, sources, hour etc. for quick selection!
+	var thing=$("#purchase-source").select2('data');
+	if (!thing){
+		return
+	}
+	var data={'source_id':thing.id}
+	$.ajax({
+		type:'POST',
+		url:'/ajax/get_popular/',
+		data:data,
+		dataType:"json",
+		contentType: "application/json; charset=utf-8",
+		success:function(data){
+			display_popular(data);
+		},
+			error:function(a,b,c){
+		}
+	});
+}
+
+
 function display_popular(data){
 	$(".autochooser").remove();
 	$.each(data['prices'], function(index,thing){add_thing_to_price_zone(thing)});
@@ -31,6 +55,9 @@ function display_popular(data){
 
 	$.each(data['sources'], function(index,thing){add_thing_to_source_zone(thing)})
 	$('.source-autochooser').click(function(e){set_source(e)});
+
+	$.each(data['products'], function(index,thing){add_thing_to_product_zone(thing)})
+	$('.product-autochooser').click(function(e){set_product(e)});
 
 	$.each(data['who_with'], function(index,thing){add_thing_to_who_zone(thing)})
 	$('.who_with-autochooser').click(function(e){set_who_with(e)});
@@ -42,6 +69,12 @@ function display_popular(data){
 function add_thing_to_source_zone(thing){
 	var sz=$(".source-chooser");
 	var txt=$("<div class='source-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+" ("+thing[1]+")</div>");
+	sz.append(txt);
+}
+
+function add_thing_to_product_zone(thing){
+	var sz=$(".product-chooser");
+	var txt=$("<div class='product-autochooser autochooser' val_id="+thing[0][1]+" val_name="+thing[0][0]+">"+thing[0][0]+" ("+thing[1]+")</div>");
 	sz.append(txt);
 }
 
@@ -59,6 +92,10 @@ function add_thing_to_hour_zone(thing){
 
 function set_source(e){
 	$("#purchase-source").select2('val', $(e.target).attr('val_id'));
+}
+
+function set_product(e){
+	$("#purchase-product").select2('val', $(e.target).attr('val_id'));
 }
 
 function set_hour(e){
