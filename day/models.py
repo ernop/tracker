@@ -218,6 +218,14 @@ class Measurement(DayModel):
     def __unicode__(self):
         return '%s %s: %s'%(self.place, self.created.strftime(DATE), rstripz(self.amount))#','.join([str(s) for s in self.sets.all()]),)
 
+    def get_amount(self):
+        '''return int(amount) if it looks ok'''
+        try:
+            if int(self.amount) == self.amount:
+                return int(self.amount)
+        except:
+            return self.amount
+
     class Meta:
         db_table='measurement'
         ordering=['-created',]

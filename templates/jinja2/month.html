@@ -13,7 +13,6 @@
 {{domaintable|safe}}
 
 <h2>{% if monthtotal<0%}Saved  {{monthtotal}}{% else %}Spent {{monthtotal}}{% endif %}</h2>
-#purchases summary by domain
 
 <table class="table thintable">
 <tr><td>day<td>tags{% for spot in spots %}<td>{{spot.name}}{% endfor %}
@@ -26,22 +25,15 @@
 {% endfor %}
 {% for spot in spots %}
     {% set ments=day.getmeasurements().filter(place=spot) %}
-    {% if ments %}<td>
-    {% for ment in ments %}{{ment.amount}}{% endfor %}
+    <td>
+    {% if ments %}
+    {% for ment in ments %}{{ment.get_amount()}}{% endfor %}
     {% endif %}
 
 {% endfor %}
 </tr>
 {% endfor %}
 </table>
-
-
-#notes
-
-#possibly prompts & direct links to update shit?
-
-
-
 <div class="notification fixed-notification">
 </div>
 
