@@ -195,6 +195,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     def mycreated(self, obj):
         return '<a href="/admin/day/purchase/?created__day=%d&created__month=%d&created__year=%d">%s</a>'%(obj.created.day, obj.created.month, obj.created.year, obj.created.strftime(DATE))
 
+    @debu
     def mycost(self, obj):
         costper=''
         if obj.quantity>1:
@@ -421,7 +422,8 @@ class PersonAdmin(OverriddenModelAdmin):
     adminify(mymet_through, myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith)
 
 class CurrencyAdmin(OverriddenModelAdmin):
-    list_display='name symbol mytotal my3months'.split()
+    list_display='name rmb_value symbol mytotal my3months'.split()
+    list_editable = ['rmb_value', ]
     def mytotal(self, obj):
         total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).aggregate(Sum('cost'))['cost__sum']
         cre=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).order_by('created')
