@@ -16,17 +16,17 @@
 <h3>{{100.0-((20000+monthtotal)/20000.0*100)}}% saving</h3>
 
 <table class="table thintable">
-<tr><td>day<td>tags{% for spot in spots %}<td>{{spot.name}}{% endfor %}
+<tr><td style="width:50px;">day<td>tags{% for spot in spots %}<td class="leftborder middle">{{spot.name}}{% endfor %}
 {% for day in days %}
 <tr><td>{{day.vlink()|safe}}
-<td>{% for note in day.notes.all()%}
-    {% for nk in note.kinds.all()%}
-        {{nk.name}}
+    <td>{% for nk in day.get_notekinds()%}
+        {{nk[0]}} {% if nk[1]==1%}
+        {% else %}({{nk[1]}}){% endif %}
     {% endfor %}
-{% endfor %}
+
 {% for spot in spots %}
     {% set ments=day.getmeasurements().filter(place=spot) %}
-    <td class="rightborder right big">
+    <td class="leftborder middle big">
     {% if ments %}
     {% for ment in ments %}{{ment.get_amount()}}{% endfor %}
     {% endif %}

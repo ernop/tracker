@@ -68,5 +68,10 @@ html {height:99%;}
 
 .big{font-size:1.3em;}
 .thintable .right{text-align:right;}
+.thintable .middle{text-align:center;vertical-align:middle;}
 
-.thintable .rightborder{border-left:2px dotted grey;}
+.thintable .rightborder{border-right:2px dotted grey;}
+.thintable .leftborder{border-left:2px dotted grey;}
+.thintable td {padding:5px;}
+
+.stdbtn{width:100px;}

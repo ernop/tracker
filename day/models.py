@@ -77,10 +77,18 @@ class Day(DayModel):
     def vlink(self, text=None):
         if not text:
             text=str(self.date)+' '+datetime.datetime.strftime(self.date, '%a')
-        return '<a class="btn" href="/aday/%s/">%s</a>'%(str(self.date), text)
+        return '<a class="stdbtn btn nb" href="/aday/%s/">%s</a>'%(str(self.date), text)
 
     def day(self):
         return datetime.datetime.strftime(self.date, '%A')
+
+    def get_notekinds(self):
+        nks = {}
+        for note in self.notes.all():
+            for nk in note.kinds.all():
+                nks[nk.name] = nks.get(nk.name, 0) + 1
+        #import ipdb;ipdb.set_trace()
+        return sorted(nks.items(), key=lambda x:x[0])
 
     def getmeasurements(self):
         try:
