@@ -125,6 +125,6 @@ def mktable(res):
     rows = []
     for row in res:
         rows.append('<tr>%s</tr>'%(''.join(['<td>%s'%thing for thing in row])))
-    return '<table class="table" style="background-color:white;">%s</table>' % ''.join(rows)
+    return '<table class="table thintable" style="background-color:white;">%s</table>' % ''.join(rows)
 
 

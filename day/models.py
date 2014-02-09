@@ -400,6 +400,19 @@ class Source(DayModel):
     def __unicode__(self):
             return self.name
 
+    def domain_summary_data(self):
+        res = {}
+        purch = self.purchases.all()
+        counts = {}
+        costs = {}
+        for domain in Domain.objects.all():
+            if purch.filter(product__domain=domain).exists():
+                counts[domain.id] = purch.filter(product__domain=domain).count()
+                costs[domain.id]= purch.filter(product__domain=domain).aggregate(Sum('cost'))['cost__sum']
+        res['counts'] = counts
+        res['costs'] = costs
+        return res
+
     def summary(self):
         if self.purchases.count():
             ptable = ''
@@ -544,7 +557,7 @@ class Person(DayModel):
     first_name=models.CharField(max_length=100)
     last_name=models.CharField(max_length=100, blank=True, null=True)
     birthday=models.DateField(blank=True, null=True)
-    met_through=models.ManyToManyField('Person', symmetrical=False, blank=True, null=True)
+    met_through=models.ManyToManyField('Person', symmetrical=False, blank=True, null=True, related_name='introduced_to')
     created=models.DateField(auto_now_add=True, blank=True, null=True)
     disabled = models.BooleanField()  #if they're gone forever / probably never meet again, just remove them form most convenience functions.
     gender=models.IntegerField() #1 male 2 female 3 organization 0 undefined
@@ -555,6 +568,23 @@ class Person(DayModel):
 
     def __unicode__(self):
         return '%s%s'%(self.first_name, self.last_name and ' %s' % self.last_name)
+
+    def d3_name(self):
+        return self.first_name.title().replace('\'S', '\'s')
+
+
+    def domain_summary_data(self):
+        res = {}
+        purch = self.purchases.all()
+        counts = {}
+        costs = {}
+        for domain in Domain.objects.all():
+            if purch.filter(product__domain=domain).exists():
+                counts[domain.id] = purch.filter(product__domain=domain).count()
+                costs[domain.id]= purch.filter(product__domain=domain).aggregate(Sum('cost'))['cost__sum']
+        res['counts'] = counts
+        res['costs'] = costs
+        return res
 
     def get_gender(self):
         if self.gender==1:return 'male'

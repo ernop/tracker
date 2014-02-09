@@ -298,7 +298,7 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id myinfo disabled birthday created mymet_through myintroduced_to myspots mypurchases'.split()
+    list_display='id myinfo disabled birthday created mymet_through myintroduced_to mywith mysources mydomains mypurchases'.split()
     list_filter=[GenderFilter, AnyPurchaseFilter,KnownSinceLongAgo, 'met_through']
     date_hierarchy = 'created'
     list_editable=['birthday',  'disabled']
@@ -350,9 +350,23 @@ class PersonAdmin(OverriddenModelAdmin):
 
     def myintroduced_to(self, obj):
         #import ipdb;ipdb.set_trace()
-        return mktable([(p.clink(), ) for p in obj.person_set.order_by('first_name', 'last_name')])
+        return mktable([(p.clink(), ) for p in obj.introduced_to.order_by('first_name', 'last_name')])
 
-    def myspots(self, obj):
+    @debu
+    def mywith(self, obj):
+        counts = {}
+        costs = {}
+        ps = obj.purchases.all()
+        for p in ps:
+            togethercount = p.who_with.count()
+            for person in p.who_with.exclude(id=obj.id):
+                counts[person.id] = counts.get(person.id, 0) + 1
+                costs[person.id] = costs.get(person.id, 0) + (p.cost / togethercount)
+        bits = [(Person.objects.get(id=p).clink(), counts[p], '%0.1f' % costs[p]) for p in counts.keys()]
+        tbl = mktable(sorted(bits, key=lambda x:-1*x[1]))
+        return tbl
+
+    def mysources(self, obj):
         #import ipdb;ipdb.set_trace()
         res = {}
         ps = Purchase.objects.filter(who_with=obj)
@@ -368,15 +382,43 @@ class PersonAdmin(OverriddenModelAdmin):
         alllink = '<a href=/admin/day/purchase/?who_with=%d>all</a>' % obj.id
         purch = Purchase.objects.filter(who_with=obj)
         res = {}
+        counts = {}
+        costs = {}
         for p in purch:
-            cl = p.product.clink()
-            res[cl] = res.get(cl, 0) + 1
-        tbl = mktable(sorted(res.items(), key=lambda x:(-1*x[1], x[0])))
-        return tbl
+            counts[p.product.id] = counts.get(p.product.id, 0) + 1
+            costs[p.product.id] = costs.get(p.product.id, 0) + p.cost
+        bits = []
+        doneprod = set()
+        for p in purch:
+            if p.product.id in doneprod:
+                continue
+            doneprod.add(p.product.id)
+            bits.append([counts[p.product.id], p.product.clink(), '<a href="../purchase/?product_id=%d&who_with=%d">%d (%0.1f)</a>' % (p.product.id, obj.id, counts[p.product.id], costs[p.product.id])])
+        bits.sort(key=lambda x:-1*x[0])
+        bits = [b[1:] for b in bits]
+        tbl = mktable(bits)
+        return tbl + '<br>' + alllink
         #prods = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
         #return prods + '<br>' + alllink
 
-    adminify(mymet_through, myintroduced_to, myspots, mypurchases, myinfo)
+    def mydomains(self, obj):
+        res = obj.domain_summary_data()
+        #count, costs
+        counts, costs = res['counts'], res['costs']
+        html = '<table class="table thintable">'
+        #import ipdb;ipdb.set_trace()
+        rows = []
+        for domain_id in counts.keys():
+            row = '<tr><td>%s<td><a href="../purchase/?product__domain__id=%d&who_with=%d">%s times</a><td>cost: %s' % (Domain.objects.get(id=domain_id).name, domain_id, obj.id, counts[domain_id], costs[domain_id])
+            rows.append([counts[domain_id], row])
+        rows.sort(key=lambda x:-1*x[0])
+        rows = [r[1] for r in rows]
+        html += '\n'.join(rows)
+        html += '</table>'
+        return html
+
+
+    adminify(mymet_through, myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith)
 
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name symbol mytotal my3months'.split()
@@ -409,6 +451,7 @@ class RegionAdmin(OverriddenModelAdmin):
     list_display = 'name currency mysources'.split()
     list_per_page = 10
     search_fields = ['name', ]
+    actions = []
 
     def mysources(self, obj):
         myobjs = Source.objects.filter(region=obj)
@@ -418,19 +461,52 @@ class RegionAdmin(OverriddenModelAdmin):
     adminify(mysources)
 
 class SourceAdmin(OverriddenModelAdmin):
-    list_display='name mytotal myproducts mywith mysummary myregion'.split()
+    list_display='name mytotal myproducts mywith mysummary mydomains myregion'.split()
     list_per_page = 10
     search_fields = ['name', ]
+    actions = []
 
     def myregion(self, obj):
         if obj.region:
             return obj.region.clink()
         return ''
 
+    #_g = globals()
+    #import ipdb;ipdb.set_trace()
+    #def make_assign_function(region):
+        #def func(self, request, queryset):
+            #for obj in queryset:
+                #obj.region = region
+                #obj.save()
+        #return func
+
+    #for region in Region.objects.all():
+        #funcname = 'assign_to_%s'%region.name.lower()
+        #actions.append(funcname)
+        #func = make_assign_function(region.name.lower())
+        #func.__name__ = str(funcname)
+        #_g[funcname] = func
+
     def myproducts(self, obj):
         products=Product.objects.filter(purchases__source=obj).distinct()
         dat=[(oo.total_spent(source=obj),str(oo)) for oo in products]
         return chart_url(dat, text='')
+
+    def mydomains(self, obj):
+        res = obj.domain_summary_data()
+        #count, costs
+        counts, costs = res['counts'], res['costs']
+        html = '<table class="table thintable">'
+        #import ipdb;ipdb.set_trace()
+        rows = []
+        for domain_id in counts.keys():
+            row = '<tr><td>%s<td>%s times<td>cost: %s' % (Domain.objects.get(id=domain_id).name, counts[domain_id], costs[domain_id])
+            rows.append([counts[domain_id], row])
+        rows.sort(key=lambda x:-1*x[0])
+        rows = [r[1] for r in rows]
+        html += '\n'.join(rows)
+        html += '</table>'
+        return html
 
     def mysummary(self, obj):
         return obj.summary()
@@ -457,7 +533,7 @@ class SourceAdmin(OverriddenModelAdmin):
             dayrange=abs((datetime.datetime.now()-earliest).days)+1
             return '<div class="nb">%0.0f%s<br>%s%s /day<br>(%d days)</div>'%(total, RMBSYMBOL, rstripz(total/dayrange), RMBSYMBOL, dayrange)
 
-    adminify(mytotal, mysummary, myproducts, mywith, myregion)
+    adminify(mytotal, mysummary, myproducts, mywith, myregion, mydomains)
 
 class PMuscleInline(admin.StackedInline):
     model = Exercise.pmuscles.through

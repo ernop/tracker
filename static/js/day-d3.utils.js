@@ -34,15 +34,14 @@ function edge_either(func, edges){
   return res
 }
 
-function fix_nodes(filter){
+function fix_nodes(usefilter){
   //fucking d3
   var newnodes=[];
   var use_ids=[];
   var exi_ids=Object.keys(id2node);
   for (ii=0;ii<Math.max.apply(null, exi_ids)+1;ii++){
 	exinode=id2node[ii]
-
-	if (exinode && filter(exinode)){
+	if (exinode && usefilter(exinode)){
 	  exinode['x']=ii
 	  exinode['y']=ii
 	  if (exinode.name=='Existence'){
@@ -54,7 +53,6 @@ function fix_nodes(filter){
 	  use_ids.push(ii)
 	}else{
 	  newnodes.push({})
-
 	}
   }
   nodes=newnodes
@@ -72,7 +70,9 @@ function fix_edges(node_ids){
 	if (inlist(node_ids,edge['source']) && inlist(node_ids, edge['target'])){
 	  var newedge={'source':id2node[edge['source']],'target':id2node[edge['target']],'value':edge['value']}
 	  if (newedge['source'] && newedge['target']){
-	  newedges.push(newedge)}}
+	  newedges.push(newedge)}else{
+	  }
+	  }
 	})
   return newedges
 }

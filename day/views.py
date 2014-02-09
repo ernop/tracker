@@ -226,45 +226,48 @@ def simple_namefunc(person):
     return res
 
 @login_required
-def people_connections(request, exclude_disabled=False):
+def recent_connections(request, exclude_disabled=False):
+    return people_connections(request, recent_only=True, exclude_disabled=True)
+
+@login_required
+def people_connections(request, exclude_disabled=False, recent_only=False):
     vals = {}
     people = Person.objects.all()
     if exclude_disabled:
         people = people.exclude(disabled=True)
-    namefunc = lambda x:x.first_name.title().replace('\'S', '\'s')
+
     edges = []
     nodes = {}
     linked_ids = set()
     for person in people:
         if person.met_through.exists():
-            #if person.gender == 3:
-                #import ipdb;ipdb.set_trace()
             for operson in person.met_through.all():
                 edges.append({'target': operson.id, 'source': person.id, 'value': 1,})
-            for operson in person.person_set.all():
-                if operson.purchases.exists():
-                    linked_ids.add(operson.id)
-                    linked_ids.add(person.id)
-            if person.purchases.exists():
+            for operson in person.introduced_to.all():
+                if recent_only and not operson.purchases.exists():
+                    continue
+                linked_ids.add(operson.id)
                 linked_ids.add(person.id)
+            if recent_only and not person.purchases.exists():
+                continue
+            linked_ids.add(person.id)
     for person in people:
-        if (not person.purchases.exists()) and person.id not in linked_ids:
+        if recent_only and (not person.purchases.exists()) and person.id not in linked_ids:
             print 'skipping', person
             continue
-        nodes[person.id] = person2obj(person, namefunc=namefunc)
+        nodes[person.id] = person2obj(person)
     vals['nodes'] = nodes
     vals['edges'] = edges
+    vals['recent_only'] = recent_only
     return r2r('jinja2/people_connections.html', request, vals)
 
-def person2obj(person, namefunc=None):
-    if not namefunc:
-        namefunc = simple_namefunc
+def person2obj(person):
     return {'id': person.id,
                                'gender':person.gender,
                                'reflexive':False,
                                'left': True,
                                'right': False,
-                               'name': namefunc(person),
+                               'name': person.d3_name(),
                                'created': person.created.strftime(DATE_DASH_REV),
                                'last_purchase': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).order_by('-created')[0].created.strftime(DATE_DASH_REV) or '2011-01-01',
                                'purchases_together': Purchase.objects.filter(who_with=person).count(),
@@ -285,3 +288,8 @@ def days(request):
     dayrange=(abs((now-earliest).days))+1
     return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
 
+
+
+def redir(request):
+    import ipdb;ipdb.set_trace()
+    return HttpResponseRedirect('/today/')

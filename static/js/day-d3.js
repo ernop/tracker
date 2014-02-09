@@ -3,37 +3,43 @@ var edges
 var nodes;
 var width = 2200;
 var height = 1300;
+//recent now shows edges which were created before the relevant time period.
 $(document).ready(function(){
   width=$('body').width()-130;
   $("#control-area").height(window.innerHeight)-40
   height=window.innerHeight-10
+
   nodes=all_nodes;
   edges=all_edges;
-  //filter_edges()
   setup_dicts();
-  do_filter(together_last_year_filter);
+    if (recent_only){
+	do_filter(together_last_year_filter);
+	}else{
+	do_filter(allfilter);
+	}
   draw();
   setup_buttons()
   })
 
-function do_filter(filter){
-  var use_node_ids=fix_nodes(filter);
+function do_filter(usefilter){
+
+  var use_node_ids=fix_nodes(usefilter);
   nodes=[]
   $.each(use_node_ids, function(index,guy){
 	nodes.push(id2node[guy])
   })
   edges=fix_edges(use_node_ids);
-  edges=filter_edges(target_last_year_filter)
+  edges=filter_edges(allfilter)
 }
 
 function together_last_year_filter(n){
   return n.gender==3 || n.last_purchase>'2013-01-01'
 }
 
-function filter_edges(filter){
+function filter_edges(usefilter){
   var newedges=[]
   $.each(edges, function(index,guy){
-	if (filter(guy)){
+	if (usefilter(guy)){
 	  newedges.push(guy)
 	}
   })

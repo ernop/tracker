@@ -24,6 +24,7 @@ TEMPLATE_CONTEXT_PROCESSORS=(
     )
 
 MIDDLEWARE_CLASSES = (
+    'tracker.general_middleware.PatchDebugMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

@@ -20,9 +20,14 @@ urlpatterns = patterns('',
     url(r'^yesterday/$','tracker.day.views.yesterday',name='yesterday'),
     url(r'^y2day/$','tracker.day.views.y2day',name='y2day'),
     url(r'^aday/(?P<day>[0-9\-]+)/$','tracker.day.views.aday',name='aday'),
-    url(r'^people_connections/$','tracker.day.views.people_connections',name='people_connections'),
+
     url(r'^notekind/(?P<id>[0-9]+)/$','tracker.day.views.notekind',name='notekind'),
     url(r'^notekind/(?P<name>[a-z]+)/$','tracker.day.views.notekind',name='notekind'),
+
+    #
+
+    url(r'^people_connections/$','tracker.day.views.people_connections',name='people_connections'),
+    url(r'^recent_connections/$','tracker.day.views.recent_connections',name='recent_connections'),
 
     #-------------------------------------------AJAX-------------------------------------------
 
@@ -32,7 +37,12 @@ urlpatterns = patterns('',
 
     url(r'^ajax/get_measurements/$','tracker.day.ajax_views.ajax_get_measurements',name='ajax_get_measurements'),
     url(r'^ajax/make_measurement/$','tracker.day.ajax_views.ajax_make_measurement',name='ajax_make_measurement'),
-    url(r'^/?$', lambda x:HttpResponseRedirect('/today/'), name='redir'),
+    url(r'^/?$', 'tracker.day.views.redir', name='redir'),
+
+    #--------------------------D3 jumping.-----------------------------------
+    url(r'^person/d3/(?P<id>[0-9]+)/$','tracker.day.jumping.jumping_person',name='jumping_person'),
+    url(r'^source/d3/(?P<id>[0-9]+)/$','tracker.day.jumping.jumping_source',name='jumping_source'),
+    url(r'^product/d3/(?P<id>[0-9]+)/$','tracker.day.jumping.jumping_product',name='jumping_product'),
 )
 
 
