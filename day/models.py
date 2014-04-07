@@ -462,7 +462,7 @@ class Purchase(DayModel):
     def save(self, *args, **kwargs):
         cc=self.created or datetime.datetime.now()
         cc=cc.date()
-        if not self.day:
+        if not self.day_id:
             try:
                 dd=Day.objects.get(created=cc)
             except Day.DoesNotExist:
