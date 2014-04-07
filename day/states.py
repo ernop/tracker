@@ -31,6 +31,9 @@ def states(request):
     
     bads=Day.objects.filter(purchases=None,notes=None)
     day_problems.append(('day obj with nothing',bads,bads.count()))
+
+    bads=Purchase.objects.filter(day=None)
+    purch_problems.append(('purch without day',bads,bads.count()))
     
     template='jinja2/states.html'
     

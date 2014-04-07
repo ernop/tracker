@@ -79,7 +79,7 @@ class Day(DayModel):
             text=str(self.date)+' '+datetime.datetime.strftime(self.date, '%a')
         return '<a class="stdbtn btn nb" href="/aday/%s/">%s</a>'%(str(self.date), text)
 
-    def day(self):
+    def show_day(self):
         return datetime.datetime.strftime(self.date, '%A')
 
     def show_notekinds(self):
@@ -463,6 +463,15 @@ class Purchase(DayModel):
         return u'<a href="%s/day/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.product.__class__.__name__.lower(), self.product.id, unicode(self))
 
     def save(self, *args, **kwargs):
+        cc=self.created or datetime.datetime.now()
+        cc=cc.date()
+        if not self.day:
+            try:
+                dd=Day.objects.get(created=cc)
+            except Day.DoesNotExist:
+                dd=Day(created=cc)
+                dd.save()
+            self.day=dd
         if not self.created:
             self.created=datetime.datetime.now()
         super(Purchase, self).save(*args, **kwargs)

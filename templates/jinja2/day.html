@@ -19,7 +19,7 @@
 <div id="day_id" day_id="{{day.id}}"></div>
 <div class="row">
     <div class="span8">
-        <h2>{{day.date}} {{day.day()}}</h2>
+        <h2>{{day.date}} {{day.show_day()}}</h2>
         {% for historyday in histories %}
             <span style="float:right;">{{historyday.vlink(text=historyday.__unicode__()+' '+historyday.show_notekinds())|safe}}</span>
         {% endfor %}

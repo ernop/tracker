@@ -5,8 +5,13 @@
 {% endblock %}
 {% block content %}
 <table class="table">
+
+{% for purch in purch_problems %}
+    <tr><td>{{purch.clink()}}<td>{{purch.vlink()}}
+{% endfor %}
+
 {% for day in day_problems %}
-<tr><td>{{day.clink()}}<td>{{day.vlink()}}
+    <tr><td>{{day.clink()}}<td>{{day.vlink()}}
 {% endfor %}
 
 {% for name,plist,ct in note_problems%}
