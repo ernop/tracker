@@ -1,0 +1,27 @@
+{% extends 'jinja2/day_base.html' %}
+{% block title %}{{title}}{% endblock %}
+{% block head %}
+{{super()}}
+{% endblock %}
+{% block content %}
+<table class="table">
+{% for day in day_problems %}
+<tr><td>{{day.clink()}}<td>{{day.vlink()}}
+{% endfor %}
+
+{% for name,plist,ct in note_problems%}
+    <tr><td><h2>{{name}} {% if ct %}({{ct}}){% else %}<span class="alert alert-success">all ok</span>{% endif %}</h2>
+    {% if ct %}
+        <tr><td>db note<td>db day<td>vlink day
+        {% for pp in plist %}
+            <tr><td>{{pp.clink()|safe}}<td>{{pp.day.clink()|safe}}<td>{{pp.day.vlink()|safe}}
+        {% endfor %}
+    {% else %}
+    {% endif %}
+{% endfor %}
+
+</table>
+{% endblock %}
+{% block footer %}
+    
+{% endblock %}

@@ -1,2 +1,2 @@
 source activate
-python manage.py shell
+python manage.py shell_plus

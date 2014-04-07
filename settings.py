@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'tracker',
     'tracker.day',
+    'django_extensions',
 )
 
 LOGGING = {

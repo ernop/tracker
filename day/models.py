@@ -82,6 +82,9 @@ class Day(DayModel):
     def day(self):
         return datetime.datetime.strftime(self.date, '%A')
 
+    def show_notekinds(self):
+        return ', '.join(['%s%s'%(nk[0],nk[1] and nk[1]!=1 and '(%d)'%(nk[1]) or '') for nk in self.get_notekinds()])
+
     def get_notekinds(self):
         nks = {}
         for note in self.notes.all():
@@ -367,6 +370,7 @@ class Person(DayModel):
         if self.gender==3:return 'org'
         return 'undef'
 class PersonDay(DayModel):
+    #not used
     person=models.ForeignKey('Person', related_name='persondays')
     day=models.ForeignKey('Day', related_name='persondays')
     created=models.DateTimeField(auto_now_add=True)
@@ -442,6 +446,7 @@ class Purchase(DayModel):
     hour=models.IntegerField(choices=HOUR_CHOICES)
     note=models.CharField(max_length=2000, blank=True, null=True)
     object_created=models.DateTimeField(auto_now_add=True)
+    day=models.ForeignKey('Day',related_name='day')
 
     class Meta:
         db_table='purchase'

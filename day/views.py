@@ -201,6 +201,14 @@ def aday(request, day):
     from day.models import MeasuringSpot
     vals['measurement_places']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
 
+    #calculate histories
+    trydate=dtday.date()
+    histories=[]
+    vals['histories']=histories
+    while trydate>(settings.LONG_AGO):
+        trydate=(trydate-datetime.timedelta(days=365))
+        if Day.objects.filter(date=trydate).exists():
+            histories.append(Day.objects.filter(date=trydate)[0])
     return r2r('jinja2/day.html', request, vals)
 
 @login_required

@@ -755,36 +755,40 @@ class TagAdmin(OverriddenModelAdmin):
     #list_display='id tag day'.split()
 
 class DayAdmin(OverriddenModelAdmin):
-    list_display='date mytags mynotes myaday'.split()
+    list_display='date mytags mynotes myvday myday'.split()
     search_fields=['text','tag__name']
     date_hierarchy='date'
-    @debu
+    
     def mytags(self, obj):
         return ', '.join([t.clink() for t in obj.tags.all()])
 
-    @debu
-    def myaday(self, obj):
+    def myvday(self, obj):
         return obj.vlink()
+    
+    def myday(self, obj):
+        return obj.day.clink()
 
-
-    @debu
     def mynotes(self, obj):
         return '<br>'.join(['%s %s'%(n.clink(text=n.day), n.subnotelink()) for n in obj.notes.all()])
 
-    adminify(mytags, myaday, mynotes)
+    adminify(mytags, myvday, mynotes,myday)
 
 class NoteAdmin(OverriddenModelAdmin):
-    list_display='text myaday mynotekinds'.split()
-    list_filter=['kinds',]
+    list_display='id text myvday myday mynotekinds'.split()
+    list_filter=['kinds',NoteHasKinds,NoteHasText]
     list_search=['kinds',]
     date_hierarchy='created'
-    @debu
-    def myaday(self, obj):
+    
+    def myvday(self, obj):
         return obj.day.vlink()
-    @debu
+    
+    def myday(self,obj):
+        return obj.day.clink()
+    
     def mynotekinds(self, obj):
         return '<br>'.join([n.clink() for n in obj.kinds.all()])
-    adminify(myaday, mynotekinds)
+    
+    adminify(myvday, mynotekinds, myday)
 
 class NoteKindAdmin(OverriddenModelAdmin):
     list_display='name mynotes myvlink'.split()

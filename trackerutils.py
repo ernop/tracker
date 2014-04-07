@@ -17,6 +17,8 @@ def monthago():
 
 class DayModel(models.Model):
 
+    #should add default modified & created here.
+
     def clink(self, text=None):
         if not text:            text=self
         return u'<a class="btn"  style="white-space:nowrap;"  href="%s/day/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)

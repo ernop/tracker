@@ -18,8 +18,11 @@
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
 <div id="day_id" day_id="{{day.id}}"></div>
 <div class="row">
-    <div class="span5">
+    <div class="span8">
         <h2>{{day.date}} {{day.day()}}</h2>
+        {% for historyday in histories %}
+            <span style="float:right;">{{historyday.vlink(text=historyday.__unicode__()+' '+historyday.show_notekinds())|safe}}</span>
+        {% endfor %}
     </div>
     <div class="span2">
         <div class="btn add-note">
@@ -46,7 +49,7 @@
     <h2>Purchases</h2>
     <table class="purchase-list table"></table>
     <div class="purchase-zone">
-        <table class="table thintable"><tr>
+        <table class="table"><tr>
         <td><input id="purchase-product" style="width:190px;"></input>
         <td style="vertical-align:middle;"><input type=text style="width:30px;" id="purchase-cost"></input>money for
         <input type=text id=purchase-quantity style="width:28px;" value=1></input> guys<td><div class="price-chooser"></div>
@@ -58,7 +61,7 @@
         <tr><td>currency<td><input type=text id=purchase-currency style="width:190px;"></input>
         <tr><td>size<td><input type=text id=purchase-size  style="width:180px;"></input>
         <tr><td><div class="btn make-purchase">Save</div>
-        <tr><td style="width:300px;" colspan=2><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/source/add"><i class="icon-plus"></i> source</a>
+        <tr><td style="width:250px;"><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/source/add"><i class="icon-plus"></i> source</a>
         <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/product/add"><i class="icon-plus"></i> product</a>
         <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/person/add"><i class="icon-plus"></i> person</a>
         </table>
@@ -84,6 +87,7 @@
         <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/measurement/add"><i class="icon-plus"></i>new</a>
         </table>
     </div>
+
 </div></div>
 
 
