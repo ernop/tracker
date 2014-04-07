@@ -24,8 +24,6 @@ def states(request):
     
     purch_problems=[]
     vals['purch_problems']=purch_problems
-    import ipdb;ipdb.set_trace()
-    
     
     bads=Note.objects.filter(kinds=None).filter(text='')
     note_problems.append(('empty notes',bads,bads.count()))
