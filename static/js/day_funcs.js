@@ -150,20 +150,26 @@ var submitting=false;
 
 function get_purchase_data(){
 	var dat={};
-
+	var prod=$("#purchase-product").select2('data')
+	if (!prod){
+		notify('product missing.',false);
+		return false;
+	}
 	dat['product_id']=$("#purchase-product").select2('data').id;
-	var dd=$("#purchase-source").select2('data');
-	if (dd){
-		dat['source_id']=dd.id;
+	var source=$("#purchase-source").select2('data');
+	if (!(source)){
+		notify('source missing.',false);
+		return false;
 	}
-	else{
-	notify('no source.',false);
-	return false;
-	}
+	dat['source_id']=source.id;
 	dat['cost']=$("#purchase-cost").val();
 	dat['quantity']=$("#purchase-quantity").val();
 	dat['size']=$("#purchase-size").val();
 	dat['hour']=$("#purchase-hour").select2('data').id;
+	if (!dat['source_id']||!dat['cost']||!dat['hour']){
+		notify('data missing.'+dat,false);
+		return false;
+	}
 	var ids=[]
 	$.each($("#purchase-who_with").select2('data'), function(index, thing){
 		ids.push(thing.id);
@@ -181,7 +187,7 @@ function notify(msg, success){
 		var klass='failure';
 	}
 	var note=$('<div class="alert alert-'+klass+'">'+msg+'</div>');
-	var nzone=$(".fixed-notification notification");
+	var nzone=$(".fixed-notification");
 	if (nzone.length){
 		nzone.find('.alert').slideUp();
 		nzone.append(note);
@@ -201,6 +207,7 @@ function submit_purchase(){
 	data=get_purchase_data();
 	if (data){
 		data['today']=today;
+		$('.make-purchase').before('<span style="float:left;" class="alert alert-error loading">saving</span>')
 		$.ajax({
 			type:'POST',
 			url:'/ajax/make_purchase/',
@@ -208,9 +215,11 @@ function submit_purchase(){
 			dataType:"json",
 			contentType: "application/json; charset=utf-8",
 			success:function(data){
+				$('.loading').slideUp();
 				display_purch();
 			},
 			error:function(a,b,c){
+				$('.loading').text('error'+a+b+c)
 			}
 		});
 	}else{

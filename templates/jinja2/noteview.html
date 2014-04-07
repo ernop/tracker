@@ -1,11 +1,9 @@
-<br><div class="row"><div class="span3">
-<h3>{{note.day.vlink()|safe}}</h3>
+<div class="note-block">
+    <h3>{{note.day.vlink()|safe}}</h3>
+    {% for nk in note.kinds.all() %}
+        {{nk.vlink(text=nk.name)|safe}}
+    {% endfor %}
+    <div class="note-text">
+        {{note.html()|safe}}
+    </div>
 </div>
-<div class="span5">{% for nk in note.kinds.all() %}
-{{nk.vlink(text=nk.name)|safe}}
-{% endfor %}
-</div>
-</div>
-<div class="row"><div class="span8">
-{{note.text}}
-</div></div>

@@ -20,3 +20,4 @@ ipython
 logs/*.log
 *.sql
 *.sql.gz
+nginx

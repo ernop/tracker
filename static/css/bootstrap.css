@@ -197,7 +197,7 @@ a:hover {
 .container,
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
-  width: 1000px;
+  width: calc(100% - 200px);
 }
 
 .span12 {
@@ -792,8 +792,8 @@ input[type="color"],
   height: 18px;
   padding: 4px;
   margin-bottom: 9px;
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 18px;
+  line-height: 23px;
   color: #555555;
 }
 

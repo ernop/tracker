@@ -294,6 +294,12 @@ class Note(DayModel):
 
     def nks(self):
         return ','.join([str(nk) for nk in self.kinds.all()])
+    
+    def html(self):
+        txt=self.text
+        txt=txt.replace('\n','<br>')
+        return txt
+    
     def subnotelink(self):
         return ','.join([nk.clink() for nk in self.kinds.all()])
 
@@ -302,6 +308,9 @@ class Note(DayModel):
 
     def getheight(self):
         return (self.text and len(self.text)/4+80) or '250'
+
+
+
 class NoteKind(DayModel):
     name=models.CharField(max_length=100)
     created=models.DateTimeField(auto_now_add=True)
