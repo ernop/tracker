@@ -6,12 +6,20 @@
 {% block content %}
 <table class="table">
 
-{% for purch in purch_problems %}
-    <tr><td>{{purch.clink()}}<td>{{purch.vlink()}}
+{% for note,bads,ct in purch_problems %}
+    <tr><td>{{note}}
+    {% for purch in bads%}
+        <tr><td>{{purch.clink()|safe}}<td>{{purch.vlink()|safe}}
+    {% endfor %}
+    
 {% endfor %}
 
-{% for day in day_problems %}
-    <tr><td>{{day.clink()}}<td>{{day.vlink()}}
+{% for note,bads,ct in day_problems %}
+    <tr><td>{{note}}
+    {% for day in bads%}
+        <tr><td>{{day.clink()|safe}}<td>{{day.vlink()|safe}}
+    {% endfor %}
+    
 {% endfor %}
 
 {% for name,plist,ct in note_problems%}

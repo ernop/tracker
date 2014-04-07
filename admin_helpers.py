@@ -25,6 +25,34 @@ class NoteHasKinds(SimpleListFilter):
             return queryset.exclude(kinds=None)
         elif self.value()=='no':
             return queryset.filter(kinds=None)
+
+class HasNoteFilter(SimpleListFilter):
+    title = 'has note'
+    parameter_name = 'has_note'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            return queryset.exclude(notes=None)
+        elif self.value()=='no':
+            return queryset.filter(notes=None)
+
+class HasPurchFilter(SimpleListFilter):
+    title = 'has purch'
+    parameter_name = 'has_purch'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            return queryset.exclude(purchases=None)
+        elif self.value()=='no':
+            return queryset.filter(purchases=None)
         
 class NoteHasText(SimpleListFilter):
     title = 'has text'

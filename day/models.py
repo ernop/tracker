@@ -41,10 +41,8 @@ class Currency(DayModel):
 class Day(DayModel):
     date=models.DateField()
     created=models.DateTimeField(auto_now_add=True)
-
     class Meta:
         db_table='day'
-        ordering=['date',]
 
     def __unicode__(self):
         return str(self.date)
@@ -446,11 +444,10 @@ class Purchase(DayModel):
     hour=models.IntegerField(choices=HOUR_CHOICES)
     note=models.CharField(max_length=2000, blank=True, null=True)
     object_created=models.DateTimeField(auto_now_add=True)
-    day=models.ForeignKey('Day',related_name='day')
+    day=models.ForeignKey('Day',related_name='purchases')
 
     class Meta:
         db_table='purchase'
-        ordering=['-created','product__name',]
 
     def __unicode__(self):
         res='%s'%self.product
