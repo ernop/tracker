@@ -224,8 +224,11 @@ def amonth(request, month):
     bits = []
     monthtotal = 0
     FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()
+    income=0
     for dd in Domain.objects.all():
         dinfo = dd.spent_history(start=start, end=end)
+        if dd.name=='money':
+            income=-1*dinfo['total_cost']
         if dd.name not in FORCE_DOMAINS and not dinfo['counts']:
             continue
         if dinfo['all_purchases_html']:
@@ -233,7 +236,8 @@ def amonth(request, month):
         else:
             summary = dinfo['top_purchases_html']
         bits.append([dd.name, str(int(dinfo['total_cost'])), '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, str(int(dinfo['total_quantity']))), summary])
-        monthtotal += dinfo['total_cost']
+        if dd.name!='money':
+            monthtotal += dinfo['total_cost']
     domaintable = mktable(bits, rights=[1, 2], bigs=[1, 2])
     #purchases summary by domain
     measurements = Measurement.objects.filter(created__gte=start, created__lt=end).exclude(amount=None)
@@ -245,7 +249,14 @@ def amonth(request, month):
     vals['pastmonth'] = add_months(mm, -1)
     vals['nextmonth'] = add_months(mm, 1)
     vals['monthtotal'] = monthtotal
-    vals['SALARY'] = settings.SALARY
+    #calc savings amount.
+    saved=None
+    saverate=None
+    if income:
+        saved=income-monthtotal
+        saverate=round(saved*1.0/income*100.0,1)
+    vals['saverate']=saverate
+    vals['saved']=saved
     vals['projected_saving'] = monthtotal
     return r2r('jinja2/month.html', request, vals)
 
