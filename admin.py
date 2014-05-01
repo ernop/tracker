@@ -38,45 +38,6 @@ class BetterDateWidget(admin.widgets.AdminDateWidget):
     def render(self, name, value, attrs=None):
         return super(BetterDateWidget, self).render(name, value)
 
-class OverriddenModelAdmin(admin.ModelAdmin):
-    """normal, except overrides some widgets."""
-    formfield_overrides = {
-        #models.DateTimeField: {'widget': admin.widgets.AdminDateWidget,},
-        #models.DateField: { 'widget': admin.widgets.AdminDateWidget,},
-        #models.DateTimeField: {'widget': BetterDateWidget,},
-        #models.DateField: { 'widget': BetterDateWidget,},
-    }
-
-    def _media(self):
-        from django.forms import Media
-        js = ("/static/admin/js/core.js","/static/admin/js/admin/RelatedObjectLookups.js",
-              '/static/admin/js/jquery.js',"/static/admin/js/jquery.init.js",
-              "/static/admin/js/actions.js",
-              '/static/admin/js/calendar.js',
-              '/static/admin/js/admin/DateTimeShortcuts.js',
-              '/static/js/jquery-1.7.2.min.js',
-              '/static/js/DjangoAjax.js',
-              '/static/js/jquery.sparkline.min.js',
-              '/static/js/admin_init.js',
-              )
-        med=Media(js=js)
-        return med
-
-    media=property(_media)
-
-    def changelist_view(self, request, extra_context=None):
-        #the way searches work in django is fucking stupid.
-        #when you view by ID and then apply a filter/search it doesn't cancel the previous ID.  so you get no results
-        #and confuse yourself.
-        if request.GET.has_key('id'):
-            #delete id parameter if there are other filters! yes!
-            real_keys = [k for k in request.GET.keys() if k not in getattr(self, 'not_count_filters', [])]
-            if len(real_keys) != 1:
-                q = request.GET.copy()
-                del q['id']
-                request.GET = q
-                request.META['QUERY_STRING'] = request.GET.urlencode()
-        return super(OverriddenModelAdmin,self).changelist_view(request, extra_context=extra_context)
 
 def new_sparkline(results, width, height):
     res = '<div class="sparkline-data">%s</div>'%(','.join([str(s) for s in results]))
@@ -861,3 +822,6 @@ class MeasurementSetAdmin(OverriddenModelAdmin):
 
 
 admin.site.register(MeasurementSet, MeasurementSetAdmin)
+
+
+from photoadmin import *

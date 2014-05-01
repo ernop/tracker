@@ -1,0 +1,22 @@
+{% extends 'jinja2/photo_base.html' %}
+{% block title %}{{title}}{% endblock %}
+{% block head %}
+    {{super()}}
+{% endblock %}
+{% block content %}
+
+<h1>{{title}}</h1>
+{% if LOCAL %}LOCAL{% endif %}
+
+<div class="row"><div class="span8">
+    <div id="notification" class="notification-zone">&nbsp;</div>
+</div></div>
+
+{% for photo in photos %}
+    <div class="photolink">{{photo.inhtml(size='small')|safe}}</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block footer %}{{super()}}{% include "jinja2/photo/photofooter.html" %}
+{% endblock %}

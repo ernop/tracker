@@ -43,6 +43,13 @@ urlpatterns = patterns('',
     url(r'^person/d3/(?P<id>[0-9]+)/$','tracker.day.jumping.jumping_person',name='jumping_person'),
     url(r'^source/d3/(?P<id>[0-9]+)/$','tracker.day.jumping.jumping_source',name='jumping_source'),
     url(r'^product/d3/(?P<id>[0-9]+)/$','tracker.day.jumping.jumping_product',name='jumping_product'),
+    
+    url(r'photo/photo/(?P<id>[0-9]+)/$','tracker.day.photoviews.photo',name='photo'),
+    url(r'photo/phototag/(?P<name>[a-zA-Z_\-0-9]+)/$','tracker.day.photoviews.phototag',name='phototag'),
+    url(r'photo/photospot/(?P<slug>[a-zA-Z_\-0-9]+)/$','tracker.day.photoviews.photospot',name='photospot'),
+    url(r'photo/incoming/$','tracker.day.photoviews.incoming',name='photospot'),
+    url(r'photo_passthrough/(?P<id>[0-9]+)/$','tracker.day.photoviews.photo_passthrough',name='photo_passthrough'),
+    url(r'^ajax/photo_data/$','tracker.day.photoviews.ajax_photo_data',name='ajax_photo_data'),
 )
 
 

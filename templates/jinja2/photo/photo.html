@@ -1,0 +1,45 @@
+{% extends 'jinja2/photo_base.html' %}
+{% block title %}Photo {{photo}}{% endblock %}
+{% block head %}
+    {{super()}}
+    
+    
+<script>
+full_phototags={{full_phototags|jsonify|safe}}    
+</script>
+
+{% endblock %}
+{% block content %}{% if LOCAL %}LOCAL{% endif %}
+<div class="row">
+    <div class="span8">
+        <h2>Photo {{photo}}</h2>
+    </div>
+</div>
+
+<div class="row"><div class="span8">
+    <div id="notification" class="notification-zone">&nbsp;</div>
+</div></div>
+
+<div class="photo-display" photoid={{photo.id}}>
+    {{photo.inhtml(link=False,size='scaled')|safe}}
+</div>
+<hr>
+<h2>Tags</h2>
+
+<button id="phototagselect2" value="{{photo.tagids()}}"></button>
+<br>
+{% if photo.day %}
+    <div class="daylink">{{photo.day.vlink()|safe}}</div>
+{% endif %}
+{% if photo.photoday %}
+    <h2>Photoday</h2> ({{photo.photoday.photos.count()}})
+    <div class="photodaylink">{{photo.photoday.vlink()|safe}}</div>
+{% endif %}
+<br>
+
+
+
+{% endblock %}
+
+{% block footer %}{{super()}}{% include "jinja2/photo/photofooter.html" %}
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'jinja2/photo_base.html' %}
+{% block title %}Tag {{phototag}}{% endblock %}
+{% block head %}
+    {{super()}}
+{% endblock %}
+{% block content %}{% if LOCAL %}LOCAL{% endif %}
+<div class="row">
+    <div class="span8">
+        <h2>Tag {{phototag}}</h2>
+    </div>
+</div>
+
+<div class="row"><div class="span8">
+    <div id="notification" class="notification-zone">&nbsp;</div>
+</div></div>
+
+{% for mid in phototag.photos.all() %}
+<div class="photolink">{{mid.photo.inhtml(size='small')|safe}}</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block footer %}{{super()}}{% include "jinja2/photo/photofooter.html" %}
+{% endblock %}

@@ -17,6 +17,8 @@ from trackerutils import DayModel, debu
 
 from choices import *
 
+from .photomodels import *
+
 def lnk(nodel, id, obj):
     return '<a href="/admin/day/%s/%d/">%s</a>'%(nodel, id, str(obj))
 
@@ -391,8 +393,8 @@ class Product(DayModel):
 
     def summary(self, source=None):
         """summary of all purchases of this product."""
-        plink, count, cost, symbol= self.summarydat(source=source)
-        return ' %s%s for %0.1f%s' % (plink, count != 1 and '(%d)' % count or '', cost, symbol)
+        vlink, count, cost, symbol= self.summarydat(source=source)
+        return ' %s%s for %0.1f%s' % (vlink, count != 1 and '(%d)' % count or '', cost, symbol)
 
     def summarydat(self, source=None):
         '''return link, count, cost,symbol'''
@@ -418,8 +420,8 @@ class Product(DayModel):
         cost=self.total_spent(source=source)
         if cost == int(cost):
             cost = int(cost)
-        plink = '<a href="/admin/day/product/?id=%d">%s</a>'%(self.id, str(self))
-        return plink, count, cost, symbol
+        vlink = '<a href="/admin/day/product/?id=%d">%s</a>'%(self.id, str(self))
+        return vlink, count, cost, symbol
 
     def total_spent(self, start=None, end=None, source=None):
         valid=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS)

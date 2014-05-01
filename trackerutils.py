@@ -16,7 +16,7 @@ def monthago():
     return datetime.datetime.now()-datetime.timedelta(days=30)
 
 class DayModel(models.Model):
-
+    
     #should add default modified & created here.
 
     def clink(self, text=None):

@@ -33,3 +33,8 @@ HUMANIZE_FULL_DATETIME=' %B %d %H%p' # September 20 18PM'
 
 
 DATE =DATE_DASH_YEARFIRST
+
+EXIF_TAKEN_FORMAT='%Y:%m:%d %H:%M:%S'
+
+YES_ICON='<img src="/static/admin/img/icon-yes.gif">'
+NO_ICON='<img src="/static/admin/img/icon-no.gif">'
