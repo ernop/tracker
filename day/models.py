@@ -460,8 +460,9 @@ class Purchase(DayModel):
         return u'<a href="%s/day/%s/?id=%d">%s</a>'%(settings.ADMIN_EXTERNAL_BASE, self.product.__class__.__name__.lower(), self.product.id, unicode(self))
 
     def save(self, *args, **kwargs):
-        cc=self.created or datetime.datetime.now()
-        ccdate=cc.date()
+        cc=self.created or (datetime.datetime.now())
+        try:ccdate=cc.date()
+        except:ccdate=cc
         if not self.day_id:
             try:
                 dd=Day.objects.get(date=ccdate)
