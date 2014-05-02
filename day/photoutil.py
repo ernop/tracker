@@ -14,6 +14,8 @@ def get_fps_from_incoming():
         fp=os.path.join(settings.INCOMING_PHOTO_FOLDER,fn)
         if not os.path.isfile(fp):
             continue
+        if not os.access(fp,6):
+            continue
         fplower=fp.lower()
         if fplower!=fp:
             shutil.move(fp, fplower)
