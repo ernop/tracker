@@ -12,7 +12,14 @@ photoInitSelection = function(element, callback) {
 
 
 $(document).ready(function(){
-    setup_phototagselect()
+    setup_phototagselect();
+    var select2=$('#phototagselect2').data('select2');
+    setTimeout(function() {
+        if (!select2.opened()) {
+            select2.open();
+        }
+    }, 0); 
+3
     })
     
 function setup_phototagselect(){
@@ -53,6 +60,10 @@ function send_data(data, target){
             $("#notification").append($('<div class="alert alert-success">'+dat['message']+'</div>'));
             setTimeout(function(){$(".alert").slideUp()}, 1500);
             target.closest('.note-row').attr('note_id',dat['note_id']);
+            //if various things are returned, trigger a page redirect
+            if (dat['goto_next_photo']){
+                document.location.href=dat['next_photo_href']
+            }
             if (dat['deleted']){
                 if (target.closest('.note-row').attr('note_id')!='new'){
                     target.closest('.note-row').slideUp(function(){$(this).remove()});

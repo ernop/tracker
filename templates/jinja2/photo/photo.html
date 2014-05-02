@@ -9,10 +9,11 @@ full_phototags={{full_phototags|jsonify|safe}}
 </script>
 
 {% endblock %}
-{% block content %}{% if LOCAL %}LOCAL{% endif %}
+{% block content %}
 <div class="row">
     <div class="span8">
         <h2>Photo {{photo}}</h2>
+        {% if LOCAL %}(Local){% endif %}
     </div>
 </div>
 
@@ -20,22 +21,33 @@ full_phototags={{full_phototags|jsonify|safe}}
     <div id="notification" class="notification-zone">&nbsp;</div>
 </div></div>
 
-<div class="photo-display" photoid={{photo.id}}>
-    {{photo.inhtml(link=False,size='scaled')|safe}}
+<div class="row">
+    <div class="photo-info">
+        {{photo.name_table(include_image=False)|safe}}
+        {{photo.info_table()|safe}}
+        {{photo.exif_table()|safe}}
+        
+    </div>
+    <div class="photo-display" photoid={{photo.id}}>
+        {{photo.inhtml(link=False,size='scaled')|safe}}
+    </div>
 </div>
-<hr>
-<h2>Tags</h2>
 
-<button id="phototagselect2" value="{{photo.tagids()}}"></button>
-<br>
-{% if photo.day %}
-    <div class="daylink">{{photo.day.vlink()|safe}}</div>
-{% endif %}
-{% if photo.photoday %}
-    <h2>Photoday</h2> ({{photo.photoday.photos.count()}})
-    <div class="photodaylink">{{photo.photoday.vlink()|safe}}</div>
-{% endif %}
-<br>
+<hr>
+<div class="row"><div class="span8">
+    <h2>Tags</h2>
+
+    <button id="phototagselect2" value="{{photo.tagids()}}"></button>
+    <br>
+    {% if photo.day %}
+        <div class="daylink">{{photo.day.vlink()|safe}}</div>
+    {% endif %}
+    {% if photo.photoday %}
+        <h2>Photoday</h2> ({{photo.photoday.photos.count()}})
+        <div class="photodaylink">{{photo.photoday.vlink()|safe}}</div>
+    {% endif %}
+    <br>
+</div></div>
 
 
 

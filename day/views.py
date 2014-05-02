@@ -167,7 +167,7 @@ def y2day(request):
 
 @login_required
 def aday(request, day):
-    dtday=datetime.datetime.strptime(day, DATE_DASH_YEARFIRST)
+    dtday=datetime.datetime.strptime(day, DATE_DASH_REV)
     vals={}
     log.info('day is %s',day)
     vals['today']=day
@@ -213,14 +213,14 @@ def aday(request, day):
 
 @login_required
 def amonth(request, month):
-    mm = datetime.datetime.strptime(month, DATE_DASH_YEARFIRST)
+    mm = datetime.datetime.strptime(month, DATE_DASH_REV)
     start = datetime.datetime(year=mm.year, month=mm.month, day=1)
     end = add_months(start, months=1)
     vals = {}
     vals['start'] = start
     vals['end'] = end
-    vals['startshow'] = start.strftime(DATE_DASH_YEARFIRST)
-    vals['endshow'] = end.strftime(DATE_DASH_YEARFIRST)
+    vals['startshow'] = start.strftime(DATE_DASH_REV)
+    vals['endshow'] = end.strftime(DATE_DASH_REV)
     bits = []
     monthtotal = 0
     FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()

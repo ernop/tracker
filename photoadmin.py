@@ -22,53 +22,37 @@ class PhotoAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
     list_display='id myname myday myinfo myexif'.split()
     #list_filter=' product__domain currency source who_with'.split()
-    list_filter='camera incoming setup myphoto iso'.split()
+    list_filter='deleted camera incoming setup myphoto iso'.split()
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']
+    actions=['undoable_delete','undelete','reinitialize',]
     
-    @debu
+    def reinitialize(self,request,queryset):
+        for photo in queryset:
+            photo.initialize()
+    
+    def undoable_delete(self,request,queryset):
+        for photo in queryset:
+            photo.undoable_delete()
+        
+    def undelete(self,request,queryset):
+        for photo in queryset:
+            photo.undelete()
+    
     def myday(self,obj):
         if obj.day:
             return obj.day.vlink()
         return ''
     
-    @debu
     def myinfo(self,obj):
-        dat=(('taken',obj.taken and obj.taken.strftime(DATE_DASH) or ''),
-             ('created',obj.created.strftime(DATE_DASH)),
-             ('modified',obj.modified.strftime(DATE_DASH)),
-             ('incoming',icon(obj.incoming)),
-             ('setup',icon(obj.setup)),
-             ('myphoto',icon(obj.myphoto))
-             )
-        res=mktable(dat)
-        return res
-    
-    def myname(self,obj):
-        tags=', '.join([tag.tag.vlink() for tag in obj.tags.all()])
-        dat=(('name',obj.name),
-             ('fp',obj.fp),
-             ('img',obj.inhtml(size='small',link=True)),
-             ('tags',tags),)
-        res=mktable(dat)
-        return res
-        
-    
+        return obj.info_table()
     @debu
+    def myname(self,obj):
+        return obj.name_table()
+    
     def myexif(self,obj):
-        if obj.resolutionx and obj.resolutiony:
-            size='%dx%d'%(obj.resolutionx,obj.resolutiony)
-        else:
-            size=''
-        dat=(('camera',obj.camera),
-             ('iso',obj.iso),
-             ('mm',obj.mm),
-             ('size',size),
-             ('filesize',humanize_size(obj.filesize)),
-             )
-        res=mktable(dat)
-        return res
+        return obj.exif_table()
     
     adminify(myday,myinfo,myexif,myname)
 
@@ -79,7 +63,9 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     #list_editable=['note',]
     #search_fields= ['name']
     list_display='id name'.split()
-    pass
+    actions=['reinitialize_tags',]
+    def reinitialize_tags(self,request,queryset):
+        PhotoTag.setup_initial_tags()
 
 class PhotoSpotAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()

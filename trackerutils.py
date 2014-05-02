@@ -123,9 +123,15 @@ def source2obj(source):
 def currency2obj(cur):
     return {'id':cur.id,'name':cur.name,'text':'%s %s'%(cur.symbol, cur.name),'symbol':cur.symbol,}
 
-def mktable(res, rights=None, bigs=None):
+def mktable(dat, rights=None, bigs=None, skip_false=False):
     rows = []
-    for row in res:
+    for row in dat:
+        if not row:
+            continue
+        if type(row) not in [list, set, tuple]:
+            row=[row,]
+        if skip_false and not row[-1]:
+            continue
         res = '<tr>'
         for ii, thing in enumerate(row):
             klasses = []
@@ -137,4 +143,17 @@ def mktable(res, rights=None, bigs=None):
         rows.append(res+'</tr>')
     return '<table class="table thintable" style="background-color:white;">%s</table>' % ''.join(rows)
 
+def mktbl(dat,skip_false=False):
+    res='<table class="table thintable">'
+    for dd in dat:
+        if not dd:
+            continue
+        if type(dd) not in [list,set,tuple]:
+            dd=[dd]
+        if not dd[-1]:
+            continue
+        res+='<tr><td>'
+        res+='<td>'.join(dd)
+    res+='</table>'
+    return res
 

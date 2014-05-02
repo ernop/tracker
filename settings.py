@@ -1,5 +1,12 @@
 import os
 
+DEFAULT_TAG_NAMES='delete undelete done myphoto timelapse friends \
+family meme background mosaic graphics\
+painting'.split()
+CLOSING_TAGS=[]
+#tags which if you add them, automatically advance to the next photo.
+#these are in addition to "done" etc. which are built in.
+
 LOCAL=os.path.exists('local')
 #controls whether debugging will stop the server or be skipped
 from local_settings import *
@@ -128,5 +135,8 @@ LONG_AGO = datetime.date(year=2012, month=5, day=1)
 #INCOMING_PHOTO_FOLDER is set in local.
 assert os.path.exists(INCOMING_PHOTO_FOLDER)
 assert os.path.exists(PHOTO_STORAGE_FOLDER)
+assert os.path.exists(DELETED_PHOTO_FOLDER)
+assert os.path.exists(DONE_PHOTO_FOLDER)
 
-DEFAULT_PHOTO_HEIGHT=500
+PHOTO_SCALED=500
+PHOTO_SMALL=75

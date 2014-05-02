@@ -66,6 +66,8 @@ def photo_passthrough(request, id):
         import ipdb;ipdb.set_trace()
     return response
 
+
+
 def ajax_photo_data(request):
     log.info(request.POST)
     vals={}
@@ -73,7 +75,7 @@ def ajax_photo_data(request):
     vals['message']='start.'
     todo=request.POST
     kind=request.POST['kind']
-    
+    goto_next_incoming=False
     if kind=='phototag':
         photo=Photo.objects.get(id=todo['photo_id'])
         new_tagids=[]
@@ -83,15 +85,47 @@ def ajax_photo_data(request):
         kept_tagids=[]
         for tag in photo.tags.all():
             if int(tag.tag.id) not in new_tagids:
+                if tag.tag.name=='delete':
+                    photo.undelete()
                 tag.delete()
             else:
                 kept_tagids.append(int(tag.tag.id))
         for tagid in new_tagids:
             if tagid not in kept_tagids:
-                pht=PhotoHasTag(tag=PhotoTag.objects.get(id=tagid),photo=photo)
+                pht=PhotoHasTag(tag=PhotoTag.objects.get(id=tagid), photo=photo)
                 pht.save()
+        if photo.tags.filter(tag__name='delete').exists() and not photo.deleted:
+            photo.undoable_delete()
+            goto_next_incoming=True
+        elif PhotoHasTag.objects.filter(tag__name='undelete').exists() and photo.deleted:
+            photo.undelete()
+            photo.tags.filter(tag__name='undelete').delete()
+            #dont actually leave the "undelete" tag on there, its weird
+        if photo.tags.filter(tag__name='done').exists() and photo.incoming:
+            #move on from incoming guys once "done" is entered
+            goto_next_incoming=True
+            photo.done()
+        if photo.tags.filter(tag__name='myphoto').exists():
+            #move on from incoming guys once "done" is entered
+            photo.myphoto=True
+            photo.save()
+        if photo.tags.filter(tag__name__in=settings.CLOSING_TAGS).exclude(tag__id__in=kept_tagids):
+            #actually was assigned this tag
+            photo.done()
+            goto_next_incoming=True
     else:
         print 'bad k',k
         import ipdb;ipdb.set_trace()
+    if goto_next_incoming:
+        next_incoming=get_next_incoming(exclude=photo.id)
+        if next_incoming:
+            vals['message']='undeleted'
+            vals['goto_next_photo']=True
+            vals['next_photo_href']=next_incoming.get_external_photo_page()
+        else:
+            vals['message']='no more photos to process'
+            vals['goto_next_photo']=True
+            vals['next_photo_href']='/photo/incoming/'
+        vals['last_photo_href']=photo.get_external_photo_page()
     vals['message']='success'
     return r2j(vals)

@@ -1,4 +1,4 @@
-import datetime
+import datetime, shutil
 
 from django.db import models
 from django.conf import settings
@@ -8,12 +8,11 @@ from django.conf import settings
 from django.db.models import Sum
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
-from utils import rstripz,make_safe_filename
-from trackerutils import *
-
+from utils import *
+        
 DATE='%Y-%m-%d'
 
-from trackerutils import DayModel, debu
+from trackerutils import DayModel, debu,mktable
 from photoutil import *
 
 from choices import *
@@ -22,6 +21,21 @@ class PhotoTag(DayModel):
     created=models.DateTimeField(auto_now_add=True)
     modified=models.DateTimeField(auto_now=True)
     name=models.CharField(max_length=100)
+    description=models.CharField(max_length=100,blank=True,null=True) #to describe "control" tags
+    
+    @classmethod
+    def setup_initial_tags(self):
+        tagnames=settings.DEFAULT_TAG_NAMES
+        for tn in tagnames:
+            exi=PhotoTag.objects.filter(name=tn)
+            if exi.exists():
+                continue
+            pt=PhotoTag(name=tn)
+            pt.save()
+    
+    #admin
+    control_tag=models.BooleanField(default=False) #ajax/js will take more actions
+    #when this tag is added.  f.e. delete / undelete
     
     class Meta:
         db_table='phototag'
@@ -35,7 +49,7 @@ class PhotoTag(DayModel):
                 text=self.name
             else:
                 text='no name phototag'
-        return '<a href="/photos/phototag/%d/">%s</a>'%(self.id, text)
+        return '<a href="/photo/phototag/%s/">%s</a>'%(self.name, text)
 
 class PhotoSpot(DayModel):
     '''a specific spot & angle to take photos from'''
@@ -78,11 +92,11 @@ class PhotoHasTag(DayModel):
         db_table='photohastag'
         
     def __unicode__(self):
-        return '%s has %s'%(self.photo.name,self.tag.name)
+        return '%s has "%s"'%(self.photo.name,self.tag.name)
         
 class Photo(DayModel):
     ''''''
-    created=models.DateTimeField(auto_now_add=True)
+    created=models.DateTimeField(auto_now_add=True) #photo db object created
     modified=models.DateTimeField(auto_now=True)
     
     name=models.CharField(max_length=100,blank=True,null=True)
@@ -90,16 +104,23 @@ class Photo(DayModel):
     day=models.ForeignKey('Day',blank=True,null=True,related_name='photos') #related day, probably when taken.
     resolutionx=models.IntegerField(blank=True,null=True)
     resolutiony=models.IntegerField(blank=True,null=True)
-    incoming=models.BooleanField(default=False)
-    setup=models.BooleanField(default=False)
-    myphoto=models.BooleanField(default=False)
+    
+    #camdata
     taken=models.DateTimeField(blank=True,null=True) #from exif data
+    photo_created=models.DateTimeField()
+    photo_modified=models.DateTimeField()
     camera=models.CharField(max_length=100,blank=True,null=True)
     iso=models.CharField(max_length=100,blank=True,null=True)
     mm=models.CharField(max_length=100,blank=True,null=True)
     exposure=models.CharField(max_length=100,blank=True,null=True)
     aperture=models.CharField(max_length=100,blank=True,null=True)
     filesize=models.CharField(max_length=20,blank=True,null=True)
+    
+    #admin
+    deleted=models.BooleanField(default=False)
+    incoming=models.BooleanField(default=False) #opposite is "done"
+    setup=models.BooleanField(default=False)
+    myphoto=models.BooleanField(default=False)
         
     class Meta:
         db_table='photo'
@@ -122,13 +143,13 @@ class Photo(DayModel):
         return '<a href="/photo/photo/%d/">%s</a>'%(self.id, text)
 
     def __unicode__(self):
-        return self.name
+        return self.name or self.fp or 'no name'
     
     def inhtml(self,link=True,size='scaled'):
         if size=='scaled':
-            height = settings.DEFAULT_PHOTO_HEIGHT or 400
+            height = settings.PHOTO_SCALED
         elif size=='small':
-            height=50
+            height= settings.PHOTO_SMALL
         elif size=='orig':
             height=None
         else:
@@ -172,9 +193,12 @@ class Photo(DayModel):
         self.resolutiony=im.size[1]
         #get resolution
         #get exif data etc.
+        stat=os.stat(self.fp)
+        self.photo_modified=datetime.datetime.fromtimestamp(stat.st_mtime)
+        self.photo_created=min(self.photo_modified,datetime.datetime.fromtimestamp(stat.st_ctime))
         
-        filesize=os.stat(self.fp).st_size
-        self.filesize=filesize
+        self.filesize=stat.st_size
+        
         self.setup=True
         return True
     
@@ -208,6 +232,93 @@ class Photo(DayModel):
                 day.save()
             self.day=day
         super(Photo, self).save(*args, **kwargs)
-        
+    
+    def filename(self):    
+        fn=os.path.split(self.fp)[-1]
+        return fn
+    
+    def undoable_delete(self):
+        if self.file_exists():
+            fn=self.filename()
+            delfp=get_nonexisting_fp(settings.DELETED_PHOTO_FOLDER,fn)
+            self.tags.filter(tag__name='undelete').delete()
+            shutil.move(self.fp,delfp)
+            self.fp=delfp
+            self.deleted=True
+            self.incoming=False
+            self.save()
+            return True
+        return False
+    
+    def done(self):
+        if self.file_exists():
+            fn=self.filename()
+            donefp=get_nonexisting_fp(settings.DONE_PHOTO_FOLDER,fn)
+            self.tags.filter(tag__name='incoming').delete()
+            shutil.move(self.fp,donefp)
+            self.fp=donefp
+            self.incoming=False
+            self.save()
+            return True
+    
+    def undelete(self):
+        if self.file_exists():
+            if self.deleted:
+                self.tags.filter(tag__name='delete').delete()
+                infp=get_nonexisting_fp(settings.INCOMING_PHOTO_FOLDER, self.filename())
+                shutil.move(self.fp,infp)
+                self.fp=infp
+                self.deleted=False
+                self.incoming=True
+                self.save()
+                return True
+            return False
+        return False
+    
     def tagids(self):
         return ','.join([str(n.tag.id) for n in self.tags.all()])
+    
+    def get_external_photo_page(self):
+        return '/photo/photo/%d/'%self.id
+    
+    def info_table(self):
+        if self.deleted:
+            dd='%sdeleted'%icon(0)
+        else:
+            dd=''
+        dat=(('deleted',dd),
+             ('taken',self.taken and self.taken.strftime(DATE_DASH_REV) or ''),
+             ('photo created',self.photo_created.strftime(DATE_DASH_REV)),
+             ('photo modified',self.photo_modified.strftime(DATE_DASH_REV)),
+             ('obj created',self.created.strftime(DATE_DASH_REV)),
+             ('obj modified',self.modified.strftime(DATE_DASH_REV)),
+             ('incoming',icon(self.incoming)),
+             ('setup',icon(self.setup)),
+             ('myphoto',icon(self.myphoto))
+             )
+        res=mktable(dat,skip_false=True)
+        return res
+    
+    def name_table(self,include_image=True):
+        tags=', '.join([tag.tag.vlink() for tag in self.tags.all()])
+        dat=[('name',self.name),
+             ('fp',self.fp),
+             ('tags',tags),]
+        if include_image:
+            dat.insert(2,('img',self.inhtml(size='small',link=True)),)
+        res=mktable(dat,skip_false=True)
+        return res
+    
+    def exif_table(self):
+        if self.resolutionx and self.resolutiony:
+            size='%dx%d'%(self.resolutionx,self.resolutiony)
+        else:
+            size=''
+        dat=(('camera',self.camera),
+             ('iso',self.iso),
+             ('mm',self.mm),
+             ('size',size),
+             ('filesize',humanize_size(self.filesize)),
+             )
+        res=mktable(dat,skip_false=True)
+        return res

@@ -21,3 +21,6 @@ logs/*.log
 *.sql
 *.sql.gz
 nginx
+incomingphoto
+done_photo
+deleted_photo
