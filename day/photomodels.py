@@ -175,7 +175,10 @@ class Photo(DayModel):
             return False
         import datetime, os
         from PIL import Image
-        im=Image.open(self.fp)
+        try:
+            im=Image.open(self.fp)
+        except IOError:
+            return False
         tags=self.get_exif(im)
         exif2db={'Model':'camera','ISOSpeedRatings':'iso','DateTime':'taken'}
         if tags:
@@ -212,7 +215,10 @@ class Photo(DayModel):
             return None
         if not im:
             from PIL import Image
-            im=Image.open(self.fp)
+            try:
+                im=Image.open(self.fp)
+            except IOError:
+                return False
         return get_exif(im)
     
     def save(self, *args, **kwargs):
