@@ -17,7 +17,7 @@ from trackerutils import DayModel, debu
 
 from choices import *
 
-from .photomodels import *
+from photomodels import *
 
 def lnk(nodel, id, obj):
     return '<a href="/admin/day/%s/%d/">%s</a>'%(nodel, id, str(obj))
@@ -63,7 +63,6 @@ class Day(DayModel):
         #just add the days
 
         #if got a month, bump that.
-        #import ipdb;ipdb.set_trace()
         newmonth = tt.month + months
         newyear = tt.year
         if newmonth == 0:
@@ -90,7 +89,6 @@ class Day(DayModel):
         for note in self.notes.all():
             for nk in note.kinds.all():
                 nks[nk.name] = nks.get(nk.name, 0) + 1
-        #import ipdb;ipdb.set_trace()
         return sorted(nks.items(), key=lambda x:x[0])
 
     def getmeasurements(self):

@@ -453,7 +453,6 @@ class SourceAdmin(OverriddenModelAdmin):
         return ''
 
     #_g = globals()
-    #import ipdb;ipdb.set_trace()
 
 
     #for region in Region.objects.all():
@@ -473,7 +472,6 @@ class SourceAdmin(OverriddenModelAdmin):
         #count, costs
         counts, costs = res['counts'], res['costs']
         html = '<table class="table thintable">'
-        #import ipdb;ipdb.set_trace()
         rows = []
         for domain_id in counts.keys():
             row = '<tr><td>%s<td>%s times<td>cost: %s' % (Domain.objects.get(id=domain_id).name, counts[domain_id], costs[domain_id])

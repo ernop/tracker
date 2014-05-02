@@ -15,7 +15,7 @@ from choices import *
 import logging
 log=logging.getLogger(__name__)
 
-from day.photoutil import *
+from photoutil import *
 
 @user_passes_test(staff_test)
 def photo(request,id):
@@ -72,6 +72,7 @@ def photo_passthrough(request, id):
     elif ext=='.png':
         return HttpResponse(data, mimetype="Image/png")
     else:
+        log.error('wronge filetype. %s',ext)
         import ipdb;ipdb.set_trace()
     return response
 
@@ -122,7 +123,7 @@ def ajax_photo_data(request):
             photo.done()
             goto_next_incoming=True
     else:
-        print 'bad k',k
+        log.error('bad k %s',k)
         import ipdb;ipdb.set_trace()
     if goto_next_incoming:
         next_incoming=get_next_incoming(exclude=photo.id)

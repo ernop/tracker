@@ -1,6 +1,8 @@
 import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime, json, calendar
 import shutil
 
+log=logging.getLogger(__name__)
+
 from django.template import RequestContext
 
 def get_fps_from_incoming():
@@ -55,6 +57,7 @@ def get_nonexisting_fp(basedir,basefn):
         testfp=os.path.join(basedir,fn)
         ii+=1
         if ii>20:
+            log.error('timeout.')
             import ipdb;ipdb.set_trace()
     return testfp
 

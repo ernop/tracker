@@ -125,7 +125,7 @@ def ajax_day_data(request):
             vals['message']+=' deleted.'
             vals['deleted']=True
     else:
-        print 'bad k',k
+        log.error('Bad K %s',kind)
         import ipdb;ipdb.set_trace()
     vals['message']='success'
     return r2j(vals)
