@@ -48,7 +48,7 @@ urlpatterns = patterns('',
     url(r'photo/phototag/(?P<name>[a-zA-Z_\-0-9]+)/$','tracker.day.photoviews.phototag',name='phototag'),
     url(r'photo/photospot/(?P<slug>[a-zA-Z_\-0-9]+)/$','tracker.day.photoviews.photospot',name='photospot'),
     url(r'photo/incoming/$','tracker.day.photoviews.incoming',name='photospot'),
-    url(r'photo_passthrough/(?P<id>[0-9]+)/$','tracker.day.photoviews.photo_passthrough',name='photo_passthrough'),
+    url(r'photo_passthrough/(?P<id>[0-9]+).jpg$','tracker.day.photoviews.photo_passthrough',name='photo_passthrough'),
     url(r'^ajax/photo_data/$','tracker.day.photoviews.ajax_photo_data',name='ajax_photo_data'),
 )
 

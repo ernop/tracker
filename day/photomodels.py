@@ -168,7 +168,7 @@ class Photo(DayModel):
         return img
         
     def get_external_fp(self):
-        return '/photo_passthrough/%d/'%self.id
+        return '/photo_passthrough/%d.jpg'%self.id
     
     def initialize(self):
         if not self.file_exists():
