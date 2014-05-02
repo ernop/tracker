@@ -19,8 +19,11 @@ $(document).ready(function(){
             select2.open();
         }
     }, 0); 
-3
-    })
+    if (next_photopath){
+        var nxt=new Image();
+        nxt.src=next_photopath;
+    }
+})
     
 function setup_phototagselect(){
     var ptg=$('#phototagselect2');
