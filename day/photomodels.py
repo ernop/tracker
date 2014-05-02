@@ -152,7 +152,10 @@ class Photo(DayModel):
     
     def inhtml(self,link=True,size='scaled'):
         if size=='scaled':
-            height = settings.PHOTO_SCALED
+            if self.resolutiony>1000:
+                height=settings.PHOTO_SCALED
+            else:
+                height=self.resolutiony
         elif size=='small':
             height= settings.PHOTO_SMALL
         elif size=='orig':
