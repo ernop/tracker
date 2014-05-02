@@ -238,6 +238,7 @@ class Photo(DayModel):
             #make the day
             from day.models import Day
             date=self.taken.date()
+            qq=date
             try:
                 day=Day.objects.filter(date=date).get()
             except Day.DoesNotExist:
