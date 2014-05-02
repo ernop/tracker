@@ -134,10 +134,10 @@ import datetime
 LONG_AGO = datetime.date(year=2012, month=5, day=1)
 
 #INCOMING_PHOTO_FOLDER is set in local.
-assert os.path.exists(INCOMING_PHOTO_FOLDER)
-assert os.path.exists(PHOTO_STORAGE_FOLDER)
-assert os.path.exists(DELETED_PHOTO_FOLDER)
-assert os.path.exists(DONE_PHOTO_FOLDER)
+assert os.path.exists(INCOMING_PHOTO_FOLDER),INCOMING_PHOTO_FOLDER
+assert os.path.exists(PHOTO_STORAGE_FOLDER),PHOTO_STORAGE_FOLDER
+assert os.path.exists(DELETED_PHOTO_FOLDER),DELETED_PHOTO_FOLDER
+assert os.path.exists(DONE_PHOTO_FOLDER),DONE_PHOTO_FOLDER
 
 PHOTO_SCALED=500
 PHOTO_SMALL=75
