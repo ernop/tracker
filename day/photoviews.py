@@ -25,7 +25,8 @@ def photo(request,id):
         return HttpResponseRedirect('/')
     vals={}
     vals['photo']=photo
-    vals['full_phototags']=[phototag2obj(pt) for pt in PhotoTag.objects.all()]
+    vals['full_phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=lambda x:x.name)]
+    
     return r2r('jinja2/photo/photo.html',request,vals)
 
 @user_passes_test(staff_test)
@@ -42,7 +43,7 @@ def photospot(request,slug):
     photo=PhotoSpot.objects.get(slug=slug)
     vals={}
     vals['photospot']=photospot
-    vals['phototags']=[phototag2obj(pt) for pt in PhotoTag.objects.all()]
+    vals['phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=lambda x:x.name)]
     return r2r('jinja2/photo/photospot.html',request,vals)
 
 @user_passes_test(staff_test)
@@ -62,11 +63,8 @@ def photo_passthrough(request, id):
         return False
     from utils import is_secure_path
     photo=Photo.objects.get(id=id)
-    if not is_secure_path(photo.fp):
-        assert False,fp
-    dd=photo.get_dir()
-    fp=os.path.join(dd,photo.fp)
-    assert os.path.exists(fp)
+    fp=photo.fp
+    assert os.path.exists(fp),fp
     ext=os.path.splitext(fp)[-1]
     data=open(fp, 'rb').read()
     if ext in ['.jpg','.jpeg']:

@@ -245,7 +245,7 @@ class Photo(DayModel):
     def undoable_delete(self):
         if self.file_exists():
             fn=self.filename()
-            delfp=get_nonexisting_fp(settings.DELETED_PHOTO_DIR,fn)
+            delfp=get_nonexisting_fp(settings.DELETED_PHOTO_FOLDER,fn)
             self.tags.filter(tag__name='undelete').delete()
             shutil.move(self.fp,delfp)
             self.fp=delfp
@@ -258,7 +258,7 @@ class Photo(DayModel):
     def done(self):
         if self.file_exists():
             fn=self.filename()
-            donefp=get_nonexisting_fp(settings.DONE_PHOTO_DIR,fn)
+            donefp=get_nonexisting_fp(settings.DONE_PHOTO_FOLDER,fn)
             self.tags.filter(tag__name='incoming').delete()
             shutil.move(self.fp,donefp)
             self.fp=donefp
@@ -270,7 +270,7 @@ class Photo(DayModel):
         if self.file_exists():
             if self.deleted:
                 self.tags.filter(tag__name='delete').delete()
-                infp=get_nonexisting_fp(settings.INCOMING_PHOTO_DIR, self.filename())
+                infp=get_nonexisting_fp(settings.INCOMING_PHOTO_FOLDER, self.filename())
                 shutil.move(self.fp,infp)
                 self.fp=infp
                 self.deleted=False
@@ -326,11 +326,4 @@ class Photo(DayModel):
              )
         res=mktable(dat,skip_false=True)
         return res
-    def get_dir(self):
-        '''what dir is it stored in.  bit of a hack.'''
-        if self.incoming:
-            return settings.INCOMING_PHOTO_DIR
-        elif self.deleted:
-            return settings.DELETED_PHOTO_DIR
-        else:
-            return settings.DONE_PHOTO_DIR
+    
