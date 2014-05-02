@@ -17,19 +17,26 @@ log=logging.getLogger(__name__)
 
 from photoutil import *
 
+@user_passes_test(staff_test)
 def photo(request,id):
     photo=Photo.objects.get(id=id)
+    if not can_access_private(request.user) and photo.tags.filter(tag__name__in=settings.EXCLUDED_TAGS).exists():
+        return HttpResponseRedirect('/')
     vals={}
     vals['photo']=photo
     vals['full_phototags']=[phototag2obj(pt) for pt in PhotoTag.objects.all()]
     return r2r('jinja2/photo/photo.html',request,vals)
 
+@user_passes_test(staff_test)
 def phototag(request,name):
     phototag=PhotoTag.objects.get(name=name)
+    if not can_access_private(request.user) and phototag.name in settings.EXCLUDED_TAGS:
+        return HttpResponseRedirect('/')
     vals={}
     vals['phototag']=phototag
     return r2r('jinja2/photo/phototag.html',request,vals)
 
+@user_passes_test(staff_test)
 def photospot(request,slug):
     photo=PhotoSpot.objects.get(slug=slug)
     vals={}
@@ -37,6 +44,7 @@ def photospot(request,slug):
     vals['phototags']=[phototag2obj(pt) for pt in PhotoTag.objects.all()]
     return r2r('jinja2/photo/photospot.html',request,vals)
 
+@user_passes_test(staff_test)
 def incoming(request):
     '''view & start classifying photos in the incoming dir'''
     check_incoming()
@@ -46,6 +54,7 @@ def incoming(request):
     vals['photos']=photos[:100]
     return r2r('jinja2/photo/photolist.html',request,vals)
 
+@user_passes_test(staff_test)
 def photo_passthrough(request, id):
     from utils import staff_test
     if not staff_test(request.user):
@@ -66,8 +75,7 @@ def photo_passthrough(request, id):
         import ipdb;ipdb.set_trace()
     return response
 
-
-
+@user_passes_test(staff_test)
 def ajax_photo_data(request):
     log.info(request.POST)
     vals={}
@@ -121,11 +129,11 @@ def ajax_photo_data(request):
         if next_incoming:
             vals['message']='undeleted'
             vals['goto_next_photo']=True
-            vals['next_photo_href']=next_incoming.get_external_photo_page()
+            vals['next_photo_href']=next_incoming.exhref()
         else:
             vals['message']='no more photos to process'
             vals['goto_next_photo']=True
             vals['next_photo_href']='/photo/incoming/'
-        vals['last_photo_href']=photo.get_external_photo_page()
+        vals['last_photo_href']=photo.exhref()
     vals['message']='success'
     return r2j(vals)

@@ -31,8 +31,10 @@ def phototag2obj(phototag):
 def get_exif(im):
     ret = {}
     from PIL.ExifTags import TAGS
-    info = im._getexif()
-    
+    try:
+        info = im._getexif()
+    except:
+        info=None
     if not info:
         return False
     for tag, value in info.items():
@@ -66,4 +68,7 @@ def get_next_incoming(exclude):
         return nextincoming
     return False
     
-    
+def can_access_private(user):
+    if user.username=='superuser':
+        return True
+    return False

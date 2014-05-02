@@ -35,18 +35,20 @@ full_phototags={{full_phototags|jsonify|safe}}
 
 <hr>
 <div class="row"><div class="span8">
-    <h2>Tags</h2>
-
-    <button id="phototagselect2" value="{{photo.tagids()}}"></button>
-    <br>
-    {% if photo.day %}
-        <div class="daylink">{{photo.day.vlink()|safe}}</div>
-    {% endif %}
-    {% if photo.photoday %}
-        <h2>Photoday</h2> ({{photo.photoday.photos.count()}})
-        <div class="photodaylink">{{photo.photoday.vlink()|safe}}</div>
-    {% endif %}
-    <br>
+    <div class="tagzone">
+        <h2>Tags</h2>
+    
+        <button id="phototagselect2" value="{{photo.tagids()}}"></button>
+        <div class="new-tag-button btn" style="margin-left:50px;"><a href="/admin/day/phototag/add/"><i class="icon-plus"></i>Add</a></div>
+    </div><hr>
+        {% if photo.day %}
+            <div class="daylink">{{photo.day.vlink()|safe}}</div>
+        {% endif %}
+        {% if photo.photoday %}
+            <h2>Photoday</h2> ({{photo.photoday.photos.count()}})
+            <div class="photodaylink">{{photo.photoday.vlink()|safe}}</div>
+        {% endif %}
+        <br>
 </div></div>
 
 

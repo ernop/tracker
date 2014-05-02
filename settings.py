@@ -4,6 +4,7 @@ DEFAULT_TAG_NAMES='delete undelete done myphoto timelapse friends \
 family meme background mosaic graphics\
 painting'.split()
 CLOSING_TAGS=[]
+EXCLUDED_TAGS=['done','delete','undelete',]
 #tags which if you add them, automatically advance to the next photo.
 #these are in addition to "done" etc. which are built in.
 

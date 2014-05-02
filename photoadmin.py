@@ -62,10 +62,36 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']
-    list_display='id name'.split()
+    list_display='id myname myphotos'.split()
     actions=['reinitialize_tags',]
+    
+    def queryset(self, request):
+        queryset = super(PhotoTagAdmin, self).queryset(request)
+        user=request.user
+        if can_access_private(user):
+            pass
+        else:
+            queryset=queryset.exclude(name__in=settings.EXCLUDED_TAGS)
+        return queryset
+    
     def reinitialize_tags(self,request,queryset):
         PhotoTag.setup_initial_tags()
+        
+    def myphotos(self,obj):
+        res=[]
+        ct=obj.photos.count()
+        for pho in obj.photos.all()[:20]:
+            realpho=pho.photo
+            res.append(realpho.inhtml(size='small'))
+        pres=''.join(res)
+        alllink='<a href="../photos/?photohastag__photo__id=%d">All Photos</a>'%obj.id
+        res='<div class="big">%d</div>%s<br>%s'%(ct,pres,alllink)
+        return res
+        
+    def myname(self,obj):
+        return obj.vlink()
+        
+    adminify(myname, myphotos)
 
 class PhotoSpotAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()

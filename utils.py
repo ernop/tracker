@@ -401,4 +401,29 @@ def humanize_size(sz):
         return '%0.1fk'%(sz*1.0/1000)
     elif sz<1000000000:
         return '%0.1fm'%(sz*1.0/1000000)
+
+def user_passes_test(test_func, login_url=None):
+    from functools import wraps
+    from django.utils.decorators import available_attrs
+    def decorator(view_func):
+        @wraps(view_func, assigned=available_attrs(view_func))
+        def _wrapped_view(request, *args, **kwargs):
+            if test_func(request.user):
+                return view_func(request, *args, **kwargs)
+            path = request.build_absolute_uri()
+            login_scheme, login_netloc = urlparse.urlparse(login_url or
+                                                        settings.LOGIN_URL)[:2]
+            current_scheme, current_netloc = urlparse.urlparse(path)[:2]
+            if ((not login_scheme or login_scheme == current_scheme) and
+                (not login_netloc or login_netloc == current_netloc)):
+                path = request.get_full_path()
+            if request.path:
+                extra = '?next=%s'% request.path
+            else:extra = ''
+            return HttpResponseRedirect('..')
+        return _wrapped_view
+    return decorator
+
     
+def staff_test(user):
+    return user and user.is_authenticated() and user.is_staff

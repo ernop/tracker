@@ -36,12 +36,13 @@ class PhotoTag(DayModel):
     #admin
     control_tag=models.BooleanField(default=False) #ajax/js will take more actions
     #when this tag is added.  f.e. delete / undelete
-    
+    def get_external_page(self):
+        return '/photo/phototag/%s/'%self.name
     class Meta:
         db_table='phototag'
         
     def __unicode__(self):
-        return '%s (%d)'%(self.name,self.id)
+        return '%s'%(self.name)
     
     def vlink(self,text=None):
         if not text:
@@ -74,7 +75,7 @@ class PhotoSpot(DayModel):
     def __unicode__(self):
         return self.name
     
-    def vlink(self,text):
+    def vlink(self,text=None):
         if not text:
             if self.name:
                 text=self.name
@@ -134,13 +135,16 @@ class Photo(DayModel):
         if self.file_exists():
             os.path.remove(self.fp)        
 
-    def vlink(self,text):
+    def vlink(self,text=None):
         if not text:
             if self.name:
                 text=self.name
             else:
                 text='no name photo'
-        return '<a href="/photo/photo/%d/">%s</a>'%(self.id, text)
+        return '<a href="%s">%s</a>'%(self.exhref(), text)
+    
+    def exhref(self):
+        return '/photo/photo/%d/'%self.id
 
     def __unicode__(self):
         return self.name or self.fp or 'no name'
@@ -278,8 +282,7 @@ class Photo(DayModel):
     def tagids(self):
         return ','.join([str(n.tag.id) for n in self.tags.all()])
     
-    def get_external_photo_page(self):
-        return '/photo/photo/%d/'%self.id
+    
     
     def info_table(self):
         if self.deleted:
