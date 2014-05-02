@@ -15,7 +15,7 @@ from choices import *
 import logging
 log=logging.getLogger(__name__)
 
-from photoutil import *
+from day.photoutil import *
 
 @user_passes_test(staff_test)
 def photo(request,id):
