@@ -67,13 +67,16 @@ def photo_passthrough(request, id):
     assert os.path.exists(fp),fp
     ext=os.path.splitext(fp)[-1]
     data=open(fp, 'rb').read()
+    
     if ext in ['.jpg','.jpeg']:
-        return HttpResponse(data, mimetype="Image/jpeg")
+        response=HttpResponse(data, mimetype="Image/jpeg")
     elif ext=='.png':
-        return HttpResponse(data, mimetype="Image/png")
+        response=HttpResponse(data, mimetype="Image/png")
+    
     else:
         log.error('wronge filetype. %s',ext)
         import ipdb;ipdb.set_trace()
+    response['Cache-Control'] = 'max-age=86400	'
     return response
 
 @user_passes_test(staff_test)
