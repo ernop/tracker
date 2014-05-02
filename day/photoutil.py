@@ -17,7 +17,7 @@ def get_fps_from_incoming():
         fplower=fp.lower()
         if fplower!=fp:
             shutil.move(fp, fplower)
-        fps.append(fp)
+        fps.append(fplower)
     return fps
         
 def check_incoming():
