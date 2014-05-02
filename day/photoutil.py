@@ -8,10 +8,10 @@ from django.template import RequestContext
 def get_fps_from_incoming():
     from django.conf import settings
     fps=[]
-    for fn in os.listdir(settings.INCOMING_PHOTO_FOLDER):
+    for fn in os.listdir(settings.INCOMING_PHOTO_DIR):
         if fn.startswith('.') or fn.startswith('_'):
             continue
-        fp=os.path.join(settings.INCOMING_PHOTO_FOLDER,fn)
+        fp=os.path.join(settings.INCOMING_PHOTO_DIR,fn)
         if not os.path.isfile(fp):
             continue
         if not os.access(fp,6):
