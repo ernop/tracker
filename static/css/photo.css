@@ -1,6 +1,6 @@
 div {box-sizing:border-box;}
 
-.photolink {border:2px solid steelblue;border-radius:3px;padding:3px;display:inline-block;}
+.photolink {border:2px solid steelblue;border-radius:3px;padding:3px;display:inline-block;margin-bottom;3px;}
 
 .photo-info{float:right;}
 

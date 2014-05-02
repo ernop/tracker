@@ -72,10 +72,14 @@ class Day(DayModel):
             newmonth = newmonth % 12
         return str(datetime.date(newyear, day=tt.day, month=newmonth))
 
-    def vlink(self, text=None):
+    def vlink(self, text=None,max_length=False):
         if not text:
             text=str(self.date)+' '+datetime.datetime.strftime(self.date, '%a')
-        return '<a class="stdbtn btn nb" href="/aday/%s/">%s</a>'%(str(self.date), text)
+        if max_length:
+            extra_style='width:inherit;'
+        else:
+            extra_style=''
+        return '<a style="%s" class="stdbtn btn nb" href="/aday/%s/">%s</a>'%(extra_style,str(self.date), text)
 
     def show_day(self):
         return datetime.datetime.strftime(self.date, '%A')
@@ -107,6 +111,14 @@ class Day(DayModel):
         except Exception, e:
             print 'bad get workouts.'
             return []
+        
+    def has_any_history(self):
+        return self.photos.exists() or self.notes.exists()
+
+    def get_history_description(self):
+        res=self.__unicode__()+' '+self.show_notekinds()
+        return res
+    
 class Domain(DayModel):
     """
     body, house, experiences, food, stuff, clothes, etc.

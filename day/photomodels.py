@@ -290,7 +290,12 @@ class Photo(DayModel):
             dd='%sdeleted'%icon(0)
         else:
             dd=''
+        if self.day:
+            daylink=self.day.vlink()
+        else:
+            daylink=None
         dat=(('deleted',dd),
+             ('day',daylink),
              ('taken',self.taken and self.taken.strftime(DATE_DASH_REV) or ''),
              ('photo created',self.photo_created.strftime(DATE_DASH_REV)),
              ('photo modified',self.photo_modified.strftime(DATE_DASH_REV)),
@@ -327,3 +332,11 @@ class Photo(DayModel):
         res=mktable(dat,skip_false=True)
         return res
     
+    def can_be_seen_by(self,user):
+        if self.is_private() and not can_access_private(user):
+            return False
+        return True
+    
+    def is_private(self):
+        
+        return self.tags.filter(tag__name__in=settings.EXCLUDED_TAGS).exists()

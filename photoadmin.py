@@ -23,6 +23,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     list_display='id myname myday myinfo myexif'.split()
     #list_filter=' product__domain currency source who_with'.split()
     list_filter='deleted camera incoming setup myphoto iso'.split()
+    list_filter.extend([PhotoHasDayFilter])
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']
@@ -53,6 +54,16 @@ class PhotoAdmin(OverriddenModelAdmin):
     
     def myexif(self,obj):
         return obj.exif_table()
+    
+    def queryset(self, request):
+        queryset = super(PhotoAdmin, self).queryset(request)
+        user=request.user
+        #return queryset
+        if can_access_private(user):
+            pass
+        else:
+            queryset=queryset.exclude(tags__tag__name__in=settings.EXCLUDED_TAGS)
+        return queryset
     
     adminify(myday,myinfo,myexif,myname)
 

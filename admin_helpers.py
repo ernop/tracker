@@ -12,6 +12,21 @@ from django.contrib.admin.views.main import SuspiciousOperation, ImproperlyConfi
 from django.contrib.admin.util import lookup_needs_distinct
 from django.db.models import Q, Count
 
+
+class PhotoHasDayFilter(SimpleListFilter):
+    title = 'has taken day'
+    parameter_name = 'has_taken_day'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            return queryset.exclude(day=None)
+        elif self.value()=='no':
+            return queryset.filter(day=None)
+
 class NoteHasKinds(SimpleListFilter):
     title = 'has kinds'
     parameter_name = 'has_kinds'

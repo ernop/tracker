@@ -207,8 +207,11 @@ def aday(request, day):
     vals['histories']=histories
     while trydate>(settings.LONG_AGO):
         trydate=(trydate-datetime.timedelta(days=365))
-        if Day.objects.filter(date=trydate).exists():
-            histories.append(Day.objects.filter(date=trydate)[0])
+        exi=Day.objects.filter(date=trydate)
+        if exi.exists():
+            day=exi[0]
+            if day.has_any_history():
+                histories.append(day)
     return r2r('jinja2/day.html', request, vals)
 
 @login_required

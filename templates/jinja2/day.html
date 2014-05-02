@@ -21,14 +21,33 @@
     <div class="span8">
         <h2>{{day.date}} {{day.show_day()}}</h2>
         {% for historyday in histories %}
-            <span style="float:right;">{{historyday.vlink(text=historyday.__unicode__()+' '+historyday.show_notekinds())|safe}}</span>
+            <div class="historybox">
+            
+            {% if historyday.photos.exists() %}
+                {% for photo in historyday.photos.all() %}
+                    {% if photo.can_be_seen_by(user)%}
+                        <div class="photolink">{{photo.inhtml(size='small')|safe}}</div>
+                    {% endif %}
+                {% endfor %}
+                <br>
+            {% endif %}
+            <span>{{historyday.vlink(text=historyday.get_history_description(),max_length=True)|safe}}</span>
+            </div>
         {% endfor %}
     </div>
+    <hr>
     <div class="span2">
         <div class="btn add-note">
             <i class="icon-plus"></i>
         </div>
     </div>
+</div>
+<div class="photozone">
+{% for photo in day.photos.all() %}
+    {% if photo.can_be_seen_by(user)%}
+        <div class="photolink">{{photo.inhtml(size='small')|safe}}</div>
+    {% endif %}
+{% endfor %}
 </div>
 <div class="notezone">
 {% for note in notes %}

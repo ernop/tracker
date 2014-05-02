@@ -1,4 +1,7 @@
 <div class="footer dayfooter">
+    {% if photo %}
+    <div class="bignav"><a href="/admin/day/photo/photo/?id={{photo.id}}">db photo</a></div>
+    {% endif %}
     <div class="bignav"><a href="/admin/day/photo/">db photos</a></div>
     <div class="bignav"><a href="/admin/day/phototag/">db phototags</a></div>
     <div class="bignav"><a href="/photo/incoming/">incoming photos</a></div>
