@@ -26,7 +26,11 @@ def photo(request,id):
     vals={}
     vals['photo']=photo
     vals['full_phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=lambda x:x.name.lower())]
-    vals['next_photopath']=get_next_incoming(exclude=photo.id).get_external_fp()
+    next_incoming=get_next_incoming(exclude=photo.id)
+    if next_incoming:
+        vals['next_photopath']=next_incoming.get_external_fp()
+    else:
+        vals['next_photopath']=False
     return r2r('jinja2/photo/photo.html',request,vals)
 
 @user_passes_test(staff_test)
