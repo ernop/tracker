@@ -64,7 +64,7 @@ def photo_passthrough(request, id):
     photo=Photo.objects.get(id=id)
     fp=photo.fp
     if not is_secure_path(fp):
-        assert False
+        assert False,fp
     assert os.path.exists(fp)
     ext=os.path.splitext(fp)[-1]
     data=open(fp, 'rb').read()
