@@ -10,7 +10,6 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 
 from utils import rstripz
 from trackerutils import *
-open('/home/ernop/django.fuseki.net/err.txt','a').write("started models.\n")
 DATE='%Y-%m-%d'
 
 from trackerutils import DayModel, debu
@@ -647,5 +646,3 @@ class Workout(DayModel):
             #res3+='%s %s'%(exercise, ' ,'.join(['%d'%s for s in summary]))
             res3+='<br>'
         return res3
-
-open('/home/ernop/django.fuseki.net/err.txt','a').write("end models.\n")

@@ -1,4 +1,3 @@
-open('/home/ernop/django.fuseki.net/err.txt','a').write("started pmodels.\n")
 import datetime, shutil
 
 from django.db import models
@@ -328,4 +327,3 @@ class Photo(DayModel):
         res=mktable(dat,skip_false=True)
         return res
     
-open('/home/ernop/django.fuseki.net/err.txt','a').write("end pmodels.\n")

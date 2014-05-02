@@ -1,4 +1,3 @@
-open('/home/ernop/django.fuseki.net/err.txt','a').write("started pviews.\n")
 
 import datetime
 
@@ -140,5 +139,3 @@ def ajax_photo_data(request):
         vals['last_photo_href']=photo.exhref()
     vals['message']='success'
     return r2j(vals)
-
-open('/home/ernop/django.fuseki.net/err.txt','a').write("end pviews.\n")

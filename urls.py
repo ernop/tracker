@@ -1,4 +1,3 @@
-open('/home/ernop/django.fuseki.net/err.txt','a').write("started urls.\n")
 from django.conf.urls.defaults import *
 from django.http import HttpResponseRedirect
 
@@ -55,5 +54,3 @@ urlpatterns = patterns('',
 
 
 
-
-open('/home/ernop/django.fuseki.net/err.txt','a').write("end urls.\n")
