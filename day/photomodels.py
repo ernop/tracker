@@ -223,7 +223,9 @@ class Photo(DayModel):
     
     def save(self, *args, **kwargs):
         if not self.setup:
-            self.initialize()
+            res=self.initialize()
+            if not res:
+                return
         if self.incoming==None:
             self.incoming=True
         if not self.name:
