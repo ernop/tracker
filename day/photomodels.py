@@ -352,3 +352,5 @@ class Photo(DayModel):
     def is_private(self):
         
         return self.tags.filter(tag__name__in=settings.EXCLUDED_TAGS).exists()
+    
+    

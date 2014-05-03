@@ -138,6 +138,6 @@ assert os.path.exists(INCOMING_PHOTO_DIR),INCOMING_PHOTO_DIR
 assert os.path.exists(DONE_PHOTO_DIR),DONE_PHOTO_DIR
 assert os.path.exists(DELETED_PHOTO_DIR),DELETED_PHOTO_DIR
 assert os.path.exists(DONE_PHOTO_DIR),DONE_PHOTO_DIR
-
+assert os.path.exists(THUMB_PHOTO_DIR),THUMB_PHOTO_DIR
 PHOTO_SCALED=1000
 PHOTO_SMALL=75

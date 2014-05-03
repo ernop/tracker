@@ -24,10 +24,8 @@
             <div class="historybox">
             
             {% if historyday.photos.exists() %}
-                {% for photo in historyday.photos.all() %}
-                    {% if photo.can_be_seen_by(user)%}
-                        <div class="photolink">{{photo.inhtml(size='small')|safe}}</div>
-                    {% endif %}
+                {% for photo in historyday.get_photos_for_history(user) %}
+                    <div class="photolink">{{photo.inhtml(size='small')|safe}}</div>
                 {% endfor %}
                 <br>
             {% endif %}
@@ -43,10 +41,10 @@
     </div>
 </div>
 <div class="photozone">
-{% for photo in day.photos.all() %}
-    {% if photo.can_be_seen_by(user)%}
-        <div class="photolink">{{photo.inhtml(size='small')|safe}}</div>
-    {% endif %}
+{% for photo in day.get_photos_for_history(user) %}
+    
+    <div class="photolink">{{photo.inhtml(size='small')|safe}}</div>
+    
 {% endfor %}
 </div>
 <div class="notezone">
