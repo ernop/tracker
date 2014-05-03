@@ -103,6 +103,7 @@ class Photo(DayModel):
     
     name=models.CharField(max_length=100,blank=True,null=True)
     fp=models.CharField(max_length=500,blank=True,null=True)
+    thumbfp=models.CharField(max_length=500,blank=True,null=True) #may not exist
     day=models.ForeignKey('Day',blank=True,null=True,related_name='photos') #related day, probably when taken.
     resolutionx=models.IntegerField(blank=True,null=True)
     resolutiony=models.IntegerField(blank=True,null=True)
@@ -123,6 +124,7 @@ class Photo(DayModel):
     incoming=models.BooleanField(default=False) #opposite is "done"
     setup=models.BooleanField(default=False)
     myphoto=models.BooleanField(default=False)
+    thumb_ok=models.BooleanField(default=False)
         
     class Meta:
         db_table='photo'
@@ -134,7 +136,9 @@ class Photo(DayModel):
     
     def delete_file(self):
         if self.file_exists():
-            os.path.remove(self.fp)        
+            os.remove(self.fp)  
+        if os.path.exists(self.thumbfp):
+            os.remove(self.thumbfp)
 
     def vlink(self,text=None):
         if not text:
@@ -151,26 +155,78 @@ class Photo(DayModel):
         return self.name or self.fp or 'no name'
     
     def inhtml(self,link=True,size='scaled'):
+        thumb=False
         if size=='scaled':
             if self.resolutiony>1000:
                 height=settings.PHOTO_SCALED
             else:
                 height=self.resolutiony
-        elif size=='small':
-            height= settings.PHOTO_SMALL
+        elif size=='thumb':
+            height= settings.THUMB_HEIGHT
+            thumb=True
         elif size=='orig':
             height=None
         else:
             height=100
+        if thumb:
+            src=self.get_external_fp(thumb=True)
+        else:
+            src=self.get_external_fp()
         if height:
-            img='<img src="%s" height=%d>'%(self.get_external_fp(), height)
+            img='<img src="%s" height=%d>'%(src, height)
         else:
             img='<img src="%s">'%(self.get_external_fp())
         if link:
             return self.vlink(text=img)
         return img
         
-    def get_external_fp(self):
+    def thumb_ok(self):
+        if self.thumbfp:
+            if os.path.exists(self.thumbfp):
+                return True
+        return False
+        
+    def create_thumb(self,force=False):
+        '''maybe not actually recreate it'''
+        if self.thumb_ok() and not force:
+            return True
+        else:
+            self._create_thumb()
+            
+    def _create_thumb(self):
+        '''really create it'''
+        if self.thumbfp:
+            if os.path.exists(self.thumbfp):
+                os.remove(self.thumbfp)
+        else:
+            self.thumbfp=self.get_thumbfp()
+            self.save()
+        cmd='convert -define "jpeg:size=500x%d" "%s" \
+        -auto-orient -thumbnail 250x%d \
+        -unsharp 0x.5 "%s"'%(settings.THUMB_HEIGHT*3, 
+                             self.fp, 
+                             settings.THUMB_HEIGHT,
+                             self.get_thumbfp())
+        res=os.system(cmd)
+        if res:
+            log.error('failure of convert command %s',cmd)
+            self.thumb_ok=False
+            self.save()
+            return False
+        if not self.thumb_ok:
+            self.thumb_ok=True
+            self.save()
+        return True
+            
+            
+    def get_thumbfp(self):
+        thumbfp=get_nonexisting_fp(settings.THUMB_PHOTO_DIR, self.filename())
+        return thumbfp
+        
+    def get_external_fp(self, thumb=False):
+        if thumb:
+            self.create_thumb(force=False)
+            return '/photo_thumb_passthrough/%d.jpg'%self.id
         return '/photo_passthrough/%d.jpg'%self.id
     
     def initialize(self):
@@ -209,7 +265,7 @@ class Photo(DayModel):
         self.photo_created=min(self.photo_modified,datetime.datetime.fromtimestamp(stat.st_ctime))
         
         self.filesize=stat.st_size
-        
+        #should create thumb.
         self.setup=True
         return True
     
@@ -315,7 +371,8 @@ class Photo(DayModel):
              ('obj modified',self.modified.strftime(DATE_DASH_REV)),
              ('incoming',icon(self.incoming)),
              ('setup',icon(self.setup)),
-             ('myphoto',icon(self.myphoto))
+             ('myphoto',icon(self.myphoto)),
+             ('thumb ok',icon(self.thumb_ok)),
              )
         res=mktable(dat,skip_false=True)
         return res
@@ -326,7 +383,7 @@ class Photo(DayModel):
              ('fp',self.fp),
              ('tags',tags),]
         if include_image:
-            dat.insert(2,('img',self.inhtml(size='small',link=True)),)
+            dat.insert(2,('img',self.inhtml(size='thumb',link=True)),)
         res=mktable(dat,skip_false=True)
         return res
     

@@ -13,7 +13,7 @@
 </div></div>
 
 {% for photo in photos %}
-    <div class="photolink">{{photo.inhtml(size='small')|safe}}</div>
+    <div class="photolink">{{photo.inhtml(size='thumb')|safe}}</div>
 {% endfor %}
 
 {% endblock %}

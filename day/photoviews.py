@@ -61,13 +61,20 @@ def incoming(request):
     return r2r('jinja2/photo/photolist.html',request,vals)
 
 @user_passes_test(staff_test)
-def photo_passthrough(request, id):
+def photo_thumb_passthrough(request,id):
+    return photo_passthrough(request, id, thumb=True)
+
+@user_passes_test(staff_test)
+def photo_passthrough(request, id, thumb=False):
     from utils import staff_test
     if not staff_test(request.user):
         return False
     from utils import is_secure_path
     photo=Photo.objects.get(id=id)
-    fp=photo.fp
+    if thumb:
+        fp=photo.thumbfp
+    else:
+        fp=photo.fp
     assert os.path.exists(fp),fp
     ext=os.path.splitext(fp)[-1]
     data=open(fp, 'rb').read()

@@ -15,7 +15,7 @@
 </div></div>
 
 {% for mid in phototag.photos.all() %}
-<div class="photolink">{{mid.photo.inhtml(size='small')|safe}}</div>
+<div class="photolink">{{mid.photo.inhtml(size='thumb')|safe}}</div>
 {% endfor %}
 
 {% endblock %}

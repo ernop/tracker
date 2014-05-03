@@ -27,15 +27,24 @@ class PhotoAdmin(OverriddenModelAdmin):
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']
-    actions=['undoable_delete','undelete','reinitialize',]
+    actions=['undoable_delete','delete_file','undelete','reinitialize','force_recreate_thumbs',]
     
     def reinitialize(self,request,queryset):
         for photo in queryset:
             photo.initialize()
     
+    
+    def delete_file(self,request,queryset):    
+        for photo in queryset:
+            photo.delete_file()
+    
     def undoable_delete(self,request,queryset):
         for photo in queryset:
             photo.undoable_delete()
+            
+    def force_recreate_thumbs(self,request,queryset):
+        for photo in queryset:
+            photo.create_thumb(force=True)
         
     def undelete(self,request,queryset):
         for photo in queryset:
@@ -93,7 +102,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         ct=obj.photos.count()
         for pho in obj.photos.all()[:20]:
             realpho=pho.photo
-            res.append(realpho.inhtml(size='small'))
+            res.append(realpho.inhtml(size='thumb'))
         pres=''.join(res)
         alllink='<a href="../photos/?photohastag__photo__id=%d">All Photos</a>'%obj.id
         res='<div class="big">%d</div>%s<br>%s'%(ct,pres,alllink)
