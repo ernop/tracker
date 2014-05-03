@@ -70,7 +70,7 @@
     <div class="purchase-zone">
         <table class="table"><tr>
         <td><input id="purchase-product" style="width:190px;"></input>
-        <td style="vertical-align:middle;"><input type=text style="width:30px;" id="purchase-cost"></input>money for
+        <td style="vertical-align:middle;"><input type=text style="width:30px;" id="purchase-cost"></input> money for
         <input type=text id=purchase-quantity style="width:28px;" value=1></input> guys<td><div class="price-chooser"></div>
         <div style="clear:both;float:left;" class="product-chooser"></div>
         <tr><td>source <td><input id="purchase-source" style="width:190px;"></input><td><div class="source-chooser">
@@ -80,18 +80,11 @@
         <tr><td>currency<td><input type=text id=purchase-currency style="width:190px;"></input>
         <tr><td>size<td><input type=text id=purchase-size  style="width:180px;"></input>
         <tr><td><div class="btn make-purchase">Save</div>
-        <tr><td style="width:250px;"><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/source/add"><i class="icon-plus"></i> source</a>
+        <td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/source/add"><i class="icon-plus"></i> source</a>
         <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/product/add"><i class="icon-plus"></i> product</a>
         <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/person/add"><i class="icon-plus"></i> person</a>
         </table>
     </div>
-</div></div>
-
-<div class="row"><div class="span8">
-<h2>Workouts</h2>
-    {% for workout in day.getworkouts() %}
-    {{workout.mysets()|safe}}<br>{% endfor %}
-    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/day/add"><i class="icon-plus"></i> new</a><br>
 </div></div>
 
 <div class="row"><div class="span8">
@@ -106,8 +99,16 @@
         <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/measurement/add"><i class="icon-plus"></i>new</a>
         </table>
     </div>
-
 </div></div>
+
+<div class="row"><div class="span8">
+<h2>Workouts</h2>
+    {% for workout in day.getworkouts() %}
+    {{workout.mysets()|safe}}<br>{% endfor %}
+    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/day/add"><i class="icon-plus"></i> new</a><br>
+</div></div>
+
+
 
 
 <div id="notemodel" class="note-row" note_id="new" style="display:none;">
