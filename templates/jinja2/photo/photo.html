@@ -11,37 +11,24 @@ next_photopath={{next_photopath|jsonify|safe}}
 
 {% endblock %}
 {% block content %}
-<div class="row">
-    <div class="span8">
+<div style="padding:5px;margin-bottom:5px;">
         <h2>Photo {{photo}}</h2>
         {% if LOCAL %}(Local){% endif %}
-    </div>
 </div>
 
-<div class="row"><div class="span8">
-    <div id="notification" class="notification-zone">&nbsp;</div>
-</div></div>
 
-<div class="row">
     <div class="photo-info">
+        <div id="notification" class="notification-zone">&nbsp;</div>
         {{photo.name_table(include_image=False)|safe}}
         {{photo.info_table()|safe}}
         {{photo.exif_table()|safe}}
         
-    </div>
-    <div class="photo-display" photoid={{photo.id}}>
-        {{photo.inhtml(link=False,size='scaled')|safe}}
-    </div>
-</div>
-
-<hr>
-<div class="row"><div class="span8">
-    <div class="tagzone">
-        <h2>Tags</h2>
-    
-        <button id="phototagselect2" value="{{photo.tagids()}}"></button>
-        <div class="new-tag-button btn" style="margin-left:50px;"><a href="/admin/day/phototag/add/"><i class="icon-plus"></i>Add</a></div>
-    </div><hr>
+        
+        <div class="tagzone" >
+            <h2>Tags</h2>
+            <button id="phototagselect2" value="{{photo.tagids()}}"></button>
+            <div class="new-tag-button btn"><a href="/admin/day/phototag/add/"><i class="icon-plus"></i>Add</a></div>
+        </div><hr>
         {% if photo.day %}
             <div class="daylink">{{photo.day.vlink()|safe}}</div>
         {% endif %}
@@ -50,8 +37,13 @@ next_photopath={{next_photopath|jsonify|safe}}
             <div class="photodaylink">{{photo.photoday.vlink()|safe}}</div>
         {% endif %}
         <br>
-</div></div>
+    </div>
+    <div class="photo-display" photoid={{photo.id}}>
+        {{photo.inhtml(link=False,size='scaled')|safe}}
+    </div>
 
+<hr>
+    
 
 
 {% endblock %}

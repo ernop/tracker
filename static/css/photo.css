@@ -1,8 +1,7 @@
 div {box-sizing:border-box;}
-.photo-display{width:calc(100% - 360px)}
+.photo-display{width:calc(100% - 390px);}
 .photolink {border:2px solid steelblue;border-radius:3px;padding:3px;display:inline-block;margin-bottom;3px;}
-
 .photo-info{float:right;}
-
 .tagzone{margin-top:140px;}
 .big{font-size:2em;}
+.photofooter{position:fixed; top:20px;right:100px;}
