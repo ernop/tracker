@@ -156,11 +156,19 @@ class Photo(DayModel):
     
     def inhtml(self,link=True,size='scaled'):
         thumb=False
+        width=None
+        height=None
         if size=='scaled':
-            if self.resolutiony>1000:
-                height=settings.PHOTO_SCALED
+            if self.resolutiony>1000 or self.resolutionx>1000:
+                if self.resolutionx>self.resolutiony:
+                    width=settings.PHOTO_SCALED
+                    height=int(1.0*settings.PHOTO_SCALED*self.resolutiony/self.resolutionx)
+                else:
+                    height=settings.PHOTO_SCALED
+                    width=int(1.0*settings.PHOTO_SCALED*self.resolutionx/self.resolutiony)
             else:
                 height=self.resolutiony
+                width=self.resolutionx
         elif size=='thumb':
             height= settings.THUMB_HEIGHT
             thumb=True
@@ -173,7 +181,10 @@ class Photo(DayModel):
         else:
             src=self.get_external_fp()
         if height:
-            img='<img src="%s" height=%d>'%(src, height)
+            if width:
+                img='<img src="%s" height=%d width=%d>'%(src, height, width)
+            else:
+                img='<img src="%s" height=%d>'%(src, height)
         else:
             img='<img src="%s">'%(self.get_external_fp())
         if link:
@@ -401,7 +412,7 @@ class Photo(DayModel):
         res=mktable(dat,skip_false=True)
         return res
     
-    def can_be_seen_by(self,user):
+    def can_be_seen_by(self,user=None):
         if self.is_private() and not can_access_private(user):
             return False
         return True

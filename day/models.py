@@ -113,19 +113,23 @@ class Day(DayModel):
             return []
         
     def has_any_history(self):
-        return self.photos.exists() or self.notes.exists()
+        return self.get_photos_for_history() or self.notes.exists()
 
     def get_history_description(self):
         '''text used on historylink on day.'''
         res=self.__unicode__()+' '+self.show_notekinds()
         return res
     
-    def get_photos_for_history(self,user):
+    def get_photos_for_history(self,user=None):
         res=[]
         photos=self.photos.exclude(incoming=True).exclude(deleted=True).exclude(tags=None)
         for ph in photos:
-            if ph.can_be_seen_by(user):
-                res.append(ph)
+            if user:
+                if ph.can_be_seen_by(user):
+                    res.append(ph)
+            else:
+                if ph.can_be_seen_by(user=None):
+                    res.append(ph)
         return res
     
     

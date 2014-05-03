@@ -205,8 +205,8 @@ def aday(request, day):
     trydate=dtday.date()
     histories=[]
     vals['histories']=histories
-    while trydate>(settings.LONG_AGO):
-        trydate=(trydate-datetime.timedelta(days=365))
+    while trydate>(settings.LONG_AGO-datetime.timedelta(days=365*20)):
+        trydate=datetime.date(year=trydate.year-1,month=trydate.month,day=trydate.day)
         exi=Day.objects.filter(date=trydate)
         if exi.exists():
             day=exi[0]

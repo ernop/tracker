@@ -76,6 +76,8 @@ def get_next_incoming(exclude):
     return False
     
 def can_access_private(user):
+    if not user:
+        return False
     if user.username=='superuser':
         return True
     return False

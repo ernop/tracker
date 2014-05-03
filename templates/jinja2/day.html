@@ -22,9 +22,9 @@
         <h2>{{day.date}} {{day.show_day()}}</h2>
         {% for historyday in histories %}
             <div class="historybox">
-            
-            {% if historyday.photos.exists() %}
-                {% for photo in historyday.get_photos_for_history(user) %}
+            {% set show_photos=historyday.get_photos_for_history(user)%}
+            {% if show_photos %}
+                {% for photo in show_photos %}
                     <div class="photolink">{{photo.inhtml(size='thumb')|safe}}</div>
                 {% endfor %}
                 <br>
