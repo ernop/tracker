@@ -257,6 +257,9 @@ class Photo(DayModel):
                     val=tags[k]
                     if v=='taken':
                         val=datetime.datetime.strptime(val,EXIF_TAKEN_FORMAT)
+                        try:
+                            val=datetime.datetime.strptime(val,EXIF_TAKEN_FORMAT)
+                        except:return False
                     setattr(self,v,val)
             if 'ApertureValue' in tags:
                 val='%0.2f'%(1.0*tags['ApertureValue'][0]/tags['ApertureValue'][1])
