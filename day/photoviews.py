@@ -75,7 +75,6 @@ def photo_passthrough(request, id, thumb=False):
         fp=photo.thumbfp
     else:
         fp=photo.fp
-    assert os.path.exists(fp),fp
     ext=os.path.splitext(fp)[-1]
     data=open(fp, 'rb').read()
     
@@ -99,6 +98,8 @@ def ajax_photo_data(request):
     todo=request.POST
     kind=request.POST['kind']
     goto_next_incoming=False
+    goto_same=False
+    import ipdb;ipdb.set_trace()
     if kind=='phototag':
         photo=Photo.objects.get(id=todo['photo_id'])
         new_tagids=[]
@@ -115,7 +116,11 @@ def ajax_photo_data(request):
                 kept_tagids.append(int(tag.tag.id))
         for tagid in new_tagids:
             if tagid not in kept_tagids:
-                pht=PhotoHasTag(tag=PhotoTag.objects.get(id=tagid), photo=photo)
+                tag=PhotoTag.objects.get(id=tagid)
+                if tag.name=='autoorient':
+                    photo.autoorient()
+                    goto_same=True
+                pht=PhotoHasTag(tag=tag, photo=photo)
                 pht.save()
         if photo.tags.filter(tag__name='delete').exists() and not photo.deleted:
             photo.undoable_delete()
@@ -150,5 +155,9 @@ def ajax_photo_data(request):
             vals['goto_next_photo']=True
             vals['next_photo_href']='/photo/incoming/'
         vals['last_photo_href']=photo.exhref()
+    if goto_same:
+        vals['message']='auto-oriented'
+        vals['goto_next_photo']=True
+        vals['next_photo_href']=photo.exhref()
     vals['message']='success'
     return r2j(vals)

@@ -336,6 +336,15 @@ class Photo(DayModel):
             return True
         return False
     
+    
+    def autoorient(self):
+        cmd='mogrify -auto-orient "%s"'%(self.fp)
+        res=os.system(cmd)
+        if res:
+            log.error('error in cmd %s',cmd)
+            return False
+        return True
+    
     def done(self):
         if self.file_exists():
             fn=self.filename()
