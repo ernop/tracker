@@ -57,7 +57,7 @@ def incoming(request):
     photos=Photo.objects.filter(incoming=True)
     vals={}
     vals['title']='incoming photos'
-    vals['photos']=photos[:10]
+    vals['photos']=photos[:20]
     return r2r('jinja2/photo/photolist.html',request,vals)
 
 @user_passes_test(staff_test)

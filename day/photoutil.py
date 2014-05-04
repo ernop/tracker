@@ -69,7 +69,7 @@ def get_next_incoming(exclude):
     #goto next incoming photo by id for quick shifting.
     #actually i should preload this...
     from day.models import Photo
-    exi=Photo.objects.exclude(id=exclude).filter(incoming=True)
+    exi=Photo.objects.exclude(id=exclude).filter(incoming=True).order_by('-day','-photo_created')
     if exi.exists():
         nextincoming=exi[0]
         return nextincoming

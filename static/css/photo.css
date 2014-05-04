@@ -4,4 +4,4 @@ div {box-sizing:border-box;}
 .photo-info{float:right;}
 .tagzone{margin-top:140px;}
 .big{font-size:2em;}
-.photofooter{position:fixed; top:20px;right:100px;}
+.photofooter{position:fixed; top:20px;right:100px;height:90px;}

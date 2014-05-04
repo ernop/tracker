@@ -23,7 +23,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     list_display='id myname myinfo myexif'.split()
     #list_filter=' product__domain currency source who_with'.split()
     list_filter='deleted camera incoming setup myphoto iso'.split()
-    list_filter.extend([PhotoHasDayFilter])
+    list_filter=[PhotoHasDayFilter,]+list_filter
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']
@@ -100,7 +100,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     def myphotos(self,obj):
         res=[]
         ct=obj.photos.count()
-        for pho in obj.photos.all()[:20]:
+        for pho in obj.photos.all()[:120]:
             realpho=pho.photo
             res.append(realpho.inhtml(size='thumb'))
         pres=''.join(res)
