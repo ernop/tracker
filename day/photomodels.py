@@ -256,7 +256,6 @@ class Photo(DayModel):
                 if k in tags:
                     val=tags[k]
                     if v=='taken':
-                        val=datetime.datetime.strptime(val,EXIF_TAKEN_FORMAT)
                         try:
                             val=datetime.datetime.strptime(val,EXIF_TAKEN_FORMAT)
                         except:return False

@@ -27,6 +27,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']
+    list_per_page=30
     actions=['undoable_delete','delete_file','undelete','reinitialize','force_recreate_thumbs',]
     
     def reinitialize(self,request,queryset):
