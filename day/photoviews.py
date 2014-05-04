@@ -99,7 +99,6 @@ def ajax_photo_data(request):
     kind=request.POST['kind']
     goto_next_incoming=False
     goto_same=False
-    import ipdb;ipdb.set_trace()
     if kind=='phototag':
         photo=Photo.objects.get(id=todo['photo_id'])
         new_tagids=[]
