@@ -28,7 +28,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     #list_editable=['note',]
     #search_fields= ['name']
     list_per_page=30
-    actions=['undoable_delete','delete_file','undelete','reinitialize','force_recreate_thumbs',]
+    actions=['undoable_delete','delete_file','undelete','reinitialize','force_recreate_thumbs','autoorient',]
     
     def reinitialize(self,request,queryset):
         for photo in queryset:
@@ -38,6 +38,10 @@ class PhotoAdmin(OverriddenModelAdmin):
     def delete_file(self,request,queryset):    
         for photo in queryset:
             photo.delete_file()
+            
+    def autoorient(self,request,queryset):    
+        for photo in queryset:
+            photo.autoorient()
     
     def undoable_delete(self,request,queryset):
         for photo in queryset:
