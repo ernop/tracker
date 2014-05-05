@@ -26,8 +26,6 @@ def photo(request,id):
     vals={}
     vals['photo']=photo
     vals['full_phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=lambda x:x.name.lower())]
-    
-    nexts=[]
     vals['next_photopaths']=get_next_photopaths(count=10,excludes=[photo.id])
     return r2r('jinja2/photo/photo.html',request,vals)
 
