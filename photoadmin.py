@@ -114,7 +114,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
             realpho=pho.photo
             res.append(realpho.inhtml(size='thumb'))
         pres=''.join(res)
-        alllink='<a href="../photos/?photohastag__photo__id=%d">All Photos</a>'%obj.id
+        alllink='<a href="../photo/?photohastag__photo__id=%d">All Photos</a>'%obj.id
         res='<div class="big">%d</div>%s<br>%s'%(ct,pres,alllink)
         return res
         

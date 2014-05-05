@@ -18,6 +18,14 @@ log=logging.getLogger(__name__)
 
 from photoutil import *
 
+full_phototags=None
+
+def get_full_phototags():
+    global full_phototags
+    if not full_phototags:
+        full_phototags=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
+    return full_phototags
+
 @user_passes_test(staff_test)
 def photo(request,id):
     photo=Photo.objects.get(id=id)
@@ -25,7 +33,7 @@ def photo(request,id):
         return HttpResponseRedirect('/photo/incoming/')
     vals={}
     vals['photo']=photo
-    vals['full_phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
+    vals['full_phototags']=get_full_phototags()
     vals['next_photopaths']=get_next_photopaths(count=10,excludes=[photo.id])
     return r2r('jinja2/photo/photo.html',request,vals)
 
@@ -70,8 +78,8 @@ def photo_passthrough(request, id, thumb=False):
     from utils import staff_test
     if not staff_test(request.user):
         return False
-    from utils import is_secure_path
     photo=Photo.objects.get(id=id)
+    from utils import is_secure_path
     if thumb:
         fp=photo.thumbfp
     else:

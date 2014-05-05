@@ -1,5 +1,6 @@
 import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime, json, calendar
 import shutil, random
+from django.conf import settings
 
 log=logging.getLogger(__name__)
 
@@ -100,6 +101,8 @@ def get_next_incoming(exclude):
             return exi
 
 def get_next_photopaths(count,excludes=None):
+    if settings.LOCAL:
+        return None
     if not excludes:excludes=[]
     excludes=excludes[:]
     photopaths=[]

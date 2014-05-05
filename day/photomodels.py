@@ -65,6 +65,9 @@ class PhotoTag(DayModel):
                 text='no name phototag'
         return '<a href="/photo/phototag/%s/">%s</a>'%(self.name, text)
 
+
+        #
+
 class PhotoSpot(DayModel):
     '''a specific spot & angle to take photos from'''
     created=models.DateTimeField(auto_now_add=True)
@@ -218,6 +221,8 @@ class Photo(DayModel):
             
     def _create_thumb(self):
         '''really create it'''
+        newthumbfp=self.get_thumbfp()
+        self.thumbfp=newthumbfp
         if self.thumbfp:
             if os.path.exists(self.thumbfp):
                 os.remove(self.thumbfp)
@@ -229,7 +234,7 @@ class Photo(DayModel):
         -unsharp 0x.5 "%s"'%(settings.THUMB_HEIGHT*3, 
                              self.fp, 
                              settings.THUMB_HEIGHT,
-                             self.get_thumbfp())
+                             newthumbfp)
         res=os.system(cmd)
         if res:
             log.error('failure of convert command %s',cmd)
@@ -247,9 +252,13 @@ class Photo(DayModel):
         return thumbfp
         
     def get_external_fp(self, thumb=False):
+        
         if thumb:
             self.create_thumb(force=False)
+            return self.get_photo_external_link(thumb=True)
             return '/photo_thumb_passthrough/%d.jpg'%self.id
+        if 1 or not settings.LOCAL:
+            return self.get_photo_external_link()
         return '/photo_passthrough/%d.jpg'%self.id
     
     def initialize(self):
@@ -442,7 +451,12 @@ class Photo(DayModel):
         return True
     
     def is_private(self):
-        
         return self.tags.filter(tag__name__in=settings.EXCLUDED_TAGS).exists()
     
-    
+    def get_photo_external_link(self,thumb=False):
+        '''will be loaded from django.fuseki.net/static/photopassthrough/<FP>'''
+        if thumb:
+            exfp='/static/'+'/'.join(self.thumbfp.rsplit('/')[-2:])
+        else:
+            exfp='/static/'+'/'.join(self.fp.rsplit('/')[-2:])
+        return exfp
