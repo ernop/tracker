@@ -39,7 +39,16 @@ def check_incoming():
         ph.save()
 
 def phototag2obj(phototag):
-    return {'id':phototag.id,'name':phototag.name,'text':phototag.name,}
+    name=phototag.name
+    from choices import *
+    if phototag.person:
+        if phototag.person.gender==ORGANIZATION:
+            name+=' (organization)'
+        else:
+            name+=' (person)'
+    return {'id':phototag.id,
+            'name':name,
+            'text':name,}
 
 def get_exif(im):
     ret = {}

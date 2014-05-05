@@ -261,10 +261,10 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id myinfo disabled birthday created mymet_through myintroduced_to mywith mysources mydomains mypurchases'.split()
+    list_display='id myinfo myintroduced_to mywith mysources mydomains mypurchases'.split()
     list_filter=[GenderFilter, AnyPurchaseFilter,KnownSinceLongAgo, 'met_through']
     date_hierarchy = 'created'
-    list_editable=['birthday',  'disabled']
+    #list_editable=[]
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
     actions = ['disable','male','female','organization', 'set_longago', 'set_today', 'update_rough_purchase_counts', ]
@@ -300,22 +300,35 @@ class PersonAdmin(OverriddenModelAdmin):
             pp.gender=2
             pp.save()
 
+    @debu
     def myinfo(self,obj):
         if obj.created == settings.LONG_AGO:
-            known_for = 'long ago'
+            known_since= 'long ago'
         else:
-            known_for = humanize_date(obj.created)
-        return '%s %s %s<br>known since %s'%(obj.first_name, obj.last_name, obj.get_gender(), known_for)
+            known_since= humanize_date(obj.created)
+        met_through=', '.join([p.clink() for p in obj.met_through.all()])
+        if obj.disabled:disabled='%sdisabled'%NO_ICON
+        else:disabled=''
+        
+        data=[('name'),'%s %s'%(obj.first_name,obj.last_name),
+              ('gender',obj.get_gender()),
+            ('known since',known_since),
+              ('met through',met_through),
+              ('disabled',disabled),
+              ('birthday','<div class="nb">%s</div>'%obj.birthday),
+              ]
+        if obj.as_tag.exists():
+            photos='<br>'+''.join([p.photo.inhtml(size='small') for p in obj.as_tag.get().photos.all()])
+        else:
+            photos=''
+        tbl=mktable(data,skip_false=True)
+        return tbl+photos
 
     def disable(self, request, queryset):
         for pp in queryset:
             pp.disabled = True
             pp.save()
             messages.info(request, 'disabled %s'%pp)
-
-    def mymet_through(self, obj):
-        return ', '.join([p.clink() for p in obj.met_through.all()])
-        #return '%s'%''.join([str(per) for per in obj.met_through.all()])
 
     def myintroduced_to(self, obj):
         return mktable([(p.clink(), ) for p in obj.introduced_to.order_by('first_name', 'last_name')])
@@ -373,18 +386,16 @@ class PersonAdmin(OverriddenModelAdmin):
         #count, costs
         counts, costs = res['counts'], res['costs']
         html = '<table class="table thintable">'
-        rows = []
+        data = []
         for domain_id in counts.keys():
-            row = '<tr><td>%s<td><a href="../purchase/?product__domain__id=%d&who_with=%d">%s times</a><td>cost: %s' % (Domain.objects.get(id=domain_id).name, domain_id, obj.id, counts[domain_id], costs[domain_id])
-            rows.append([counts[domain_id], row])
-        rows.sort(key=lambda x:-1*x[0])
-        rows = [r[1] for r in rows]
-        html += '\n'.join(rows)
-        html += '</table>'
-        return html
+            row = (Domain.objects.get(id=domain_id).name,'<a class="nb" href="../purchase/?product__domain__id=%d&who_with=%d">%s times</a>'% (domain_id, obj.id, counts[domain_id],),
+                   '%s' % costs[domain_id])
+            data.append([counts[domain_id], row])
+        data.sort(key=lambda x:-1*x[0])
+        data = [r[1] for r in data]
+        return mktable(data)
 
-
-    adminify(mymet_through, myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith)
+    adminify(myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith)
 
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name rmb_value symbol mytotal my3months'.split()

@@ -25,7 +25,7 @@ def photo(request,id):
         return HttpResponseRedirect('/photo/incoming/')
     vals={}
     vals['photo']=photo
-    vals['full_phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=lambda x:x.name.lower())]
+    vals['full_phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
     vals['next_photopaths']=get_next_photopaths(count=10,excludes=[photo.id])
     return r2r('jinja2/photo/photo.html',request,vals)
 
@@ -38,12 +38,17 @@ def phototag(request,name):
     vals['phototag']=phototag
     return r2r('jinja2/photo/phototag.html',request,vals)
 
+def phototagsort(x):
+    key=(x.person is not None, x.person and -1*x.person.rough_purchase_count or 0,x.name)
+    print key
+    return key
+
 @user_passes_test(staff_test)
 def photospot(request,slug):
     photo=PhotoSpot.objects.get(slug=slug)
     vals={}
     vals['photospot']=photospot
-    vals['phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=lambda x:x.name.lower())]
+    vals['phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),cmp=phototagsort)]
     return r2r('jinja2/photo/photospot.html',request,vals)
 
 @user_passes_test(staff_test)

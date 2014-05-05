@@ -6,7 +6,8 @@
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
 <div class="row">
     <div class="span8">
-        <h2>Tag {{phototag}}</h2>
+        <h1>Tag {{phototag}}</h1>
+        {% if phototag.person %}<br><h2>{{phototag.person.clink()|safe}}</h2>{% endif %}
     </div>
 </div>
 

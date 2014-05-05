@@ -38,3 +38,8 @@ EXIF_TAKEN_FORMAT='%Y:%m:%d %H:%M:%S'
 
 YES_ICON='<img src="/static/admin/img/icon-yes.gif">'
 NO_ICON='<img src="/static/admin/img/icon-no.gif">'
+
+#GENDERS for Person objects
+MALE=1
+FEMALE=2
+ORGANIZATION=3

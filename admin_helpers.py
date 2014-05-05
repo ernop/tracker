@@ -48,6 +48,21 @@ class PhotoDoneFilter(SimpleListFilter):
         elif self.value()=='no':
             return queryset.exclude(tags__tag__name='done')
 
+class TagHasPersonFilter(SimpleListFilter):
+    title = 'has person'
+    parameter_name = 'has_person'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            return queryset.exclude(person=None)
+        elif self.value()=='no':
+            return queryset.filter(person=None)
+
 class PhotoHasDayFilter(SimpleListFilter):
     title = 'has taken day'
     parameter_name = 'has_taken_day'

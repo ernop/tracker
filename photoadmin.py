@@ -88,6 +88,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']
+    list_filter=['control_tag', TagHasPersonFilter]
     list_display='id myname myphotos'.split()
     actions=['reinitialize_tags',]
     
@@ -114,8 +115,12 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         res='<div class="big">%d</div>%s<br>%s'%(ct,pres,alllink)
         return res
         
+    @debu
     def myname(self,obj):
-        return obj.vlink()
+        data=(('vlink',obj.vlink()),
+              ('person clink',obj.person and '%s'%(obj.person.clink()) or ''),
+              )
+        return mktable(data)
         
     adminify(myname, myphotos)
 

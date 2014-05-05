@@ -142,18 +142,3 @@ def mktable(dat, rights=None, bigs=None, skip_false=False):
             res += '<td class="%s">%s</td>' % (' '.join(klasses), thing)
         rows.append(res+'</tr>')
     return '<table class="table thintable" style="background-color:white;">%s</table>' % ''.join(rows)
-
-def mktbl(dat,skip_false=False):
-    res='<table class="table thintable">'
-    for dd in dat:
-        if not dd:
-            continue
-        if type(dd) not in [list,set,tuple]:
-            dd=[dd]
-        if not dd[-1]:
-            continue
-        res+='<tr><td>'
-        res+='<td>'.join(dd)
-    res+='</table>'
-    return res
-

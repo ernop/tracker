@@ -23,6 +23,10 @@ class PhotoTag(DayModel):
     modified=models.DateTimeField(auto_now=True)
     name=models.CharField(max_length=100)
     description=models.CharField(max_length=100,blank=True,null=True) #to describe "control" tags
+    person=models.ForeignKey('Person', blank=True,null=True,related_name='as_tag')
+    
+    #admin
+    control_tag=models.BooleanField(default=False) #ajax/js will take more actions
     
     @classmethod
     def setup_initial_tags(self):
@@ -34,8 +38,7 @@ class PhotoTag(DayModel):
             pt=PhotoTag(name=tn)
             pt.save()
     
-    #admin
-    control_tag=models.BooleanField(default=False) #ajax/js will take more actions
+    
     #when this tag is added.  f.e. delete / undelete
     def get_external_page(self):
         return '/photo/phototag/%s/'%self.name
