@@ -280,6 +280,7 @@ class Photo(DayModel):
         self.filesize=stat.st_size
         #should create thumb.
         self.setup=True
+        self.save()
         return True
     
     def get_exif(self,im=None):
