@@ -22,22 +22,20 @@ from photoutil import *
 def photo(request,id):
     photo=Photo.objects.get(id=id)
     if not can_access_private(request.user) and photo.tags.filter(tag__name__in=settings.EXCLUDED_TAGS).exists():
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect('/photo/incoming/')
     vals={}
     vals['photo']=photo
     vals['full_phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=lambda x:x.name.lower())]
-    next_incoming=get_next_incoming(exclude=photo.id)
-    if next_incoming:
-        vals['next_photopath']=next_incoming.get_external_fp()
-    else:
-        vals['next_photopath']=False
+    
+    nexts=[]
+    vals['next_photopaths']=get_next_photopaths(count=10,excludes=[photo.id])
     return r2r('jinja2/photo/photo.html',request,vals)
 
 @user_passes_test(staff_test)
 def phototag(request,name):
     phototag=PhotoTag.objects.get(name=name)
     if not can_access_private(request.user) and phototag.name in settings.EXCLUDED_TAGS:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect('/photo/incoming/')
     vals={}
     vals['phototag']=phototag
     return r2r('jinja2/photo/phototag.html',request,vals)

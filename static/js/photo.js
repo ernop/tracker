@@ -19,9 +19,13 @@ $(document).ready(function(){
             select2.open();
         }
     }, 0); 
-    if (next_photopath){
-        var nxt=new Image();
-        nxt.src=next_photopath;
+    if (next_photopaths){
+        $.each(next_photopaths, function(index,photopath){
+            var nxt=new Image();
+            nxt.src=photopath;
+            console.log('starting to load',photopath)
+        })
+        
     }
 })
     

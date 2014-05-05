@@ -386,9 +386,9 @@ class Photo(DayModel):
             daylink=None
         dat=(('deleted',dd),
              ('day',daylink),
-             ('taken',self.taken and self.taken.strftime(DATE_DASH_REV) or ''),
-             ('photo created',self.photo_created.strftime(DATE_DASH_REV)),
-             ('photo modified',self.photo_modified.strftime(DATE_DASH_REV)),
+             ('taken',self.taken and self.taken.strftime(DATE_DASH_REV_DAY) or ''),
+             ('photo created',self.photo_created.strftime(DATE_DASH_REV_DAY)),
+             ('photo modified',self.photo_modified.strftime(DATE_DASH_REV_DAY)),
              ('obj created',self.created.strftime(DATE_DASH_REV)),
              ('obj modified',self.modified.strftime(DATE_DASH_REV)),
              ('incoming',icon(self.incoming)),

@@ -15,6 +15,7 @@ SLASH_REV='%Y/%m/%d'
 DATE_DASH='%m-%d-%Y'  #10-21-2012
 DATE_DASH_HOUR='%m-%d-%Y %H:%M'  #10-21-2012
 DATE_DASH_REV = '%Y-%m-%d'  #2012-10-21
+DATE_DASH_REV_DAY = '%Y-%m-%d, %a'  #2012-10-21, Thu
 DATE_DASH_DOW='%m-%d-%Y %a'  #10-21-2012 Thursday
 DATE_DASH_FULL='%m-%d-%Y %A %H:%M'  #10-21-2012 Thursday 4:00
 DAY_SECTION = '%A %H:%M'

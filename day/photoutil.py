@@ -1,5 +1,5 @@
 import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime, json, calendar
-import shutil
+import shutil, random
 
 log=logging.getLogger(__name__)
 
@@ -71,11 +71,33 @@ def get_next_incoming(exclude):
     #goto next incoming photo by id for quick shifting.
     #actually i should preload this...
     from day.models import Photo
-    exi=Photo.objects.exclude(id=exclude).filter(incoming=True).order_by('-day','-photo_created')
-    if exi.exists():
-        nextincoming=exi[0]
-        return nextincoming
-    return False
+    if type(exclude) is not list:
+        exclude=[exclude]
+    exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).order_by('id')
+    ii=0
+    found=False
+    while 1:
+        if len(exis)>ii:
+            exi=exis[ii]
+        else:
+            return False #out the end
+        ii+=1
+        if exi.file_exists():
+            return exi
+
+def get_next_photopaths(count,excludes=None):
+    if not excludes:excludes=[]
+    excludes=excludes[:]
+    photopaths=[]
+    for n in range(count):
+        next_incoming=get_next_incoming(exclude=excludes)
+        if next_incoming:
+            if next_incoming.file_exists():
+                photopaths.append(next_incoming.get_external_fp())
+                excludes.append(next_incoming.id)
+        else:
+            break
+    return photopaths
     
 def can_access_private(user):
     if not user:
