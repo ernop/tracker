@@ -13,6 +13,20 @@ from django.contrib.admin.util import lookup_needs_distinct
 from django.db.models import Q, Count
 
 
+class PhotoDoneFilter(SimpleListFilter):
+    title = 'photo done'
+    parameter_name = 'photo_done'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            return queryset.filter(tags__tag__name='done')
+        elif self.value()=='no':
+            return queryset.exclude(tags__tag__name='done')
+
 class PhotoHasDayFilter(SimpleListFilter):
     title = 'has taken day'
     parameter_name = 'has_taken_day'

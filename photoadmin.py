@@ -22,8 +22,8 @@ class PhotoAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
     list_display='id myname myinfo myexif'.split()
     #list_filter=' product__domain currency source who_with'.split()
-    list_filter='deleted camera incoming setup myphoto iso'.split()
-    list_filter=[PhotoHasDayFilter,]+list_filter
+    list_filter='thumb_ok deleted camera incoming setup myphoto iso'.split()
+    list_filter=[PhotoHasDayFilter, PhotoDoneFilter,]+list_filter
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']

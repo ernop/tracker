@@ -191,7 +191,7 @@ class Photo(DayModel):
             return self.vlink(text=img)
         return img
         
-    def thumb_ok(self):
+    def is_thumb_ok(self):
         if self.thumbfp:
             if os.path.exists(self.thumbfp):
                 return True
@@ -199,7 +199,7 @@ class Photo(DayModel):
         
     def create_thumb(self,force=False):
         '''maybe not actually recreate it'''
-        if self.thumb_ok() and not force:
+        if self.is_thumb_ok() and not force:
             return True
         else:
             self._create_thumb()
