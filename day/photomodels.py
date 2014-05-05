@@ -29,6 +29,15 @@ class PhotoTag(DayModel):
     control_tag=models.BooleanField(default=False) #ajax/js will take more actions
     
     @classmethod
+    def setup_people_tags(self):
+        from day.models import Person
+        for person in Person.objects.all():
+            if PhotoTag.objects.filter(person=person).exists():
+                continue
+            tg=PhotoTag(name=unicode(person), person=person)
+            tg.save()
+    
+    @classmethod
     def setup_initial_tags(self):
         tagnames=settings.DEFAULT_TAG_NAMES
         for tn in tagnames:

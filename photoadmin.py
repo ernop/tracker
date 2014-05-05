@@ -87,10 +87,10 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     #list_filter=' product__domain currency source who_with'.split()
     #date_hierarchy='created'
     #list_editable=['note',]
-    #search_fields= ['name']
+    search_fields= ['name']
     list_filter=['control_tag', TagHasPersonFilter]
     list_display='id myname myphotos'.split()
-    actions=['reinitialize_tags',]
+    actions=['reinitialize_tags','create_people_tags',]
     
     def queryset(self, request):
         queryset = super(PhotoTagAdmin, self).queryset(request)
@@ -103,6 +103,9 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     
     def reinitialize_tags(self,request,queryset):
         PhotoTag.setup_initial_tags()
+        
+    def create_people_tags(self,request,queryset):
+        PhotoTag.setup_people_tags()
         
     def myphotos(self,obj):
         res=[]
