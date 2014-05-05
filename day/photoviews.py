@@ -34,7 +34,7 @@ def photo(request,id):
     vals={}
     vals['photo']=photo
     vals['full_phototags']=get_full_phototags()
-    vals['next_photopaths']=get_next_photopaths(count=10,excludes=[photo.id])
+    vals['next_photopaths']=get_next_photopaths(count=1,excludes=[photo.id])
     return r2r('jinja2/photo/photo.html',request,vals)
 
 @user_passes_test(staff_test)
