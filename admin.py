@@ -482,16 +482,13 @@ class SourceAdmin(OverriddenModelAdmin):
         res = obj.domain_summary_data()
         #count, costs
         counts, costs = res['counts'], res['costs']
-        html = '<table class="table thintable">'
         rows = []
         for domain_id in counts.keys():
-            row = '<tr><td>%s<td>%s times<td>cost: %s' % (Domain.objects.get(id=domain_id).name, counts[domain_id], costs[domain_id])
+            row = Domain.objects.get(id=domain_id).name, '%s times'%counts[domain_id], 'cost %s'%costs[domain_id]
             rows.append([counts[domain_id], row])
         rows.sort(key=lambda x:-1*x[0])
         rows = [r[1] for r in rows]
-        html += '\n'.join(rows)
-        html += '</table>'
-        return html
+        return mktable(rows)
 
     def mysummary(self, obj):
         return obj.summary()
