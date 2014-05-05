@@ -39,6 +39,7 @@ def photo(request,id):
 
 @user_passes_test(staff_test)
 def phototag(request,name):
+    name=name.replace('%20',' ')
     phototag=PhotoTag.objects.get(name=name)
     if not can_access_private(request.user) and phototag.name in settings.EXCLUDED_TAGS:
         return HttpResponseRedirect('/photo/incoming/')
