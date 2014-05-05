@@ -17,6 +17,8 @@ def get_fps_from_incoming():
         if not os.access(fp,6):
             continue
         fplower=fp.lower()
+        if fplower.endswith('.jpeg'):
+            fplower=fplower.rsplit('.jpeg',1)[-2]+'.jpg'
         if fplower!=fp:
             shutil.move(fp, fplower)
         fps.append(fplower)

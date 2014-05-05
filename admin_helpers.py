@@ -12,6 +12,26 @@ from django.contrib.admin.views.main import SuspiciousOperation, ImproperlyConfi
 from django.contrib.admin.util import lookup_needs_distinct
 from django.db.models import Q, Count
 
+class PhotoExtensionFilter(SimpleListFilter):
+    title='extension'
+    parameter_name='extension'
+    def lookups(self, request, model_admin):
+        return (
+            ('jpg', 'jpg'),
+            ('gif', 'gif'),
+            ('png', 'png'),
+            ('webp', 'webp'),
+        )
+    
+    def queryset(self, request, queryset):
+        if self.value()=='jpg':
+            return queryset.filter(fp__endswith='.jpg')
+        elif self.value()=='gif':
+            return queryset.filter(fp__endswith='.gif')
+        elif self.value()=='png':
+            return queryset.filter(fp__endswith='.png')
+        elif self.value()=='webp':
+            return queryset.filter(fp__endswith='.webp')
 
 class PhotoDoneFilter(SimpleListFilter):
     title = 'photo done'
@@ -21,6 +41,7 @@ class PhotoDoneFilter(SimpleListFilter):
             ('yes', 'yes'),
             ('no', 'no'),
         )
+    
     def queryset(self, request, queryset):
         if self.value()=='yes':
             return queryset.filter(tags__tag__name='done')

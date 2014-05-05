@@ -82,7 +82,10 @@ def photo_passthrough(request, id, thumb=False):
         response=HttpResponse(data, mimetype="Image/jpeg")
     elif ext=='.png':
         response=HttpResponse(data, mimetype="Image/png")
-    
+    elif ext=='.gif':
+        response=HttpResponse(data, mimetype="Image/gif")
+    elif ext=='.webp':
+        response=HttpResponse(data, mimetype="Image/webp")
     else:
         log.error('wronge filetype. %s',ext)
         import ipdb;ipdb.set_trace()
