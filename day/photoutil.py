@@ -21,6 +21,11 @@ def get_fps_from_incoming():
             fplower=fplower.rsplit('.jpeg',1)[-2]+'.jpg'
         if fplower!=fp:
             shutil.move(fp, fplower)
+        cmd='mogrify -auto-orient "%s"'%fplower
+        res=os.system(cmd)
+        if res:
+            log.error("fail cmd %s for fp %s"%(cmd,fp))
+            continue
         fps.append(fplower)
     return fps
         
