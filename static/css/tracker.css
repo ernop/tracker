@@ -9,7 +9,7 @@ body {font-family:calibri;}
     width:610px;
     height:110px;
 }
-.photo{margin-top:50px;padding:4px;background:#DDD;}
+.photo{margin-top:10px;padding:4px;background:#DDD;display:inline-block;}
 .select2-container{width:300px;}
 
 .fixed-notification{
