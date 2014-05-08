@@ -2,9 +2,9 @@ div {box-sizing:border-box;}
 .photo-display{}
 .photolink {border:2px solid steelblue;border-radius:3px;padding:3px;display:inline-block;margin-bottom;3px;}
 .photo-info{float:right;}
-.tagzone{margin-top:140px;}
 .big{font-size:2em;}
 .photofooter{position:fixed; top:20px;right:100px;height:90px;}
 
 .infozone{width:300px;float:right;display:inline-block;}
-.tagzone{clear:both;float:left;}
+.tagzone{clear:both;float:right;margin-top:40px;}
+.photozone{text-align:center;}

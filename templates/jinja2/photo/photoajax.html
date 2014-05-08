@@ -25,7 +25,7 @@ function load(donefunc){
         var fakephoto={tagids:[ii*3,ii*4+1],id:ii,fp:'/static/incomingphoto/'+ii+'.jpg',infozone:'<table class="table thintable"><tr><td>stuff</table>'}
         //receive fp, infobox.  add on a photo image.
         var im=new Image()
-        im.height=500
+        im.height=800
         im.src=fakephoto.fp;
         fakephoto.image=im
         loaded_photos.push(fakephoto)
@@ -64,7 +64,7 @@ function load(donefunc){
                         console.log("got new",nextphoto.fp)
                         loaded_photos.push(nextphoto)
                         var im=new Image()
-                        im.height=500
+                        im.height=800
                         im.src=nextphoto.fp;
                         nextphoto.image=im
                         if (donefunc){donefunc.call(json)}
@@ -260,18 +260,27 @@ function make_photozone(photo){
         {% if LOCAL %}(Local){% endif %}
 </div>
 
-    <div id="notification" class="notification-zone">Notification zone</div>
+    
     <div class="infozone">
+    </div>
+    <div id="notification" style="clear:right;float:right;" class="notification-zone">Notification zone</div>
+    <div class="tagzone" >
+    <h2>Tags</h2>
+        <button id="phototagselect2" value=""></button>
+        
+        
+        <br><br>
+        
+        <div class="new-tag-button btn">
+        
+        <a href="/admin/day/phototag/add/"><i class="icon-plus"></i>Add</a></div>
+            <p><div class="btn prev-btn">prev</div>
+<div class="btn next-btn">next</div></p>
     </div>
     <div class="photozone">
         Photo Goes Here
     </div>
-    <div class="tagzone" >
-    <h2>Tags</h2>
-        <button id="phototagselect2" value=""></button><div class="new-tag-button btn"><a href="/admin/day/phototag/add/"><i class="icon-plus"></i>Add</a></div>
-            <p><div class="btn prev-btn">prev</div>
-<div class="btn next-btn">next</div></p>
-    </div>
+    
     
 {% endblock %}
 
