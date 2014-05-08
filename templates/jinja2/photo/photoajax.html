@@ -48,7 +48,7 @@ function load(donefunc){
             data:dat,
             //processData:false,
             success:function(json){
-                notify(json['message'],json['success'])
+                
                 if (json['success']){
                     notify('loaded',true)
                     var nextphoto=json.nextphoto
@@ -62,6 +62,7 @@ function load(donefunc){
                     })
                     if (!exi){//we actually got a new one...
                         console.log("got new",nextphoto.fp)
+                        notify(json['message'],json['success'])
                         loaded_photos.push(nextphoto)
                         var im=new Image()
                         im.height=800
@@ -69,7 +70,7 @@ function load(donefunc){
                         nextphoto.image=im
                         if (donefunc){donefunc.call(json)}
                     }
-                    load();
+                    setTimeout(load(),2000);
                 }
             },
             error:function(json){
@@ -85,7 +86,7 @@ function maybe_show(){
     if (!showing){
         show_next()
     }
-    load()
+    setTimeout(load(),2000);
     console.log('maybe show end')
 }
 
@@ -118,7 +119,7 @@ function show_next(going_backwards){
         notify('no photo was ready',false)
     }
     console.log('show next end')
-    load();
+    setTimeout(load(),2000);
 }
 
 $(document).ready(function(){
