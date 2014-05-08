@@ -13,11 +13,6 @@ photoInitSelectionPhoto = function(element, callback) {
     
 function setup_phototagselect_photo(){
     var ptg=$('#phototagselect2');
-    //$.each(full_phototags, function(index,pt){
-        //var phototagselect=$('#phototagselect2');
-        //var option=$('<option value="'+index+'">'+pt+'</option>');
-        //ptg.append(option);
-    //});
     ptg.select2({data:full_phototags,
         multiple:true,
         initSelection: photoInitSelectionPhoto ,})

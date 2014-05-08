@@ -82,11 +82,13 @@ def get_nonexisting_fp(basedir,basefn):
             import ipdb;ipdb.set_trace()
     return testfp
 
-def get_next_incoming(exclude):
+def get_next_incoming(exclude=None):
     #goto next incoming photo by id for quick shifting.
     #actually i should preload this...
     from day.models import Photo
-    if type(exclude) is not list:
+    if not exclude:
+        exclude=[]
+    elif type(exclude) is not list:
         exclude=[exclude]
     exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).order_by('id')
     ii=0

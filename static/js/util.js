@@ -26,8 +26,10 @@ function notify(msg, success){
 	}
 	var note=$('<div class="alert alert-'+klass+'">'+msg+'</div>');
 	var nzone=$(".fixed-notification");
+	
+	if (!nzone.length){var nzone=$('.notification-zone')}
 	if (nzone.length){
-		nzone.find('.alert').slideUp();
+		nzone.find('.alert').slideUp(function(){this.remove()});
 		nzone.append(note);
 	}
 }

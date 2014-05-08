@@ -131,7 +131,36 @@ def ajax_photo_data(request):
         kind=request.POST['kind']
         goto_next_incoming=False
         goto_same=False
-        if kind=='phototag':
+        if kind=='ajax photo preload':
+            try:
+                if 'exclude_ids[]' in request.POST and request.POST['exclude_ids[]']:
+                    #exclude_ids=[int(_) for _ in request.POST['exclude_ids[]'].split(',')]
+                    exclude_ids=request.POST.getlist('exclude_ids[]')
+                else:
+                    exclude_ids=None
+            except Exception,e:
+                import ipdb;ipdb.set_trace()
+            nextphoto=get_next_incoming(exclude=exclude_ids)
+            log.info("exclusions: %s %s",str(exclude_ids),request.POST)
+            if not nextphoto:
+                import ipdb;ipdb.set_trace()
+                vals['success']=False
+                vals['message']='could not get next incoming'
+                log.error('failed to get next.')
+            else:
+                infozone=nextphoto.name_table(include_image=False)+nextphoto.info_table()+nextphoto.exif_table()
+                nextphoto_js={'tagids':[t.tag.id for t in nextphoto.tags.all()],
+                              'id':nextphoto.id,
+                              'fp':nextphoto.get_external_fp(),
+                              'infozone':infozone,
+                              'dayvlink':nextphoto.day and nextphoto.day.vlink() or ''
+                              }
+                
+                vals['nextphoto']=nextphoto_js
+                vals['success']=True
+                vals['message']='preloaded fp %s'%nextphoto_js['fp']
+                log.info('returning photo %s',nextphoto_js)
+        elif kind=='phototag':
             photo=Photo.objects.get(id=todo['photo_id'])
             new_tagids=[]
             for tagid in todo['phototag_ids'].split(','):
