@@ -16,3 +16,18 @@ function fix_phototags(){
         }
     });
 }
+
+
+function notify(msg, success){
+	if (success){
+		var klass='success'}
+	else{
+		var klass='failure';
+	}
+	var note=$('<div class="alert alert-'+klass+'">'+msg+'</div>');
+	var nzone=$(".fixed-notification");
+	if (nzone.length){
+		nzone.find('.alert').slideUp();
+		nzone.append(note);
+	}
+}

@@ -180,20 +180,6 @@ function get_purchase_data(){
 	return dat;
 }
 
-function notify(msg, success){
-	if (success){
-		var klass='success'}
-	else{
-		var klass='failure';
-	}
-	var note=$('<div class="alert alert-'+klass+'">'+msg+'</div>');
-	var nzone=$(".fixed-notification");
-	if (nzone.length){
-		nzone.find('.alert').slideUp();
-		nzone.append(note);
-	}
-}
-
 function get_measurement_data(){
 	var dat={};
 	dat['place_id']=$("#measurement-place").select2('data').id;

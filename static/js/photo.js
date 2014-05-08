@@ -1,4 +1,4 @@
-photoInitSelection = function(element, callback) {
+photoInitSelectionPhoto = function(element, callback) {
     var data = [];
     var ids = element.val().split(",");
     $(ids).each(function() {
@@ -7,38 +7,20 @@ photoInitSelection = function(element, callback) {
             if (id.localeCompare(""+this.id)==0) data.push(this);
         });
     });
+    console.log('setting initial data',data)
     callback(data);
 }
-
-
-$(document).ready(function(){
-    setup_phototagselect();
-    var select2=$('#phototagselect2').data('select2');
-    setTimeout(function() {
-        if (!select2.opened()) {
-            select2.open();
-        }
-    }, 0); 
-    if (next_photopaths){
-        $.each(next_photopaths, function(index,photopath){
-            var nxt=new Image();
-            nxt.src=photopath;
-            console.log('starting to load',photopath)
-        })
-        
-    }
-})
     
-function setup_phototagselect(){
+function setup_phototagselect_photo(){
     var ptg=$('#phototagselect2');
-    $.each(full_phototags, function(index,pt){
-        var phototagselect=$('#phototagselect2');
-        var option=$('<option value="'+index+'">'+pt+'</option>');
-        ptg.append(option);
-    });
+    //$.each(full_phototags, function(index,pt){
+        //var phototagselect=$('#phototagselect2');
+        //var option=$('<option value="'+index+'">'+pt+'</option>');
+        //ptg.append(option);
+    //});
     ptg.select2({data:full_phototags,
         multiple:true,
-        initSelection: photoInitSelection ,})
+        initSelection: photoInitSelectionPhoto ,})
     fix_phototags()
     ptg.unbind('change').on('change', change_phototag)
 }

@@ -27,6 +27,24 @@ def get_full_phototags():
     return full_phototags
 
 @user_passes_test(staff_test)
+def photoajax(request):
+    '''load & then preload a bunch of photos.  basically, ajax-enabled fast flickr
+    
+    format: load js only.
+    js:
+    1. load_show()
+    load show: load(show())
+               
+               load()
+    load:      send current list to server, to get another and preload it
+    '''
+    vals={}
+    vals['full_phototags']=get_full_phototags()
+    vals['TAGIDS_WHICH_FORCE_NEXT']=[tt.id for tt in PhotoTag.objects.filter(name__in=settings.CLOSING_TAGS)]
+    #get the tags
+    return r2r('jinja2/photo/photoajax.html',request,vals)
+
+@user_passes_test(staff_test)
 def photo(request,id):
     photo=Photo.objects.get(id=id)
     if not can_access_private(request.user) and photo.tags.filter(tag__name__in=settings.EXCLUDED_TAGS).exists():
@@ -104,72 +122,77 @@ def photo_passthrough(request, id, thumb=False):
 
 @user_passes_test(staff_test)
 def ajax_photo_data(request):
-    log.info(request.POST)
     vals={}
-    vals['success']=True
-    vals['message']='start.'
-    todo=request.POST
-    kind=request.POST['kind']
-    goto_next_incoming=False
-    goto_same=False
-    if kind=='phototag':
-        photo=Photo.objects.get(id=todo['photo_id'])
-        new_tagids=[]
-        for tagid in todo['phototag_ids'].split(','):
-            if tagid:
-                new_tagids.append(int(tagid))
-        kept_tagids=[]
-        for tag in photo.tags.all():
-            if int(tag.tag.id) not in new_tagids:
-                if tag.tag.name=='delete':
-                    photo.undelete()
-                tag.delete()
-            else:
-                kept_tagids.append(int(tag.tag.id))
-        for tagid in new_tagids:
-            if tagid not in kept_tagids:
-                tag=PhotoTag.objects.get(id=tagid)
-                if tag.name=='autoorient':
-                    photo.autoorient()
-                    goto_same=True
-                pht=PhotoHasTag(tag=tag, photo=photo)
-                pht.save()
-        if photo.tags.filter(tag__name='delete').exists() and not photo.deleted:
-            photo.undoable_delete()
-            goto_next_incoming=True
-        elif PhotoHasTag.objects.filter(tag__name='undelete').exists() and photo.deleted:
-            photo.undelete()
-            photo.tags.filter(tag__name='undelete').delete()
-            #dont actually leave the "undelete" tag on there, its weird
-        if photo.tags.filter(tag__name='done').exists() and photo.incoming:
-            #move on from incoming guys once "done" is entered
-            goto_next_incoming=True
-            photo.done()
-        if photo.tags.filter(tag__name='myphoto').exists():
-            #move on from incoming guys once "done" is entered
-            photo.myphoto=True
-            photo.save()
-        if photo.tags.filter(tag__name__in=settings.CLOSING_TAGS).exclude(tag__id__in=kept_tagids):
-            #actually was assigned this tag
-            photo.done()
-            goto_next_incoming=True
-    else:
-        log.error('bad k %s',k)
-        import ipdb;ipdb.set_trace()
-    if goto_next_incoming:
-        next_incoming=get_next_incoming(exclude=photo.id)
-        if next_incoming:
-            vals['message']='undeleted'
-            vals['goto_next_photo']=True
-            vals['next_photo_href']=next_incoming.exhref()
+    log.info(request.POST)
+    try:
+        vals['success']=True
+        vals['message']='start.'
+        todo=request.POST
+        kind=request.POST['kind']
+        goto_next_incoming=False
+        goto_same=False
+        if kind=='phototag':
+            photo=Photo.objects.get(id=todo['photo_id'])
+            new_tagids=[]
+            for tagid in todo['phototag_ids'].split(','):
+                if tagid:
+                    new_tagids.append(int(tagid))
+            kept_tagids=[]
+            for tag in photo.tags.all():
+                if int(tag.tag.id) not in new_tagids:
+                    if tag.tag.name=='delete':
+                        photo.undelete()
+                    tag.delete()
+                else:
+                    kept_tagids.append(int(tag.tag.id))
+            for tagid in new_tagids:
+                if tagid not in kept_tagids:
+                    tag=PhotoTag.objects.get(id=tagid)
+                    if tag.name=='autoorient':
+                        photo.autoorient()
+                        goto_same=True
+                    pht=PhotoHasTag(tag=tag, photo=photo)
+                    pht.save()
+            if photo.tags.filter(tag__name='delete').exists() and not photo.deleted:
+                photo.undoable_delete()
+                goto_next_incoming=True
+            elif PhotoHasTag.objects.filter(tag__name='undelete').exists() and photo.deleted:
+                photo.undelete()
+                photo.tags.filter(tag__name='undelete').delete()
+                #dont actually leave the "undelete" tag on there, its weird
+            if photo.tags.filter(tag__name='done').exists() and photo.incoming:
+                #move on from incoming guys once "done" is entered
+                goto_next_incoming=True
+                photo.done()
+            if photo.tags.filter(tag__name='myphoto').exists():
+                #move on from incoming guys once "done" is entered
+                photo.myphoto=True
+                photo.save()
+            if photo.tags.filter(tag__name__in=settings.CLOSING_TAGS).exclude(tag__id__in=kept_tagids):
+                #actually was assigned this tag
+                photo.done()
+                goto_next_incoming=True
         else:
-            vals['message']='no more photos to process'
+            log.error('bad k %s',k)
+            import ipdb;ipdb.set_trace()
+        if goto_next_incoming:
+            next_incoming=get_next_incoming(exclude=photo.id)
+            if next_incoming:
+                vals['message']='undeleted'
+                vals['goto_next_photo']=True
+                vals['next_photo_href']=next_incoming.exhref()
+            else:
+                vals['message']='no more photos to process'
+                vals['goto_next_photo']=True
+                vals['next_photo_href']='/photo/incoming/'
+            vals['last_photo_href']=photo.exhref()
+        if goto_same:
+            vals['message']='auto-oriented'
             vals['goto_next_photo']=True
-            vals['next_photo_href']='/photo/incoming/'
-        vals['last_photo_href']=photo.exhref()
-    if goto_same:
-        vals['message']='auto-oriented'
-        vals['goto_next_photo']=True
-        vals['next_photo_href']=photo.exhref()
-    vals['message']='success'
-    return r2j(vals)
+            vals['next_photo_href']=photo.exhref()
+        vals['message']='success'
+        return r2j(vals)
+    except Exception,e:
+        vals['success']=False
+        vals['message']=str(e)
+        return r2j(vals)

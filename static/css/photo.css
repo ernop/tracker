@@ -5,3 +5,6 @@ div {box-sizing:border-box;}
 .tagzone{margin-top:140px;}
 .big{font-size:2em;}
 .photofooter{position:fixed; top:20px;right:100px;height:90px;}
+
+.infozone{width:300px;float:right;display:inline-block;}
+.tagzone{clear:both;float:left;}

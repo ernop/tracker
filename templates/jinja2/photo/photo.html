@@ -2,11 +2,29 @@
 {% block title %}Photo {{photo}}{% endblock %}
 {% block head %}
     {{super()}}
-    
+    <script src='/static/js/photo.js'></script>
     
 <script>
 full_phototags={{full_phototags|jsonify|safe}}    
 next_photopaths={{next_photopaths|jsonify|safe}}
+
+$(document).ready(function(){
+    setup_phototagselect_photo();
+    var select2=$('#phototagselect2').data('select2');
+    setTimeout(function() {
+        if (!select2.opened()) {
+            select2.open();
+        }
+    }, 0); 
+    if (next_photopaths){
+        $.each(next_photopaths, function(index,photopath){
+            var nxt=new Image();
+            nxt.src=photopath;
+            console.log('starting to load',photopath)
+        })
+        
+    }
+})
 </script>
 
 {% endblock %}
