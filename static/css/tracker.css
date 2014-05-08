@@ -1,4 +1,5 @@
 html {height:99%;}
+body {font-family:calibri;}
 
 .notification-zone{display:inline-block;height:120px;}
 
@@ -8,7 +9,7 @@ html {height:99%;}
     width:610px;
     height:110px;
 }
-
+.photo{margin-top:50px;padding:4px;background:#DDD;}
 .select2-container{width:300px;}
 
 .fixed-notification{
