@@ -11,9 +11,9 @@ past_photos=[]
 TAGIDS_WHICH_FORCE_NEXT={{TAGIDS_WHICH_FORCE_NEXT|jsonify|safe}}
 ii=0
 function load_show(){
-    //console.log('load show start')
+    console.log('load show start')
     load(maybe_show)
-    //console.log('load show end')
+    console.log('load show end')
 }
 
 function load(donefunc){
@@ -81,12 +81,12 @@ function load(donefunc){
 
 
 function maybe_show(){
-    ////console.log('maybe show start')
+    console.log('maybe show start')
     if (!showing){
         show_next()
     }
     load()
-    ////console.log('maybe show end')
+    console.log('maybe show end')
 }
 
 function show_prev(){
@@ -96,9 +96,9 @@ function show_prev(){
 }
 
 function show_next(going_backwards){
-    ////console.log('show next start')
+    console.log('show next start')
     next=loaded_photos.shift()
-    ////console.log('got next',next)
+    console.log('got next',next)
     if (next){
         if (current_photo){
         
@@ -117,7 +117,7 @@ function show_next(going_backwards){
     }else{
         notify('no photo was ready',false)
     }
-    ////console.log('show next end')
+    console.log('show next end')
     load();
 }
 
@@ -137,7 +137,7 @@ function pop_select2(){
 }
 
 function reset_photo_tags(){
-    ////console.log('reset photo tags start')
+    console.log('reset photo tags start')
     var ptg=$('#phototagselect2');
     ptg.attr('value',current_photo.tagids.join(','))
     //completely fucking retarded that even if you setup initselection based, select2 won't call it
@@ -152,11 +152,11 @@ function reset_photo_tags(){
     fix_phototags()
     ptg.unbind('change').on('change', change_phototag)
     pop_select2();
-    ////console.log('reset photo tags end')
+    console.log('reset photo tags end')
 }
 
 function get_tags_for_current_photo(){
-    //console.log('get current tags start')
+    console.log('get current tags start')
     //grab the tags from the full tag js object.
     var data = [];
     var ids = current_photo.tagids;
@@ -168,12 +168,12 @@ function get_tags_for_current_photo(){
         })
     })
     
-    //console.log('get current tags end',data)
+    console.log('get current tags end',data)
     return data;
 }
 
 function maybe_goto_next(tagids){
-    //console.log('tagids are',tagids);
+    console.log('tagids are',tagids);
     $.each(tagids, function(index, tagid){
         if (TAGIDS_WHICH_FORCE_NEXT.indexOf(parseInt(tagid))!=-1){
             show_next()
@@ -183,12 +183,12 @@ function maybe_goto_next(tagids){
 }
 
 function change_phototag(e){
-    //console.log('change phototag start')
+    console.log('change phototag start')
     
     data_changed($(e.target), 'phototag');
     fix_phototags();
     maybe_goto_next($(e.target).attr('value').split(','))
-    //console.log('change phototag end')
+    console.log('change phototag end')
 }
 
 function data_changed(target, kind){
@@ -231,11 +231,11 @@ function clear_photozone(){
 }
 
 function put_infozone(photo){
-    //console.log('put infozone')
+    console.log('put infozone')
     $('.infozone').append(make_infozone(photo))
 }
 function put_photozone(photo){
-    //console.log('put photozone')
+    console.log('put photozone')
     $('.photozone').append(make_photozone(photo))
     $('.photozone').attr('photo_id',photo.id)
 }

@@ -410,6 +410,7 @@ class Photo(DayModel):
         else:
             daylink=None
         dat=(('deleted',dd),
+             ('id',self.id),
              ('day',daylink),
              ('taken',self.taken and self.taken.strftime(DATE_DASH_REV_DAY) or ''),
              ('photo created',self.photo_created.strftime(DATE_DASH_REV_DAY)),
