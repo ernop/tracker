@@ -235,6 +235,7 @@ class Photo(DayModel):
                              self.fp, 
                              settings.THUMB_HEIGHT,
                              newthumbfp)
+        log.info("create thumb doing cmd %s",cmd)
         res=os.system(cmd)
         if res:
             log.error('failure of convert command %s',cmd)
@@ -316,6 +317,8 @@ class Photo(DayModel):
         return get_exif(im)
     
     def save(self, *args, **kwargs):
+        #TODO: when settings not incoming, should move to storage.
+        #but for now, probably fine.
         if not self.setup:
             res=self.initialize()
             if not res:

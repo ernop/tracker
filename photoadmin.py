@@ -29,12 +29,17 @@ class PhotoAdmin(OverriddenModelAdmin):
     #list_editable=['note',]
     search_fields= ['name']
     list_per_page=30
-    actions=['undoable_delete','delete_file','undelete','reinitialize','force_recreate_thumbs','autoorient',]
+    actions=['undoable_delete','delete_file','undelete','reinitialize','force_recreate_thumbs','autoorient','redo_classification',]
     
+    def redo_classification(self,request,queryset):
+        for photo in queryset:
+            photo.tags.delete()
+            photo.incoming=True
+            photo.save()
+            
     def reinitialize(self,request,queryset):
         for photo in queryset:
             photo.initialize()
-    
     
     def delete_file(self,request,queryset):    
         for photo in queryset:
@@ -90,8 +95,15 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     search_fields= ['name']
     list_filter=['control_tag', TagHasPersonFilter]
     list_display='id myname myphotos'.split()
-    actions=['reinitialize_tags','create_people_tags',]
+    actions=['reinitialize_tags','create_people_tags','redo_classification']
     
+    def redo_classification(self,request,queryset):
+        for phototag in queryset:
+            for photo in Photo.objects.filter(tags__tag=phototag):
+                photo.tags.all().delete()
+                photo.incoming=True
+                photo.save()
+   
     def queryset(self, request):
         queryset = super(PhotoTagAdmin, self).queryset(request)
         user=request.user
