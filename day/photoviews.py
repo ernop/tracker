@@ -18,12 +18,8 @@ log=logging.getLogger(__name__)
 
 from photoutil import *
 
-full_phototags=None
-
 def get_full_phototags():
-    global full_phototags
-    if not full_phototags:
-        full_phototags=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
+    full_phototags=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
     return full_phototags
 
 @user_passes_test(staff_test)
