@@ -124,7 +124,8 @@ function show_next(going_backwards){
         notify('no photo was ready',false)
     }
     console.log('show next end')
-    //setTimeout(load(),2000);
+    if (loaded_photos.length<10)
+    {load();}
 }
 
 function pop_select2(){

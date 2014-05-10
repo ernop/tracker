@@ -1,7 +1,8 @@
 html {height:99%;}
-body {font-family:calibri;}
+body {font-family:calibri;
+font-size}
 
-.notification-zone{display:inline-block;height:120px;}
+.notification-zone{display:inline-block;height:120px;width:400px;}
 
 .footer{position:fixed; bottom:100px;right:100px;}
 
