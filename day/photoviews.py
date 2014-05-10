@@ -156,7 +156,24 @@ def ajax_photo_data(request):
                 vals['success']=True
                 vals['message']='preloaded fp %s'%nextphoto_js['fp']
                 log.info('returning photo %s',nextphoto_js)
+        elif kind=='new phototag':
+            if 'tagname' in todo and todo['tagname']:
+                name=make_safe_filename(todo['tagname'])
+                try:
+                    exi=PhotoTag.objects.get(name=name)
+                    vals['message']='phototag of this name already existed'
+                    vals['success']=False
+                except PhotoTag.DoesNotExist:
+                    pt=PhotoTag(name=name)
+                    pt.save()
+                    vals['message']='created phototag %s'%pt
+                    vals['phototag_id']=pt.id
+                    vals['name']=name
+            else:
+                vals['message']='bad text %s'%todo['tagname']
+                vals['success']=False
         elif kind=='phototag':
+            #setting/removing phototags on a given Photo
             photo=Photo.objects.get(id=todo['photo_id'])
             new_tagids=[]
             for tagid in todo['phototag_ids'].split(','):

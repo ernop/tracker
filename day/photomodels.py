@@ -410,7 +410,7 @@ class Photo(DayModel):
         else:
             daylink=None
         dat=(('deleted',dd),
-             ('id',self.id),
+             ('id',self.clink(text=self.id)),
              ('day',daylink),
              ('taken',self.taken and self.taken.strftime(DATE_DASH_REV_DAY) or ''),
              ('photo created',self.photo_created.strftime(DATE_DASH_REV_DAY)),
@@ -426,10 +426,12 @@ class Photo(DayModel):
         return res
     
     def name_table(self,include_image=True):
-        tags=', '.join([tag.tag.vlink() for tag in self.tags.all()])
+        vtags=', '.join([tag.tag.vlink() for tag in self.tags.all()])
+        ctags=', '.join([tag.tag.clink() for tag in self.tags.all()])
         dat=[('name',self.name),
              ('fp',self.fp),
-             ('tags',tags),]
+             ('tags vlink',vtags),
+             ('tags clink',ctags),]
         if include_image:
             dat.insert(2,('img',self.inhtml(size='thumb',link=True)),)
         res=mktable(dat,skip_false=True)

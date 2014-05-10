@@ -10,6 +10,12 @@ current_photo=null
 past_photos=[]
 TAGIDS_WHICH_FORCE_NEXT={{TAGIDS_WHICH_FORCE_NEXT|jsonify|safe}}
 ii=0
+$(document).ready(function(){
+    load_show();
+    setup_buttons();
+    //setup_phototagselect(); //empty tags when first load, but all choices.
+})
+
 function load_show(){
     console.log('load show start')
     load(maybe_show)
@@ -43,7 +49,6 @@ function load(donefunc){
             dat['exclude_ids']=exclude_ids
         }
         console.log('doing dat',exclude_ids)
-        debugger;
         $.ajax({
             url:'/ajax/photo_data/',
             type:'post',
@@ -122,12 +127,6 @@ function show_next(going_backwards){
     //setTimeout(load(),2000);
 }
 
-$(document).ready(function(){
-    load_show();
-    setup_buttons();
-    //setup_phototagselect(); //empty tags when first load, but all choices.
-})
-
 function pop_select2(){
     var select2=$('#phototagselect2').data('select2');
     setTimeout(function() {
@@ -141,7 +140,7 @@ function reset_photo_tags(){
     console.log('reset photo tags start')
     var ptg=$('#phototagselect2');
     ptg.attr('value',current_photo.tagids.join(','))
-    //completely fucking retarded that even if you setup initselection based, select2 won't call it
+    //sucks that even if you setup initselection based, select2 won't call it
     //unless you ALSO define a "value" field on the select2 element, EVEN if you never use that!
     ptg.select2({data:full_phototags,
         multiple:true,
@@ -185,11 +184,35 @@ function maybe_goto_next(tagids){
 
 function change_phototag(e){
     console.log('change phototag start')
-    
-    data_changed($(e.target), 'phototag');
+    if (e){var target=$(e.target)}else{
+    var target=$('#phototagselect2')}
+    data_changed(target, 'phototag');
     fix_phototags();
-    maybe_goto_next($(e.target).attr('value').split(','))
+    maybe_goto_next(target.attr('value').split(','))
     console.log('change phototag end')
+}
+
+function create_tag(tagname, success_func){
+    //check we dont have it already
+    data={kind:'new phototag',tagname:tagname}
+    $.ajax({
+        url:'/ajax/photo_data/',
+        type:'POST',
+        data:data,
+        success:function(dat){
+            notify(dat['message'],dat['success']);
+            if (dat['success']){
+                var ptag={id:dat.phototag_id,text:dat.name,name:dat.name};
+                full_phototags.push(ptag);
+                if (success_func){
+                    success_func(ptag)
+                }
+            }
+        },
+        error:function(dat){
+            notify('error',false);
+        }
+    })
 }
 
 function data_changed(target, kind){
@@ -222,6 +245,20 @@ function setup_buttons(){
     $('.prev-btn').click(function(){
         show_prev();
     })
+    
+    $('#create-new-tag-form').submit(function(e){
+        var tagname=$('#create-new-tag-input').val();
+        notify('creating tag based on form submit '+tagname,true);
+        create_tag(tagname, function(ptag){
+            //function to be called if creation is ok.
+                if (ptag){
+                    current_photo.tagids.push(ptag.id)
+                    reset_photo_tags();
+                    change_phototag();
+                }
+            })
+        $('#create-new-tag-input').val('')
+    });
 }
 
 function clear_infozone(){
@@ -260,22 +297,22 @@ function make_photozone(photo){
 <div style="padding:5px;margin-bottom:5px;">
         {% if LOCAL %}(Local){% endif %}
 </div>
-
-    
     <div class="infozone">
     </div>
     <div id="notification" style="clear:right;float:right;" class="notification-zone">Notification zone</div>
     <div class="tagzone" >
     <h2>Tags</h2>
-        <button id="phototagselect2" value=""></button>
+        
         
         
         <br><br>
+        <form id="create-new-tag-form" onsubmit="return false;">
+            <input id="create-new-tag-input" /><i class="icon-plus"></i>Add Tag</a>
+        </form>
         
-        <div class="new-tag-button btn">
+        <button id="phototagselect2" value=""></button>
         
-        <a href="/admin/day/phototag/add/"><i class="icon-plus"></i>Add</a></div>
-            <p><div class="btn prev-btn">prev</div>
+        <p><div class="btn prev-btn">prev</div>
 <div class="btn next-btn">next</div></p>
     </div>
     <div class="photozone">
