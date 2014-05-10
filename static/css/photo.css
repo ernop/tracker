@@ -3,7 +3,7 @@ div {box-sizing:border-box;}
 .photolink {border:2px solid steelblue;border-radius:3px;padding:3px;display:inline-block;margin-bottom;3px;}
 .photo-info{float:right;}
 .big{font-size:2em;}
-.photofooter{position:fixed; bottom:120px;right:100px;height:90px;}
+.photofooter{position:fixed; bottom:120px;left:10px;height:90px;}
 
 .infozone{width:300px;float:right;display:inline-block;}
 .tagzone{clear:both;float:right;margin-top:40px;}

@@ -328,8 +328,8 @@ def add_months(sourcedate,months):
 def make_safe_tag_name(ss):
     res = []
     OKS = ['-', '_', ' ']
-    fn=fn.replace('_','-')
-    for c in fn:
+    ss=ss.replace('_','-')
+    for c in ss:
         if c.isalnum() or c in OKS:
             res.append(c)
     return ''.join(res)
