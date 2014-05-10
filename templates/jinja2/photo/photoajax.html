@@ -42,26 +42,26 @@ function load(donefunc){
         if (exclude_ids && exclude_ids.length){
             dat['exclude_ids']=exclude_ids
         }
+        console.log('doing dat',exclude_ids)
+        debugger;
         $.ajax({
             url:'/ajax/photo_data/',
             type:'post',
             data:dat,
-            //processData:false,
             success:function(json){
-                
                 if (json['success']){
-                    notify('loaded',true)
                     var nextphoto=json.nextphoto
-                    
                     var exi=false
                     $.each(loaded_photos, function(index, lp){
                         if (lp.id==nextphoto.id){
                             exi=true
                             console.log("got duplicate",nextphoto.fp)
+                            notify('dup',true)
                             return}
                     })
                     if (!exi){//we actually got a new one...
-                        console.log("got new",nextphoto.fp)
+                        
+                        console.log("got new",nextphoto.id)
                         notify(json['message'],json['success'])
                         loaded_photos.push(nextphoto)
                         var im=new Image()
@@ -86,7 +86,7 @@ function maybe_show(){
     if (!showing){
         show_next()
     }
-    setTimeout(load(),2000);
+    //setTimeout(load(),2000);
     console.log('maybe show end')
 }
 
@@ -119,7 +119,7 @@ function show_next(going_backwards){
         notify('no photo was ready',false)
     }
     console.log('show next end')
-    setTimeout(load(),2000);
+    //setTimeout(load(),2000);
 }
 
 $(document).ready(function(){
