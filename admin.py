@@ -318,7 +318,7 @@ class PersonAdmin(OverriddenModelAdmin):
               ('birthday','<div class="nb">%s</div>'%obj.birthday),
               ]
         if obj.as_tag.exists():
-            photos='<br>'+''.join([p.photo.inhtml(size='small') for p in obj.as_tag.get().photos.all()])
+            photos='<br>'+''.join([p.photo.inhtml(size='thumb') for p in obj.as_tag.get().photos.all()])
         else:
             photos=''
         tbl=mktable(data,skip_false=True)

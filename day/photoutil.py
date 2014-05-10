@@ -90,7 +90,7 @@ def get_next_incoming(exclude=None):
         exclude=[]
     elif type(exclude) is not list:
         exclude=[exclude]
-    exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).order_by('id')
+    exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).order_by('-id')
     ii=0
     found=False
     while 1:
