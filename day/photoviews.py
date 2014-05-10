@@ -158,7 +158,7 @@ def ajax_photo_data(request):
                 log.info('returning photo %s',nextphoto_js)
         elif kind=='new phototag':
             if 'tagname' in todo and todo['tagname']:
-                name=make_safe_filename(todo['tagname'])
+                name=make_safe_tag_name(todo['tagname'])
                 try:
                     exi=PhotoTag.objects.get(name=name)
                     vals['message']='phototag of this name already existed'

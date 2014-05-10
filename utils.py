@@ -325,6 +325,15 @@ def add_months(sourcedate,months):
     day = min(sourcedate.day,calendar.monthrange(year,month)[1])
     return datetime.date(year,month,day)
 
+def make_safe_tag_name(ss):
+    res = []
+    OKS = ['-', '_', ' ']
+    fn=fn.replace('_','-')
+    for c in fn:
+        if c.isalnum() or c in OKS:
+            res.append(c)
+    return ''.join(res)
+
 def make_safe_filename(fn):
     res = []
     OKS = ['-', '_', ]
