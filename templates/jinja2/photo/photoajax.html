@@ -188,7 +188,8 @@ function change_phototag(e){
     var target=$('#phototagselect2')}
     data_changed(target, 'phototag');
     fix_phototags();
-    maybe_goto_next(target.attr('value').split(','))
+    current_photo.tagids=target.attr('value').split(',');
+    maybe_goto_next(current_photo.tagids)
     console.log('change phototag end')
 }
 
