@@ -63,6 +63,20 @@ class TagHasPersonFilter(SimpleListFilter):
         elif self.value()=='no':
             return queryset.filter(person=None)
 
+class PhotoHasSpotFilter(SimpleListFilter):
+    title = 'has photospot'
+    parameter_name = 'has_photospot'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            return queryset.exclude(photospot=None)
+        elif self.value()=='no':
+            return queryset.filter(photospot=None)
+    
 class PhotoHasDayFilter(SimpleListFilter):
     title = 'has taken day'
     parameter_name = 'has_taken_day'

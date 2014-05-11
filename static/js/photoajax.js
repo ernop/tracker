@@ -165,7 +165,7 @@ function reset_photo_tags(){
     //first time you set it up its empty.  each re-getting data will re-set it.
     fix_phototags()
     ptg.unbind('change').on('change', change_phototag)
-    pop_select2();
+    //pop_select2();
     console.log('reset photo tags end')
 }
 
