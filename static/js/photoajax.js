@@ -290,7 +290,7 @@ function update_spot_info(spotid){
   vtarget.find('a').remove()
   var spot=get_photospot(spotid);
   ctarget.append('<a class="btn" href="/admin/day/photospot/?id='+spot.id+'">'+spot.name+'</a> ')
-  vtarget.append('<a class="btn" href="/photo/photospot/'+spot.name+'">'+spot.name+'</a> ')
+  vtarget.append('<a class="btn" href="/photo/photospot/'+spot.name.replace(/ /g,'_')+'">'+spot.name+'</a> ')
 }
 
 function get_phototag(tagid){
