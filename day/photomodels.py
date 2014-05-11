@@ -400,7 +400,10 @@ class Photo(DayModel):
             self.fp=donefp
             self.incoming=False
             self.save()
+            log.info('moved photo %s to done folder %s',self,donefp)
             return True
+        else:
+            log.error('couldn\'t move photo to done folder cause file not exist. %s %s',self,self.fp)
     
     def undelete(self):
         if self.file_exists():

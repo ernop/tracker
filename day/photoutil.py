@@ -29,9 +29,11 @@ def get_fps_from_incoming():
 def check_incoming():
     photos=get_fps_from_incoming()
     from day.photomodels import Photo
-    new=[fp for fp in photos if not Photo.objects.filter(fp=fp,incoming=True).exists()]
-    
-    for fp in new:
+    new=[fp for fp in photos if not Photo.objects.filter(fp=fp, incoming=True).exists()]
+    log.info('noticed %d new photos in incoming dir.',len(new))
+    for ii,fp in enumerate(new):
+        if ii%50==0:
+            log.info('have mogrified %d / %d photos this time.',ii,len(new))
         cmd='mogrify -auto-orient "%s"'%fp
         res=os.system(cmd)
         if res:
