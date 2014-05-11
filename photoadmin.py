@@ -153,7 +153,7 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
     list_display='id mylinks'.split()
     def mylinks(self,obj):
         data=[('vlink',obj.vlink()),
-              
+              ('count',obj.photos.count()),
               ]
         
         return mktable(data)
