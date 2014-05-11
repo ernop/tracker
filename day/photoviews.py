@@ -142,7 +142,6 @@ def photo_passthrough(request, id, thumb=False):
 @user_passes_test(staff_test)
 def ajax_photo_data(request):
     vals={}
-    log.info(request.POST)
     try:
         vals['success']=True
         vals['message']='start.'
