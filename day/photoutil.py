@@ -40,7 +40,10 @@ def check_incoming():
             log.error("fail cmd %s for fp %s"%(cmd,fp))
             continue
         ph=Photo(fp=fp,incoming=True)
-        ph.save()
+        try:
+            ph.save()
+        except:
+            log.error('error saving photo fp %s',fp)
 
 def photo2obj(photo):
     res={'fp':photo.get_external_fp(),
