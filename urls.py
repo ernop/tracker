@@ -46,7 +46,7 @@ urlpatterns = patterns('',
     
     url(r'photo/photo/(?P<id>[0-9]+)/$','tracker.day.photoviews.photo',name='photo'),
     url(r'photo/phototag/(?P<name>[a-zA-Z_\-0-9 \%]+)/$','tracker.day.photoviews.phototag',name='phototag'),
-    url(r'photo/photospot/(?P<name>[a-zA-Z_\-0-9 ]+)/$','tracker.day.photoviews.photospot',name='photospot'),
+    url(r'photo/photospot/(?P<name>[a-zA-Z_\-0-9 \%]+)/$','tracker.day.photoviews.photospot',name='photospot'),
     url(r'photo/incoming/$','tracker.day.photoviews.incoming',name='photospot'),
     url(r'photo_passthrough/(?P<id>[0-9]+).(jpg|gif|webp|png)$','tracker.day.photoviews.photo_passthrough',name='photo_passthrough'),
     url(r'photo_thumb_passthrough/(?P<id>[0-9]+).(jpg|gif|webp|png)$','tracker.day.photoviews.photo_thumb_passthrough',name='photo_thumb_passthrough'),
