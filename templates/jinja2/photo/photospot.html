@@ -10,22 +10,28 @@
 {% endblock %}
 {% block content %}
     
-    <div class="main-zone" style="height:700px;">
+    <div class="main-photospot-zone">
         <div class="current-photo">&nbsp;</div>
     </div>
     
     <div class="thumbzone">
     <div style="float:left;"><h2>Spot {{photospot}} ({{photos.count()}})</h2></div>
     {% for photo in photos %}
-        <div class="photolink photothumb" photo_id={{photo.id}}>{{photo.inhtml(size='thumb')|safe}}</div>
+        <div class="photospot-photolink photothumb" photo_id={{photo.id}}>{{photo.inhtml(size='thumb')|safe}}</div>
     {% endfor %}
     <div id="notification" style="clear:right;float:right;" class="notification-zone">Notification zone</div>
     <br><div class="btn prev-btn">prev</div>
     <div class="btn next-btn">next</div>
-    <div class="btn save-crops">Save crops</div>    
+    <div class="btn save-crops" style="color:red;">Save crops</div>    
     
     {% if LOCAL %}LOCAL{% endif %}
     
+    <table class="table thintable" style="width:inherit;">
+    <tr><td colspan=3>Crop photos from a given spot using the keyboard:
+    <tr><td><b>left/right</b><td>navigate between photos
+    <tr><td><b>h</b><td>jump back and forth between this photo, and the first photo. (you should always compare the first, example photo, to the current, rather than sequentially, which would accumulate error.)
+    <tr><td><b>wasd</b><td>move photo around (crop it)
+    <tr><td><b>x</b><td>kill current photo - disassociate it form this photospot
     </div>
     
     

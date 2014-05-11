@@ -269,12 +269,56 @@ function create_photospot(spotname, success_func){
     })
 }
 
+function update_tag_info(tagids){
+  //as you add tags etc. fix the name info zone too.  could be done with
+  //ajax but this is faster
+  var ctarget=$('.ctagzone')
+  var vtarget=$('.vtagzone')
+  ctarget.find('a').remove()
+  vtarget.find('a').remove()
+  $.each(tagids, function(index,tagid){
+    var tag=get_phototag(tagid);
+    ctarget.append('<a class="btn" href="/admin/day/phototag/?id='+tag.id+'">'+tag.name+'</a> ')
+    vtarget.append('<a class="btn" href="/photo/phototag/'+tag.name+'">'+tag.name+'</a> ')
+  })
+}
+
+function update_spot_info(spotid){
+  var ctarget=$('.cspotzone')
+  var vtarget=$('.vspotzone')
+  ctarget.find('a').remove()
+  vtarget.find('a').remove()
+  var spot=get_photospot(spotid);
+  ctarget.append('<a class="btn" href="/admin/day/photospot/?id='+spot.id+'">'+spot.name+'</a> ')
+  vtarget.append('<a class="btn" href="/photo/photospot/'+spot.name+'">'+spot.name+'</a> ')
+}
+
+function get_phototag(tagid){
+  var res=null
+  $.each(full_phototags, function(index, tag){
+    if (tag.id==tagid){res=tag}
+    return
+  })
+  return res
+}
+
+function get_photospot(photospot_id){
+  var res=null
+  $.each(full_photospots, function(index, photospot){
+    if (photospot.id==photospot_id){res=photospot}
+    return
+  })
+  return res
+}
+
 function data_changed(target, kind){
     var data={'kind':kind};
     if (kind=='phototag'){
         data['phototag_ids']=target.attr('value');
+        update_tag_info(target.attr('value').split(','));
     }else if (kind=='photospot'){
-        data['photospot_ids']=target.attr('value');
+        data['photospot_id']=target.attr('value');
+        update_spot_info(target.attr('value'))
     }
     data['photo_id']=$(".photozone").attr('photo_id')
     send_data(data, target);

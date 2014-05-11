@@ -83,15 +83,16 @@ def phototagsort(x):
     return key
 
 @user_passes_test(staff_test)
-def photospot(request,slug):
+def photospot(request,name):
+    name=name.replace('%20',' ')
     #should load all the full images inline.
     #keyboard controls to quickly move between them
     #and also to adjust their crop
     #and to kill them (remove them from photospot)
-    pspot=PhotoSpot.objects.get(slug=slug)
+    pspot=PhotoSpot.objects.get(name=name)
     vals={}
     vals['photospot']=pspot
-    vals['photos']=pspot.photos.all()
+    vals['photos']=pspot.photos.exclude(deleted=True).all()
     vals['photo_objs']=[photo2obj(pho) for pho in pspot.photos.all()]
     vals['phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
     return r2r('jinja2/photo/photospot.html',request,vals)
@@ -145,7 +146,6 @@ def ajax_photo_data(request):
     try:
         vals['success']=True
         vals['message']='start.'
-        import ipdb;ipdb.set_trace()
         try:
             todo=request.POST
             kind=request.POST['kind']
@@ -218,7 +218,7 @@ def ajax_photo_data(request):
         elif kind=='photospot':
             #assigning a photospot to a photo
             photo=Photo.objects.get(id=todo['photo_id'])
-            spot=PhotoSpot.objects.get(id=todo['photospot_ids'])
+            spot=PhotoSpot.objects.get(id=todo['photospot_id'])
             photo.photospot=spot
             photo.save()
         
@@ -265,16 +265,16 @@ def ajax_photo_data(request):
                 photo.done()
                 goto_next_incoming=True
         
-        elif kind=='photospot kill':        
-            import ipdb;ipdb.set_trace()
+        elif kind=='remove photo from photospot':        
             #disassociate a photo from a photospot.
             #also mark it as not interesting any longer at all (so its out of incoming)
             photo=Photo.objects.get(id=todo['photo_id'])
-            photo.photospot=None
+            photo.undoable_delete()
             photo.save()
-            vals['message']='disassociated photo from photospot.'
+            #also mark it done & not incoming anymore.
+            
+            vals['message']='disassociated photo from photospot.  to undo, go here: %s'%photo.clink()
         elif kind=='save photospot crops':
-            import ipdb;ipdb.set_trace()
             for crop in todo['crops']:
                 photo=Photo.objects.get(id=crop['photo_id'])
                 save=False
@@ -309,7 +309,6 @@ def ajax_photo_data(request):
             vals['message']='auto-oriented'
             vals['goto_next_photo']=True
             vals['next_photo_href']=photo.exhref()
-        vals['message']='success'
         return r2j(vals)
     except Exception,e:
         vals['success']=False

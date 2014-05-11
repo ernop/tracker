@@ -139,6 +139,17 @@ def mktable(dat, rights=None, bigs=None, skip_false=False):
                 klasses.append('right')
             if bigs and ii in bigs:
                 klasses.append('big')
-            res += '<td class="%s">%s</td>' % (' '.join(klasses), thing)
+            if klasses:
+                res += '<td class="%s">%s</td>' % (' '.join(klasses), thing)
+            else:
+                res += '<td>%s</td>' % (thing)
         rows.append(res+'</tr>')
     return '<table class="table thintable" style="background-color:white;">%s</table>' % ''.join(rows)
+
+
+def div(klass=None,contents=None):
+    klasszone=''
+    if klass:
+        klasszone='class="%s"'%klass
+    res='<div %s>%s</div>'%(klasszone,contents)
+    return res

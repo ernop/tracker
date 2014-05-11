@@ -145,6 +145,14 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']
+    list_display='id mylinks'.split()
+    def mylinks(self,obj):
+        data=[('vlink',obj.vlink()),
+              
+              ]
+        
+        return mktable(data)
+    adminify(mylinks)
     pass
 
 admin.site.register(Photo, PhotoAdmin)

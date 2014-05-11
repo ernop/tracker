@@ -63,7 +63,7 @@ class PhotoTag(DayModel):
                 text=self.name
             else:
                 text='no name phototag'
-        return '<a href="/photo/phototag/%s/">%s</a>'%(self.name, text)
+        return '<a class="btn" href="/photo/phototag/%s/">%s</a>'%(self.name, text)
 
 
         #
@@ -96,7 +96,7 @@ class PhotoSpot(DayModel):
                 text=self.name
             else:
                 text='no name photospot'
-        return '<a href="/photo/photospot/%s/">%s</a>'%(self.slug, text)
+        return '<a class="btn" href="/photo/photospot/%s/">%s</a>'%(self.slug, text)
 
 class PhotoHasTag(DayModel):
     '''through object for photo&phototag'''
@@ -179,7 +179,7 @@ class Photo(DayModel):
                 text=self.name
             else:
                 text='no name photo'
-        return '<a href="%s">%s</a>'%(self.exhref(), text)
+        return '<a class="btn" href="%s">%s</a>'%(self.exhref(), text)
     
     def exhref(self):
         return '/photo/photo/%d/'%self.id
@@ -383,7 +383,6 @@ class Photo(DayModel):
             return True
         return False
     
-    
     def autoorient(self):
         cmd='mogrify -auto-orient "%s"'%(self.fp)
         res=os.system(cmd)
@@ -447,15 +446,18 @@ class Photo(DayModel):
              )
         res=mktable(dat,skip_false=True)
         return res
-    
+
     def name_table(self,include_image=True):
-        vtags=', '.join([tag.tag.vlink() for tag in self.tags.all()])
-        ctags=', '.join([tag.tag.clink() for tag in self.tags.all()])
+        from trackerutils import div
+        vtags=div(klass='vtagzone',contents=', '.join([tag.tag.vlink() for tag in self.tags.all()]))
+        ctags=div(klass='ctagzone',contents=', '.join([tag.tag.clink() for tag in self.tags.all()]))
         cspot=''
         vspot=''
         if self.photospot:
             cspot=self.photospot.clink()
             vspot=self.photospot.vlink()
+        cspot=div(klass='cspotzone',contents=cspot or '&nbsp;')
+        vspot=div(klass='vspotzone',contents=vspot or '&nbsp;')
         dat=[('name',self.name),
              ('fp',self.fp),
              ('tags vlink',vtags),

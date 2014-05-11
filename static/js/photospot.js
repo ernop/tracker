@@ -1,6 +1,7 @@
 total_photos=photos.length
 current_index=0;
 show_current()
+working_photo=null;
 
 $(document).ready(function(){
   start_preloading()
@@ -57,11 +58,9 @@ function add_css(obj,xcrop,ycrop){
   obj.css('right','0')
   if (xcrop){
     obj.css('left',String(-1*parseInt(xcrop))+'px')
-    notify('cropped x'+parseInt(xcrop),true);    
     }
   if (ycrop){
     obj.css('top',String(parseInt(ycrop))+'px')
-    notify('y'+parseInt(ycrop),true);    
     }
 }
 
@@ -70,8 +69,8 @@ function show_current(){
   $('.current-photo').find('img').remove()
   add_css($('.current-photo'), photo.xcrop, photo.ycrop)
   $('.current-photo').append(photo.im);
-  $('.active-photo').removeClass('active-photo')
-  $('.photothumb[photo_id='+photo.id+']').addClass('active-photo')
+  $('.photospot-active-photo').removeClass('photospot-active-photo')
+  $('.photothumb[photo_id='+photo.id+']').addClass('photospot-active-photo')
 }
 
 function crop_current(xx,yy){
@@ -103,9 +102,48 @@ function save_crops(){
   })
 }
 
+function kill_current(){
+  if (current_index==0){
+    notify('cant kill first photo',false)
+    return
+  }
+  var photo=photos[current_index];
+  var data={'photo_id':photo.id,
+  'kind':'remove photo from photospot',}
+  $.ajax({
+    url:'/ajax/photo_data/',
+    type:'post',
+    data:JSON.stringify(data),
+    success:function(json){
+      notify(json['message'],json['success'])
+    },
+    error:function(json){
+      notify('error',false);
+    },
+  })
+  total_photos=total_photos-1
+  current_index=current_index-1
+  photos.splice(current_index,1)//remove current photo
+  $('.photothumb[photo_id='+photo.id+']').remove()
+  show_current()
+}
+
+function flip_first(){
+  //flip back and forth between this photo and the first one.
+  if (current_index!=0){
+    working_photo=current_index
+    current_index=0;
+    show_current();
+  }else{
+    current_index=working_photo;
+    show_current();
+  }
+}
+
+
 function setup_keynav(){
   $(document.documentElement).keydown(function (event) {
-     //handle cursor keys
+    //notify(event.keyCode, true);
      if (event.keyCode == 37) {
         show_prev()
     } else if (event.keyCode == 39) {
@@ -113,17 +151,24 @@ function setup_keynav(){
       show_next()
     }
     else if (event.keyCode==87){//up
-      crop_current(0,-1);
+      crop_current(0,1);
     }
     else if (event.keyCode==65){//left
       crop_current(-1,0);
     }
     else if (event.keyCode==83){//down
-      crop_current(0,1);
+      crop_current(0,-1);
     }
     else if (event.keyCode==68){//right
       crop_current(1,0);
     }
+    else if (event.keyCode==88){//x
+      kill_current();
+    }
+    else if (event.keyCode==72){//x
+      flip_first();
+    }
     
 });
 }
+
