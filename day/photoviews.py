@@ -22,6 +22,10 @@ def get_full_phototags():
     full_phototags=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
     return full_phototags
 
+def get_full_photospots():
+    full_photospots=[photospot2obj(pt) for pt in sorted(PhotoSpot.objects.all(),key=photospotsort)]
+    return full_photospots
+
 @user_passes_test(staff_test)
 def photoajax(request):
     '''load & then preload a bunch of photos.  basically, ajax-enabled fast flickr
@@ -36,9 +40,19 @@ def photoajax(request):
     '''
     vals={}
     vals['full_phototags']=get_full_phototags()
+    vals['full_photospots']=get_full_photospots()
     vals['TAGIDS_WHICH_FORCE_NEXT']=[tt.id for tt in PhotoTag.objects.filter(name__in=settings.CLOSING_TAGS)]
     #get the tags
     return r2r('jinja2/photo/photoajax.html',request,vals)
+
+#def incoming_photospot_photos_ajax(request):
+    #'''go through all photospos incoming photos '''
+        #vals={}
+    #vals['full_phototags']=get_full_phototags()
+    #vals['full_photospots']=get_full_photospots()
+    ##vals['TAGIDS_WHICH_FORCE_NEXT']=[tt.id for tt in PhotoTag.objects.filter(name__in=settings.CLOSING_TAGS)]
+    ##get the tags
+    #return r2r('jinja2/photo/incoming_photospot_ajax.html',request,vals)
 
 @user_passes_test(staff_test)
 def photo(request,id):
@@ -61,17 +75,25 @@ def phototag(request,name):
     vals['phototag']=phototag
     return r2r('jinja2/photo/phototag.html',request,vals)
 
+def photospotsort(x):
+    return x.id
+
 def phototagsort(x):
     key=(x.person is not None, x.person and -1*x.person.rough_purchase_count or 0,x.name)
-    print key
     return key
 
 @user_passes_test(staff_test)
 def photospot(request,slug):
-    photo=PhotoSpot.objects.get(slug=slug)
+    #should load all the full images inline.
+    #keyboard controls to quickly move between them
+    #and also to adjust their crop
+    #and to kill them (remove them from photospot)
+    pspot=PhotoSpot.objects.get(slug=slug)
     vals={}
-    vals['photospot']=photospot
-    vals['phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),cmp=phototagsort)]
+    vals['photospot']=pspot
+    vals['photos']=pspot.photos.all()
+    vals['photo_objs']=[photo2obj(pho) for pho in pspot.photos.all()]
+    vals['phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
     return r2r('jinja2/photo/photospot.html',request,vals)
 
 @user_passes_test(staff_test)
@@ -123,8 +145,13 @@ def ajax_photo_data(request):
     try:
         vals['success']=True
         vals['message']='start.'
-        todo=request.POST
-        kind=request.POST['kind']
+        import ipdb;ipdb.set_trace()
+        try:
+            todo=request.POST
+            kind=request.POST['kind']
+        except:
+            todo=json.loads(request.raw_post_data)
+            kind=todo['kind']
         goto_next_incoming=False
         goto_same=False
         if kind=='ajax photo preload':
@@ -139,7 +166,6 @@ def ajax_photo_data(request):
             nextphoto=get_next_incoming(exclude=exclude_ids)
             log.info("exclusions: %s %s",str(exclude_ids),request.POST)
             if not nextphoto:
-                import ipdb;ipdb.set_trace()
                 vals['success']=False
                 vals['message']='could not get next incoming'
                 log.error('failed to get next.')
@@ -149,7 +175,8 @@ def ajax_photo_data(request):
                               'id':nextphoto.id,
                               'fp':nextphoto.get_external_fp(),
                               'infozone':infozone,
-                              'dayvlink':nextphoto.day and nextphoto.day.vlink() or ''
+                              'dayvlink':nextphoto.day and nextphoto.day.vlink() or '',
+                              'photospothtml':nextphoto.get_photospothtml(),
                               }
                 
                 vals['nextphoto']=nextphoto_js
@@ -172,6 +199,29 @@ def ajax_photo_data(request):
             else:
                 vals['message']='bad text %s'%todo['tagname']
                 vals['success']=False
+        elif kind=='new photospot':
+            if 'spotname' in todo and todo['spotname']:
+                name=make_safe_tag_name(todo['spotname'])
+                try:
+                    exi=PhotoSpot.objects.get(name=name)
+                    vals['message']='photospot of this name already existed'
+                    vals['success']=False
+                except PhotoSpot.DoesNotExist:
+                    ps=PhotoSpot(name=name)
+                    ps.save()
+                    vals['message']='created photospot %s'%ps
+                    vals['photospot_id']=ps.id
+                    vals['name']=name
+            else:
+                vals['message']='bad text %s'%todo['tagname']
+                vals['success']=False
+        elif kind=='photospot':
+            #assigning a photospot to a photo
+            photo=Photo.objects.get(id=todo['photo_id'])
+            spot=PhotoSpot.objects.get(id=todo['photospot_ids'])
+            photo.photospot=spot
+            photo.save()
+        
         elif kind=='phototag':
             #setting/removing phototags on a given Photo
             photo=Photo.objects.get(id=todo['photo_id'])
@@ -214,6 +264,33 @@ def ajax_photo_data(request):
                 #actually was assigned this tag
                 photo.done()
                 goto_next_incoming=True
+        
+        elif kind=='photospot kill':        
+            import ipdb;ipdb.set_trace()
+            #disassociate a photo from a photospot.
+            #also mark it as not interesting any longer at all (so its out of incoming)
+            photo=Photo.objects.get(id=todo['photo_id'])
+            photo.photospot=None
+            photo.save()
+            vals['message']='disassociated photo from photospot.'
+        elif kind=='save photospot crops':
+            import ipdb;ipdb.set_trace()
+            for crop in todo['crops']:
+                photo=Photo.objects.get(id=crop['photo_id'])
+                save=False
+                if crop['xcrop']!=photo.xcrop:
+                    photo.xcrop=crop['xcrop']
+                    save=True
+                if crop['ycrop']!=photo.ycrop:
+                    photo.ycrop=crop['ycrop']
+                    save=True
+                if save:
+                    photo.save()
+            #save new crop info for a photo.  
+            #the photo won't actually be modified on disk, but pages which support cropped views
+            #(mostly photospot view page) will show it with cropping info.
+            pass
+        
         else:
             log.error('bad k %s',k)
             import ipdb;ipdb.set_trace()

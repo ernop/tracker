@@ -2,18 +2,33 @@
 {% block title %}Photospot {{photospot}}{% endblock %}
 {% block head %}
     {{super()}}
+    <script>
+    var photos={{photo_objs|jsonify|safe}}
+    //all photos
+    </script>
+    <script src="/static/js/photospot.js"></script>
 {% endblock %}
-{% block content %}{% if LOCAL %}LOCAL{% endif %}
-<div class="row">
-    <div class="span8">
-        <h2>Spot {{photospot}}</h2>
+{% block content %}
+    
+    <div class="main-zone" style="height:700px;">
+        <div class="current-photo">&nbsp;</div>
     </div>
-</div>
-
-<div class="row"><div class="span8">
-    <div id="notification" class="notification-zone">&nbsp;</div>
-</div></div>
-
+    
+    <div class="thumbzone">
+    <div style="float:left;"><h2>Spot {{photospot}} ({{photos.count()}})</h2></div>
+    {% for photo in photos %}
+        <div class="photolink photothumb" photo_id={{photo.id}}>{{photo.inhtml(size='thumb')|safe}}</div>
+    {% endfor %}
+    <div id="notification" style="clear:right;float:right;" class="notification-zone">Notification zone</div>
+    <br><div class="btn prev-btn">prev</div>
+    <div class="btn next-btn">next</div>
+    <div class="btn save-crops">Save crops</div>    
+    
+    {% if LOCAL %}LOCAL{% endif %}
+    
+    </div>
+    
+    
 {% endblock %}
 
 {% block footer %}{{super()}}{% include "jinja2/photo/photofooter.html" %}

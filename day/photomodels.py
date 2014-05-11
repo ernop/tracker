@@ -73,11 +73,10 @@ class PhotoSpot(DayModel):
     created=models.DateTimeField(auto_now_add=True)
     modified=models.DateTimeField(auto_now=True)
     name=models.CharField(max_length=100)
-    description=models.CharField(max_length=500)
-    slug=models.CharField(max_length=100)
+    description=models.CharField(max_length=500,blank=True,null=True)
+    slug=models.CharField(max_length=100,blank=True,null=True)
     latitude=models.CharField(max_length=30,blank=True,null=True)
     longitude=models.CharField(max_length=30,blank=True,null=True)
-    tag=models.ForeignKey('PhotoTag',related_name='photospot')
     
     class Meta:
         db_table='photospot'
@@ -105,12 +104,26 @@ class PhotoHasTag(DayModel):
     modified=models.DateTimeField(auto_now=True)
     photo=models.ForeignKey('Photo',related_name='tags')
     tag=models.ForeignKey('PhotoTag',related_name='photos')
+    
     class Meta:
         db_table='photohastag'
         
     def __unicode__(self):
         return '%s has "%s"'%(self.photo.name,self.tag.name)
+    
+#class PhotoHasPhotospot(DayModel):
+    #'''linkage between photo and photospot'''
+    #created=models.DateTimeField(auto_now_add=True)
+    #modified=models.DateTimeField(auto_now=True)
+    #photo=models.ForeignKey('Photo',related_name='photospot')
+    #photospot=models.ForeignKey('PhotoSpot',related_name='photos')
+    
+    #class Meta:
+        #db_table='photohasphotospot'
         
+    #def __unicode__(self):
+        #return '%s has "%s"'%(self.photo.name,self.photospot.name)
+
 class Photo(DayModel):
     ''''''
     created=models.DateTimeField(auto_now_add=True) #photo db object created
@@ -122,6 +135,11 @@ class Photo(DayModel):
     day=models.ForeignKey('Day',blank=True,null=True,related_name='photos') #related day, probably when taken.
     resolutionx=models.IntegerField(blank=True,null=True)
     resolutiony=models.IntegerField(blank=True,null=True)
+    
+    #photospot
+    photospot=models.ForeignKey('PhotoSpot',related_name='photos',blank=True,null=True)
+    xcrop=models.IntegerField(default=0) #how off it is from the default image.
+    ycrop=models.IntegerField(default=0)
     
     #camdata
     taken=models.DateTimeField(blank=True,null=True) #from exif data
@@ -319,6 +337,10 @@ class Photo(DayModel):
     def save(self, *args, **kwargs):
         #TODO: when settings not incoming, should move to storage.
         #but for now, probably fine.
+        if self.xcrop == None:
+            self.xcrop=0
+        if self.ycrop == None:
+            self.ycrop=0
         if not self.setup:
             res=self.initialize()
             if not res:
@@ -421,6 +443,7 @@ class Photo(DayModel):
              ('setup',icon(self.setup)),
              ('myphoto',icon(self.myphoto)),
              ('thumb ok',icon(self.thumb_ok)),
+             ('crop',(self.xcrop or self.ycrop) and ('%dx%d'%(self.xcrop,self.ycrop)) or ''),
              )
         res=mktable(dat,skip_false=True)
         return res
@@ -428,10 +451,18 @@ class Photo(DayModel):
     def name_table(self,include_image=True):
         vtags=', '.join([tag.tag.vlink() for tag in self.tags.all()])
         ctags=', '.join([tag.tag.clink() for tag in self.tags.all()])
+        cspot=''
+        vspot=''
+        if self.photospot:
+            cspot=self.photospot.clink()
+            vspot=self.photospot.vlink()
         dat=[('name',self.name),
              ('fp',self.fp),
              ('tags vlink',vtags),
-             ('tags clink',ctags),]
+             ('tags clink',ctags),
+             ('photospot clink',cspot),
+             ('photospot vlink',vspot),
+             ]
         if include_image:
             dat.insert(2,('img',self.inhtml(size='thumb',link=True)),)
         res=mktable(dat,skip_false=True)
@@ -458,6 +489,21 @@ class Photo(DayModel):
     
     def is_private(self):
         return self.tags.filter(tag__name__in=settings.EXCLUDED_TAGS).exists()
+    
+    
+    
+    def get_photospothtml(self):
+        if self.photospot:
+            cl=self.photospot.clink()
+            vl=self.photospot.vlink()
+            data=[('name',self.photospot.name),
+                  ('clink',cl),
+                  ('vlink',vl),
+                  ('count',self.photospot.photos.count()),]
+            return mktable(data)
+        
+        else:
+            return ''
     
     def get_photo_external_link(self,thumb=False):
         '''will be loaded from django.fuseki.net/static/photopassthrough/<FP>'''

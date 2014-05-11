@@ -52,6 +52,7 @@ urlpatterns = patterns('',
     url(r'photo_thumb_passthrough/(?P<id>[0-9]+).(jpg|gif|webp|png)$','tracker.day.photoviews.photo_thumb_passthrough',name='photo_thumb_passthrough'),
     url(r'^ajax/photo_data/$','tracker.day.photoviews.ajax_photo_data',name='ajax_photo_data'),
     url(r'^photo/photoajax/$','tracker.day.photoviews.photoajax',name='ajax_photoajax'),
+    #url(r'^photo/photospotajax/$','tracker.day.photoviews.incoming_photospot_photos_ajax',name='ajax_photospotajax'),
 )
 
 

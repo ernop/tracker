@@ -1,6 +1,7 @@
 import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime, json, calendar
 import shutil, random
 from django.conf import settings
+from choices import *
 
 log=logging.getLogger(__name__)
 
@@ -39,15 +40,31 @@ def check_incoming():
         ph=Photo(fp=fp,incoming=True)
         ph.save()
 
+def photo2obj(photo):
+    res={'fp':photo.get_external_fp(),
+     'thumbfp':photo.get_external_fp(thumb=True),
+     'id':photo.id,
+     'name':photo.name,
+     'vday':photo.day and photo.day.vlink() or '',
+     'cday':photo.day and photo.day.clink() or '',
+     'xcrop':photo.xcrop,
+     'ycrop':photo.ycrop}
+    return res
+
 def phototag2obj(phototag):
     name=phototag.name
-    from choices import *
     if phototag.person:
         if phototag.person.gender==ORGANIZATION:
             name+=' (organization)'
         else:
             name+=' (person)'
     return {'id':phototag.id,
+            'name':name,
+            'text':name,}
+
+def photospot2obj(photospot):
+    name=photospot.name
+    return {'id':photospot.id,
             'name':name,
             'text':name,}
 
@@ -103,8 +120,8 @@ def get_next_incoming(exclude=None):
             return exi
 
 def get_next_photopaths(count,excludes=None):
-    if settings.LOCAL:
-        return None
+    #if settings.LOCAL:
+        #return None
     if not excludes:excludes=[]
     excludes=excludes[:]
     photopaths=[]
