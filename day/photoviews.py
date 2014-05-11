@@ -92,8 +92,8 @@ def photospot(request,name):
     pspot=PhotoSpot.objects.get(name=name)
     vals={}
     vals['photospot']=pspot
-    vals['photos']=pspot.photos.exclude(deleted=True).all()
-    vals['photo_objs']=[photo2obj(pho) for pho in pspot.photos.all()]
+    vals['photos']=pspot.photos.exclude(deleted=True)
+    vals['photo_objs']=[photo2obj(pho) for pho in pspot.photos.exclude(deleted=True)]
     vals['phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
     return r2r('jinja2/photo/photospot.html',request,vals)
 
