@@ -50,7 +50,7 @@ def gethour(hour=None):
         res='night'
     else:
         res='midnight'
-    log.info('hour %d res %s',hour, res)
+    #log.info('hour %d res %s',hour, res)
     return res
 
 HOUR_CHOICES=zip([0,1,2,3,4,5], 'morning noon afternoon evening night midnight'.split())

@@ -48,7 +48,6 @@ def make_workout(request):
 
 @login_required
 def ajax_day_data(request):
-    log.info(request.POST)
     vals={}
     vals['success']=True
     vals['message']='start.'
@@ -169,7 +168,7 @@ def y2day(request):
 def aday(request, day):
     dtday=datetime.datetime.strptime(day, DATE_DASH_REV)
     vals={}
-    log.info('day is %s',day)
+    #log.info('day is %s',day)
     vals['today']=day
     day,created=Day.objects.get_or_create(date=dtday)
     day.save()
