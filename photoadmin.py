@@ -29,7 +29,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     #list_editable=['note',]
     search_fields= ['name']
     list_per_page=30
-    actions=['undoable_delete','delete_file','undelete','reinitialize','force_recreate_thumbs','autoorient','redo_classification',]
+    actions=['undoable_delete','delete_file','undelete','reinitialize','force_recreate_thumbs','autoorient','redo_classification','kill_entry',]
     
     def redo_classification(self,request,queryset):
         for photo in queryset:
