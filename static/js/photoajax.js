@@ -279,7 +279,7 @@ function update_tag_info(tagids){
   $.each(tagids, function(index,tagid){
     var tag=get_phototag(tagid);
     ctarget.append('<a class="btn" href="/admin/day/phototag/?id='+tag.id+'">'+tag.name+'</a> ')
-    vtarget.append('<a class="btn" href="/photo/phototag/'+tag.name+'">'+tag.name+'</a> ')
+    vtarget.append('<a class="btn" href="/photo/phototag/'+tag.name.replace(/ /g,'_')+'">'+tag.name+'</a> ')
   })
 }
 

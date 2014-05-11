@@ -84,7 +84,7 @@ def phototagsort(x):
 
 @user_passes_test(staff_test)
 def photospot(request,name):
-    name=name.replace('%20',' ')
+    name=name.replace('%20',' ').replace('_',' ')
     #should load all the full images inline.
     #keyboard controls to quickly move between them
     #and also to adjust their crop

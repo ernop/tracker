@@ -96,7 +96,7 @@ class PhotoSpot(DayModel):
                 text=self.name
             else:
                 text='no name photospot'
-        return '<a class="btn" href="/photo/photospot/%s/">%s</a>'%(self.name, text)
+        return '<a class="btn" href="/photo/photospot/%s/">%s</a>'%(self.name.replace(' ','_'), text)
 
 class PhotoHasTag(DayModel):
     '''through object for photo&phototag'''
