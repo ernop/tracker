@@ -167,6 +167,13 @@ class Photo(DayModel):
             return False
         return os.path.exists(self.fp)
     
+    def kill_this(self):
+        if self.file_exists():
+            os.remove(self.fp)  
+        if os.path.exists(self.thumbfp):
+            os.remove(self.thumbfp)
+        self.delete()
+    
     def delete_file(self):
         if self.file_exists():
             os.remove(self.fp)  

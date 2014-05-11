@@ -41,6 +41,11 @@ class PhotoAdmin(OverriddenModelAdmin):
         for photo in queryset:
             photo.initialize()
     
+    
+    def kill_entry(self,request,queryset):
+        for photo in queryset:
+            photo.kill_this()
+    
     def delete_file(self,request,queryset):    
         for photo in queryset:
             photo.delete_file()
