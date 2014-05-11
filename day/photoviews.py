@@ -180,7 +180,6 @@ def ajax_photo_data(request):
                 vals['nextphoto']=nextphoto_js
                 vals['success']=True
                 vals['message']='preloaded fp %s'%nextphoto_js['fp']
-                log.info('returning photo %s',nextphoto_js)
         elif kind=='new phototag':
             if 'tagname' in todo and todo['tagname']:
                 name=make_safe_tag_name(todo['tagname'])
