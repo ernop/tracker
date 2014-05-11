@@ -143,6 +143,6 @@ def get_next_photopaths(count,excludes=None):
 def can_access_private(user):
     if not user:
         return False
-    if user.username=='superuser':
+    if user.username.startswith('superuser'):
         return True
     return False
