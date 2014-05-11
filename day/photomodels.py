@@ -352,7 +352,7 @@ class Photo(DayModel):
                 self.name=self.fp.rsplit('/')[-1]
             else:
                 self.name=self.fp
-        self.name=make_safe_filename(self.name)
+        self.name=make_safe_filename(self.name)[:100]
         if self.taken and not self.day:
             #make the day
             from day.models import Day

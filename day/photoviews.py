@@ -163,7 +163,6 @@ def ajax_photo_data(request):
             except Exception,e:
                 import ipdb;ipdb.set_trace()
             nextphoto=get_next_incoming(exclude=exclude_ids)
-            log.info("exclusions: %s %s",str(exclude_ids),request.POST)
             if not nextphoto:
                 vals['success']=False
                 vals['message']='could not get next incoming'

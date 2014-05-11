@@ -81,7 +81,10 @@ def get_exif(im):
         return False
     for tag, value in info.items():
         decoded = TAGS.get(tag, tag)
-        ret[decoded] = value
+        try:
+            ret[decoded] = value
+        except:
+            ret[decoded] = repr(value)
     return ret
 
 def getletter():
