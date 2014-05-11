@@ -261,7 +261,11 @@ class Photo(DayModel):
                              settings.THUMB_HEIGHT,
                              newthumbfp)
         log.info("create thumb doing cmd %s",cmd)
-        res=os.system(cmd)
+        try:
+            res=os.system(cmd)
+        except:
+            log.error('failure in cmd %s',cmd)
+            return False
         if res:
             log.error('failure of convert command %s',cmd)
             self.thumb_ok=False
