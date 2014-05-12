@@ -111,13 +111,16 @@ def get_next_incoming(exclude=None):
     #goto next incoming photo by id for quick shifting.
     #actually i should preload this...
     from day.models import Photo
+    log.info('getting next incoming with exclude %s', str(exclude))
     if not exclude:
         exclude=[]
     elif type(exclude) is not list:
         exclude=[exclude]
     exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('-id')
+    log.info('first exis ct.%d', exis.count())
     if not exis.exists():
         exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).order_by('-id')
+    log.info('second exis ct.%d', exis.count())
     ii=0
     found=False
     ct=exis.count()
@@ -127,6 +130,7 @@ def get_next_incoming(exclude=None):
         exi=exis[ii]
         if exi.file_exists():
             return exi
+        ii=ii+1
 
 def get_next_photopaths(count,excludes=None):
     #if settings.LOCAL:
