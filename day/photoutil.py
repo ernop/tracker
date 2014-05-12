@@ -116,12 +116,11 @@ def get_next_incoming(exclude=None):
         exclude=[]
     elif type(exclude) is not list:
         exclude=[exclude]
-    exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img')
+    exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img')
     log.info('first exis ct.%d', exis.count())
     if not exis.exists():
-        exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True)
+        exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True)
     exis=exis.order_by('day__date','taken','created','modified','id')
-    log.info('second exis ct.%d', exis.count())
     ii=0
     found=False
     ct=exis.count()
