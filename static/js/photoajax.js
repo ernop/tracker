@@ -2,12 +2,13 @@ showing=false;
 loaded_photos=[];
 current_photo=null
 past_photos=[]
-
+keynav_active=true;
 ii=0
 $(document).ready(function(){
     load_show();
     setup_buttons();
     //setup_phototagselect(); //empty tags when first load, but all choices.
+    setup_keynav();
 })
 
 function load_show(){
@@ -69,7 +70,7 @@ function load(donefunc){
                         nextphoto.image=im
                         if (donefunc){donefunc.call(json)}
                     }
-                    setTimeout(load(),2000);
+                    setTimeout(load(),1000);
                 }
             },
             error:function(json){
@@ -124,7 +125,7 @@ function show_next(going_backwards){
     {load();}
 }
 
-function pop_select2(){
+function pop_tag(){
     //force focus to the tag/control box select 2 thing.
     var select2=$('#phototagselect2').data('select2');
     setTimeout(function() {
@@ -133,6 +134,17 @@ function pop_select2(){
         }
     }, 0); 
 }
+
+function pop_photospot(){
+    //force focus to the tag/control box select 2 thing.
+    var select2=$('#phototagselect2').data('select2');
+    setTimeout(function() {
+        if (!select2.opened()) {
+            select2.open();
+        }
+    }, 0); 
+}
+
 
 function reset_photospot_select2(){
     var sel=$('#photospotselect2');
@@ -165,7 +177,6 @@ function reset_photo_tags(){
     //first time you set it up its empty.  each re-getting data will re-set it.
     fix_phototags()
     ptg.unbind('change').on('change', change_phototag)
-    //pop_select2();
     console.log('reset photo tags end')
 }
 
@@ -407,3 +418,41 @@ function make_photozone(photo){
 }
 
 
+function setup_keynav(){
+  $(document.documentElement).keydown(function (event) {
+    if (!keynav_active){return}
+    if (event.keyCode==84){ //t
+        pop_tag()
+        keynav_active=false;
+    }
+    if (event.keyCode==80){ //p
+            pop_photospot()
+            keynav_active=false;t
+    }
+     //if (event.keyCode == 37) {
+        //show_prev()
+    //} else if (event.keyCode == 39) {
+    
+      //show_next()
+    //}
+    //else if (event.keyCode==87){//up
+      //crop_current(0,1);
+    //}
+    //else if (event.keyCode==65){//left
+      //crop_current(-1,0);
+    //}
+    //else if (event.keyCode==83){//down
+      //crop_current(0,-1);
+    //}
+    //else if (event.keyCode==68){//right
+      //crop_current(1,0);
+    //}
+    //else if (event.keyCode==88){//x
+      //kill_current();
+    //}
+    //else if (event.keyCode==72){//x
+      //flip_first();
+    //}
+    
+});
+}

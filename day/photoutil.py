@@ -115,15 +115,16 @@ def get_next_incoming(exclude=None):
         exclude=[]
     elif type(exclude) is not list:
         exclude=[exclude]
-    exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).order_by('-id')
+    exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).filter(fn__icontains='img').order_by('-id')
+    if not exis.exists():
+        exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).order_by('-id')
     ii=0
     found=False
+    ct=exis.count()
     while 1:
-        if len(exis)>ii:
-            exi=exis[ii]
-        else:
-            return False #out the end
-        ii+=1
+        if ii>ct:
+            return False
+        exi=exis[ii]
         if exi.file_exists():
             return exi
 

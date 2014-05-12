@@ -154,8 +154,14 @@ class PurchaseAdmin(OverriddenModelAdmin):
     def mysource(self, obj):
         return obj.source.clink()
 
+    @debu
     def mycreated(self, obj):
-        return '<a href="/admin/day/purchase/?created__day=%d&created__month=%d&created__year=%d">%s</a>'%(obj.created.day, obj.created.month, obj.created.year, obj.created.strftime(DATE))
+        ct='<a href="/admin/day/purchase/?created__day=%d&created__month=%d&created__year=%d">%s</a>'%(obj.created.day, obj.created.month, obj.created.year, obj.created.strftime(DATE))
+        try:
+            day=Day.objects.get(date=obj.created.date()).vlink()
+        except Day.DoesNotExist:
+            day=None
+        return mktable([('clink',obj.clink()),('day',day),('ct',ct)], skip_false=True)
 
     @debu
     def mycost(self, obj):
