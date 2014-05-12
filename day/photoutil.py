@@ -115,7 +115,7 @@ def get_next_incoming(exclude=None):
         exclude=[]
     elif type(exclude) is not list:
         exclude=[exclude]
-    exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).filter(fn__icontains='img').order_by('-id')
+    exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('-id')
     if not exis.exists():
         exis=Photo.objects.exclude(id__in=exclude).filter(incoming=True).order_by('-id')
     ii=0

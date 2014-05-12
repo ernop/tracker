@@ -116,7 +116,8 @@ function show_next(going_backwards){
         notify(next.fp,true);
         showing=true;
         reset_photo_tags();
-        reset_photospot_select2()
+        reset_photospot_select2();
+        keynav_active=true
     }else{
         notify('no photo was ready',false)
     }
