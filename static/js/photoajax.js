@@ -122,8 +122,8 @@ function show_next(going_backwards){
         notify('no photo was ready',false)
     }
     console.log('show next end')
-    if (loaded_photos.length<10)
-    {load();}
+    /if (loaded_photos.length<10)
+    //{load();}
 }
 
 function pop_tag(){
@@ -138,7 +138,7 @@ function pop_tag(){
 
 function pop_photospot(){
     //force focus to the tag/control box select 2 thing.
-    var select2=$('#phototagselect2').data('select2');
+    var select2=$('#photospotselect2').data('select2');
     setTimeout(function() {
         if (!select2.opened()) {
             select2.open();
@@ -428,7 +428,7 @@ function setup_keynav(){
     }
     if (event.keyCode==80){ //p
             pop_photospot()
-            keynav_active=false;t
+            keynav_active=false;
     }
      //if (event.keyCode == 37) {
         //show_prev()
