@@ -122,7 +122,7 @@ function show_next(going_backwards){
         notify('no photo was ready',false)
     }
     console.log('show next end')
-    /if (loaded_photos.length<10)
+    //if (loaded_photos.length<10)
     //{load();}
 }
 
