@@ -52,10 +52,10 @@ function show_prev(){
   show_current()
 }
 
-function add_css(obj,xcrop,ycrop){
+function add_css(obj, xcrop, ycrop){
   obj.css('position','relative')
   obj.css('left','0')
-  obj.css('right','0')
+  obj.css('top','0')
   if (xcrop){
     obj.css('left',String(-1*parseInt(xcrop))+'px')
     }
@@ -122,8 +122,9 @@ function kill_current(){
     },
   })
   total_photos=total_photos-1
-  current_index=current_index-1
+  
   photos.splice(current_index,1)//remove current photo
+  current_index=current_index-1
   $('.photothumb[photo_id='+photo.id+']').remove()
   show_current()
 }

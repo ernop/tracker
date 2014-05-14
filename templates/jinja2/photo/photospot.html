@@ -15,7 +15,7 @@
     </div>
     
     <div class="thumbzone">
-    <div style="float:left;"><h2>Spot {{photospot}} ({{photos.count()}})</h2></div>
+    <div><h2>Spot {{photospot}} ({{photos.count()}})</h2></div>
     {% for photo in photos %}
         <div class="photospot-photolink photothumb" photo_id={{photo.id}}>{{photo.inhtml(size='thumb')|safe}}</div>
     {% endfor %}

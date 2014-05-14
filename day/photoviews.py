@@ -78,8 +78,8 @@ def photospot(request,name):
     pspot=PhotoSpot.objects.get(name=name)
     vals={}
     vals['photospot']=pspot
-    vals['photos']=pspot.photos.exclude(deleted=True)
-    vals['photo_objs']=[photo2obj(pho) for pho in pspot.photos.exclude(deleted=True)]
+    vals['photos']=pspot.photos.exclude(deleted=True).order_by('day__date')
+    vals['photo_objs']=[photo2obj(pho) for pho in pspot.photos.exclude(deleted=True).order_by('day__date')]
     vals['phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
     return r2r('jinja2/photo/photospot.html',request,vals)
 
@@ -230,14 +230,12 @@ def ajax_photo_data(request):
                     pht.save()
             if photo.tags.filter(tag__name='delete').exists() and not photo.deleted:
                 photo.undoable_delete()
-                goto_next_incoming=True
             elif PhotoHasTag.objects.filter(tag__name='undelete').exists() and photo.deleted:
                 photo.undelete()
                 photo.tags.filter(tag__name='undelete').delete()
                 #dont actually leave the "undelete" tag on there, its weird
             if photo.tags.filter(tag__name='done').exists() and photo.incoming:
                 #move on from incoming guys once "done" is entered
-                goto_next_incoming=True
                 photo.done()
             if photo.tags.filter(tag__name='myphoto').exists():
                 #move on from incoming guys once "done" is entered
@@ -246,18 +244,20 @@ def ajax_photo_data(request):
             if photo.tags.filter(tag__name__in=settings.CLOSING_TAGS).exclude(tag__id__in=kept_tagids):
                 #actually was assigned this tag
                 photo.done()
-                goto_next_incoming=True
             vals['message']='saved %d tags.'%photo.tags.count()
         
         elif kind=='remove photo from photospot':        
             #disassociate a photo from a photospot.
             #also mark it as not interesting any longer at all (so its out of incoming)
             photo=Photo.objects.get(id=todo['photo_id'])
-            photo.undoable_delete()
+            #photo.undoable_delete()
+            photo.photospot=None
+            photo.tags.find(tag__name='done').remove()
+            photo.incoming=True
             photo.save()
             #also mark it done & not incoming anymore.
             
-            vals['message']='disassociated photo from photospot.  to undo, go here: %s'%photo.clink()
+            vals['message']='disassociated photo from photospot. %s'%photo.clink()
         elif kind=='save photospot crops':
             for crop in todo['crops']:
                 photo=Photo.objects.get(id=crop['photo_id'])
@@ -273,15 +273,11 @@ def ajax_photo_data(request):
             #save new crop info for a photo.  
             #the photo won't actually be modified on disk, but pages which support cropped views
             #(mostly photospot view page) will show it with cropping info.
-            pass
+            vals['message']='saved %d crops'%len(todo['crops'])
         
         else:
             log.error('bad k %s',k)
             import ipdb;ipdb.set_trace()
-        if goto_same:
-            vals['message']='auto-oriented'
-            vals['goto_next_photo']=True
-            vals['next_photo_href']=photo.exhref()
         return r2j(vals)
     except Exception,e:
         vals['success']=False
