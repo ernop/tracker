@@ -79,7 +79,7 @@ def photospotsort(x):
     return x.id
 
 def phototagsort(x):
-    key=(x.person is not None, x.person and -1*x.person.rough_purchase_count or 0,x.name)
+    key=(x.person is not None, x.person and -1*x.person.rough_purchase_count or 0,x.use_count*-1,x.name)
     return key
 
 @user_passes_test(staff_test)

@@ -248,6 +248,7 @@ class Measurement(DayModel):
     place=models.ForeignKey('MeasuringSpot', related_name='measurements')
     amount=models.FloatField()
     created=models.DateField()
+    day=models.ForeignKey('Day',related_name='measurements')
 
     def __unicode__(self):
         return '%s %s: %s'%(self.place, self.created.strftime(DATE), rstripz(self.amount))#','.join([str(s) for s in self.sets.all()]),)

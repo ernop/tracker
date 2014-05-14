@@ -725,7 +725,7 @@ class TagAdmin(OverriddenModelAdmin):
     #list_display='id tag day'.split()
 
 class DayAdmin(OverriddenModelAdmin):
-    list_display='id date mytags mynotes myvday myday'.split()
+    list_display='id date mytags mynotes myvday mymeasurements'.split()
     search_fields=['text','tag__name','text',]
     list_filter=[HasPurchFilter,HasNoteFilter,]
     date_hierarchy='date'
@@ -739,10 +739,13 @@ class DayAdmin(OverriddenModelAdmin):
     def myday(self, obj):
         return obj.clink()
 
+    def mymeasurements(self,obj):
+        return '<br>'.join([m.clink() for m in obj.measurements.all()])
+
     def mynotes(self, obj):
         return '<br>'.join(['%s %s'%(n.clink(text=n.day), n.subnotelink()) for n in obj.notes.all()])
 
-    adminify(mytags, myvday, mynotes,myday)
+    adminify(mytags, myvday, mynotes,myday,mymeasurements)
 
 class NoteAdmin(OverriddenModelAdmin):
     list_display='id text myvday myday mynotekinds'.split()

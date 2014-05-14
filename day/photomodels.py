@@ -27,6 +27,7 @@ class PhotoTag(DayModel):
     
     #admin
     control_tag=models.BooleanField(default=False) #ajax/js will take more actions
+    use_count=models.IntegerField()
     
     @classmethod
     def setup_people_tags(self):
@@ -47,6 +48,17 @@ class PhotoTag(DayModel):
             pt=PhotoTag(name=tn)
             pt.save()
     
+    @classmethod
+    def update_tag_counts(self):
+        for pt in PhotoTag.objects.all():
+            ct=pt.photos.count()
+            pt.use_count=ct
+            pt.save()
+    
+    def save(self, *args, **kwargs):
+        if self.use_count is None:
+            self.use_count=0
+        super(PhotoTag, self).save(*args, **kwargs)
     
     #when this tag is added.  f.e. delete / undelete
     def get_external_page(self):
@@ -474,8 +486,10 @@ class Photo(DayModel):
         vspot=div(klass='vspotzone',contents=vspot or '&nbsp;')
         dat=[('name',self.name),
              ('fp',self.fp),
-             ('tags vlink',vtags),
              ('tags clink',ctags),
+             ('tags vlink',vtags),
+             
+             
              ('photospot clink',cspot),
              ('photospot vlink',vspot),
              ]

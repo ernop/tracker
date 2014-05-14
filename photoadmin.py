@@ -120,9 +120,8 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     
     def reinitialize_tags(self,request,queryset):
         PhotoTag.setup_initial_tags()
-        
-    def create_people_tags(self,request,queryset):
         PhotoTag.setup_people_tags()
+        PhotoTag.update_tag_counts()
         
     def myphotos(self,obj):
         res=[]
@@ -138,6 +137,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     @debu
     def myname(self,obj):
         data=(('vlink',obj.vlink()),
+              ('use count',obj.use_count),
               ('person clink',obj.person and '%s'%(obj.person.clink()) or ''),
               )
         return mktable(data)
