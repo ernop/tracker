@@ -125,7 +125,7 @@ def get_next_incoming(exclude=None):
     found=False
     ct=exis.count()
     while 1:
-        if ii>ct:
+        if ii>=ct:
             return False
         exi=exis[ii]
         if exi.file_exists():
