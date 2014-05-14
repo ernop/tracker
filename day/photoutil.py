@@ -38,6 +38,9 @@ def check_incoming():
         res=os.system(cmd)
         if res:
             log.error("fail cmd %s for fp %s"%(cmd,fp))
+            ph=Photo(fp=fp,deleted=True,incoming=False)
+            #if mogrify fails, just mark them deleted and prepare to kill them later
+            ph.save()
             continue
         ph=Photo(fp=fp,incoming=True)
         try:
@@ -116,10 +119,13 @@ def get_next_incoming(exclude=None):
         exclude=[]
     elif type(exclude) is not list:
         exclude=[exclude]
-    exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img')
-    log.info('first exis ct.%d', exis.count())
-    if not exis.exists():
-        exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True)
+    imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img')
+    for img in imgexis:
+        if img.file_exists():
+            return img
+        
+    #no IMG ones, so return
+    exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True)
     exis=exis.order_by('day__date','taken','created','modified','id')
     ii=0
     found=False
@@ -154,3 +160,21 @@ def can_access_private(user):
     if user.username.startswith('superuser'):
         return True
     return False
+
+
+def get_full_phototags():
+    from photomodels import PhotoTag
+    full_phototags=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
+    return full_phototags
+
+def get_full_photospots():
+    from photomodels import PhotoSpot
+    full_photospots=[photospot2obj(pt) for pt in sorted(PhotoSpot.objects.all(),key=photospotsort)]
+    return full_photospots
+
+def photospotsort(x):
+    return x.name
+
+def phototagsort(x):
+    key=(x.person is not None, x.person and -1*x.person.rough_purchase_count or 0,x.use_count*-1,x.name)
+    return key

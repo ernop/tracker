@@ -18,13 +18,6 @@ log=logging.getLogger(__name__)
 
 from photoutil import *
 
-def get_full_phototags():
-    full_phototags=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
-    return full_phototags
-
-def get_full_photospots():
-    full_photospots=[photospot2obj(pt) for pt in sorted(PhotoSpot.objects.all(),key=photospotsort)]
-    return full_photospots
 
 @user_passes_test(staff_test)
 def photoajax(request):
@@ -74,13 +67,6 @@ def phototag(request,name):
     vals={}
     vals['phototag']=phototag
     return r2r('jinja2/photo/phototag.html',request,vals)
-
-def photospotsort(x):
-    return x.id
-
-def phototagsort(x):
-    key=(x.person is not None, x.person and -1*x.person.rough_purchase_count or 0,x.use_count*-1,x.name)
-    return key
 
 @user_passes_test(staff_test)
 def photospot(request,name):
@@ -218,6 +204,7 @@ def ajax_photo_data(request):
             spot=PhotoSpot.objects.get(id=todo['photospot_id'])
             photo.photospot=spot
             photo.save()
+            vals['message']='assigned photospot.'
         
         elif kind=='phototag':
             #setting/removing phototags on a given Photo
@@ -261,6 +248,7 @@ def ajax_photo_data(request):
                 #actually was assigned this tag
                 photo.done()
                 goto_next_incoming=True
+            vals['message']='saved %d tags.'%photo.tags.count()
         
         elif kind=='remove photo from photospot':        
             #disassociate a photo from a photospot.

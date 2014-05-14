@@ -57,7 +57,7 @@ function load(donefunc){
                             exi=true
                             console.log("got duplicate",nextphoto.fp)
                             notify('dup',true)
-                            return}
+                            return false}
                     })
                     if (!exi){//we actually got a new one...
                         
@@ -150,13 +150,16 @@ function pop_photospot(){
 function reset_photospot_select2(){
     var sel=$('#photospotselect2');
     if (current_photo.photospot){
-        sel.attr('value',current_photo.photospot.id)
+        console.log('setting current')
+        sel.attr('value',current_photo.photospot.id);
+    }else{
+        sel.attr('value',null);
     }
     sel.select2({data:full_photospots,
         multiple:false,
-        initSelection: function(element,callback){
-            callback(get_photospot_for_current_photo())
-        }
+        //initSelection: function(element,callback){
+            //callback(get_photospot_for_current_photo())
+        //}
     })
     sel.unbind('change').on('change', change_photospot)
 }
@@ -165,19 +168,19 @@ function reset_photo_tags(){
     //after loading a photo, set the phototags for it
     //based on the current_photo object
     console.log('reset photo tags start')
-    var ptg=$('#phototagselect2');
-    ptg.attr('value',current_photo.tagids.join(','))
+    var sel=$('#phototagselect2');
+    sel.attr('value',current_photo.tagids.join(','))
     //sucks that even if you setup initselection based, select2 won't call it
     //unless you ALSO define a "value" field on the select2 element, EVEN if you never use that!
-    ptg.select2({data:full_phototags,
+    sel.select2({data:full_phototags,
         multiple:true,
         initSelection: function(element,callback){
             callback(get_tags_for_current_photo())
         }
     })
     //first time you set it up its empty.  each re-getting data will re-set it.
-    fix_phototags()
-    ptg.unbind('change').on('change', change_phototag)
+    //fix_phototags()
+    sel.unbind('change').on('change', change_phototag)
     console.log('reset photo tags end')
 }
 
@@ -200,7 +203,7 @@ function get_tags_for_current_photo(){
 function get_photospot_for_current_photo(){
     if (current_photo && current_photo.photospot)
         {return current_photo.photospot.id}
-    return null
+    return []
 }
 
 function maybe_goto_next(tagids){
@@ -208,7 +211,7 @@ function maybe_goto_next(tagids){
     $.each(tagids, function(index, tagid){
         if (TAGIDS_WHICH_FORCE_NEXT.indexOf(parseInt(tagid))!=-1){
             show_next()
-            return;
+            return false;
         }
     })
 }
@@ -228,8 +231,9 @@ function change_photospot(e){
     console.log('change photospot start')
     if (e){var target=$(e.target)}else{
     var target=$('#photospotselect2')}
+    current_photo.photoid=target.attr('value');
     data_changed(target, 'photospot');
-    //current_photo.tagids=target.attr('value').split(',');
+    
     //maybe_goto_next(current_photo.tagids)
     console.log('change photospot end')
 }
@@ -290,6 +294,7 @@ function update_tag_info(tagids){
   vtarget.find('a').remove()
   $.each(tagids, function(index,tagid){
     var tag=get_phototag(tagid);
+    if (!tag){return}
     ctarget.append('<a class="btn" href="/admin/day/phototag/?id='+tag.id+'">'+tag.name+'</a> ')
     vtarget.append('<a class="btn" href="/photo/phototag/'+tag.name.replace(/ /g,'_')+'">'+tag.name+'</a> ')
   })
@@ -301,15 +306,17 @@ function update_spot_info(spotid){
   ctarget.find('a').remove()
   vtarget.find('a').remove()
   var spot=get_photospot(spotid);
-  ctarget.append('<a class="btn" href="/admin/day/photospot/?id='+spot.id+'">'+spot.name+'</a> ')
-  vtarget.append('<a class="btn" href="/photo/photospot/'+spot.name.replace(/ /g,'_')+'">'+spot.name+'</a> ')
+  if (spot){
+    ctarget.append('<a class="btn" href="/admin/day/photospot/?id='+spot.id+'">'+spot.name+'</a> ')
+    vtarget.append('<a class="btn" href="/photo/photospot/'+spot.name.replace(/ /g,'_')+'">'+spot.name+'</a> ')
+  }
 }
 
 function get_phototag(tagid){
   var res=null
   $.each(full_phototags, function(index, tag){
-    if (tag.id==tagid){res=tag}
-    return
+    if (tag.id==tagid){res=tag;return false}
+    
   })
   return res
 }
@@ -317,8 +324,8 @@ function get_phototag(tagid){
 function get_photospot(photospot_id){
   var res=null
   $.each(full_photospots, function(index, photospot){
-    if (photospot.id==photospot_id){res=photospot}
-    return
+    if (photospot.id==photospot_id){res=photospot;return false}
+    
   })
   return res
 }
