@@ -137,7 +137,6 @@ def ajax_photo_data(request):
         except:
             todo=json.loads(request.raw_post_data)
             kind=todo['kind']
-        goto_next_incoming=False
         goto_same=False
         if kind=='ajax photo preload':
             try:
@@ -279,17 +278,6 @@ def ajax_photo_data(request):
         else:
             log.error('bad k %s',k)
             import ipdb;ipdb.set_trace()
-        if goto_next_incoming:
-            next_incoming=get_next_incoming(exclude=photo.id)
-            if next_incoming:
-                vals['message']='undeleted'
-                vals['goto_next_photo']=True
-                vals['next_photo_href']=next_incoming.exhref()
-            else:
-                vals['message']='no more photos to process'
-                vals['goto_next_photo']=True
-                vals['next_photo_href']='/photo/incoming/'
-            vals['last_photo_href']=photo.exhref()
         if goto_same:
             vals['message']='auto-oriented'
             vals['goto_next_photo']=True

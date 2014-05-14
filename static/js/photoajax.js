@@ -17,7 +17,9 @@ function load_show(){
     console.log('load show end')
 }
 
-function load(donefunc){
+function load_one(){load(null, true)}
+
+function load(donefunc, only_one){
     if (loaded_photos.length>25){return}
     ii=ii+1
     
@@ -60,7 +62,6 @@ function load(donefunc){
                             return false}
                     })
                     if (!exi){//we actually got a new one...
-                        
                         console.log("got new",nextphoto.id)
                         notify(json['message'],json['success'])
                         loaded_photos.push(nextphoto)
@@ -70,7 +71,9 @@ function load(donefunc){
                         nextphoto.image=im
                         if (donefunc){donefunc.call(json)}
                     }
-                    setTimeout(load(),1000);
+                    if (!only_one){
+                        setTimeout(load(),1000);
+                    }
                 }
             },
             error:function(json){
@@ -122,8 +125,8 @@ function show_next(going_backwards){
         notify('no photo was ready',false)
     }
     console.log('show next end')
-    //if (loaded_photos.length<10)
-    //{load();}
+    if (loaded_photos.length<20)
+        {load_one();}
 }
 
 function pop_tag(){

@@ -165,6 +165,10 @@ def can_access_private(user):
 def get_full_phototags():
     from photomodels import PhotoTag
     full_phototags=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
+    #move done to the end.
+    res=full_phototags[:2]
+    res.reverse()
+    full_phototags=res+full_phototags[2:]
     return full_phototags
 
 def get_full_photospots():
