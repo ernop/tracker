@@ -29,7 +29,8 @@ def do_measurementset(request, measurementset_id=None):
         ms=MeasurementSet.objects.get(id=measurementset_id)
         msids=[]
         for spot in ms.measurement_spots.all():
-            m=Measurement(place=spot, created=datetime.datetime.now(), amount=0)
+            day=Day.objects.get(date=datetime.datetime.now().today())
+            m=Measurement(place=spot, created=datetime.datetime.now(), amount=0,day=day)
             m.save()
             msids.append(m.id)
         qs=Measurement.objects.filter(id__in=msids)

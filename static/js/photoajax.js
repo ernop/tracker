@@ -58,12 +58,13 @@ function load(donefunc, only_one){
                         if (lp.id==nextphoto.id){
                             exi=true
                             console.log("got duplicate",nextphoto.fp)
-                            notify('dup',true)
+                            notify('dup, loaded:'+loaded_photos.length,true);
+                            setTimeout(load_one(),0);
                             return false}
                     })
                     if (!exi){//we actually got a new one...
                         console.log("got new",nextphoto.id)
-                        notify(json['message'],json['success'])
+                        notify(json['message']+' preloaded this many:'+loaded_photos.length,json['success'])
                         loaded_photos.push(nextphoto)
                         var im=new Image()
                         im.height=800
@@ -72,7 +73,7 @@ function load(donefunc, only_one){
                         if (donefunc){donefunc.call(json)}
                     }
                     if (!only_one){
-                        setTimeout(load(),1000);
+                        setTimeout(load(),0);
                     }
                 }
             },
@@ -89,7 +90,6 @@ function maybe_show(){
     if (!showing){
         show_next()
     }
-    //setTimeout(load(),2000);
     console.log('maybe show end')
 }
 
