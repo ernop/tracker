@@ -470,6 +470,7 @@ class Photo(DayModel):
              ('setup',icon(self.setup)),
              ('myphoto',icon(self.myphoto)),
              ('thumb ok',icon(self.thumb_ok)),
+             ('done',icon(self.done)),
              ('crop',(self.xcrop or self.ycrop) and ('%dx%d'%(self.xcrop,self.ycrop)) or ''),
              )
         res=mktable(dat,skip_false=True)
