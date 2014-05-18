@@ -743,8 +743,10 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         while trying<now:
             if trying.strftime(DATE) in res:
                 lastt=res.get(trying.strftime(DATE))
+            lastt=lastt or 0
             res2.append(lastt)
             trying=datetime.timedelta(days=1)+trying
+        
         thang = simple_sparkline(results=res2, width=2, height=100)
         return '<div>%s</div>'% thang
 
