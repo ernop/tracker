@@ -108,7 +108,7 @@ function show_next(going_backwards){
         
             if (going_backwards)
                 {loaded_photos.unshift(current_photo)}   
-            else{past_photos.push(current_photo)}
+            else{past_photos=[current_photo]}
         }
         current_photo=next
         clear_infozone()
