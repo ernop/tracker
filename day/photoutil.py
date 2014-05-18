@@ -139,6 +139,7 @@ def get_next_incoming(exclude=None):
             log.info('returning img %s', img)
             return img
         else:
+            log.error('deleting img %s',img)
             img.undoable_delete()
         ii=ii+1
         log.info("ii %d",ii)
