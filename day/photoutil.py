@@ -122,6 +122,7 @@ def get_next_incoming(exclude=None):
     imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img')
     for img in imgexis:
         if img.file_exists():
+            log.info('returning img %s', img)
             return img
     #no IMG ones, so return
     exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True)
@@ -131,11 +132,14 @@ def get_next_incoming(exclude=None):
     ct=exis.count()
     while 1:
         if ii>=ct:
+            log.info("return false. %d",ii)
             return False
-        exi=exis[ii]
-        if exi.file_exists():
-            return exi
+        img=exis[ii]
+        if img.file_exists():
+            log.info('returning img %s', img)
+            return img
         ii=ii+1
+        log.info("ii %d",ii)
 
 def get_next_photopaths(count,excludes=None):
     #if settings.LOCAL:
