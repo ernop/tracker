@@ -178,8 +178,12 @@ class Photo(DayModel):
 
     def file_exists(self):
         if not self.fp:
+            log.error('image missing fp. %s',fp)
             return False
-        return os.path.exists(self.fp)
+        res=os.path.exists(self.fp)
+        if not res:
+            log.error('fp not exist. %s %s',self,fp)
+        return res
     
     def kill_this(self):
         if self.file_exists():

@@ -138,6 +138,9 @@ def get_next_incoming(exclude=None):
         if img.file_exists():
             log.info('returning img %s', img)
             return img
+        else:
+            img.
+            img.save()
         ii=ii+1
         log.info("ii %d",ii)
 
