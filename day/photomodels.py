@@ -183,8 +183,7 @@ class Photo(DayModel):
             return False
         res=os.path.exists(self.fp)
         if not res:
-            log.error('fp not exist. %s %s',self,fp)
-        if not res:
+            log.error('fp not exist. %s %s',self,self.fp)
             self.undoable_delete()
         return res
     
