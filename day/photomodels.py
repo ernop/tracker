@@ -407,11 +407,10 @@ class Photo(DayModel):
             self.tags.filter(tag__name='undelete').delete()
             shutil.move(self.fp,delfp)
             self.fp=delfp
-            self.deleted=True
-            self.incoming=False
-            self.save()
-            return True
-        return False
+        self.deleted=True
+        self.incoming=False
+        self.save()
+        return True
     
     def autoorient(self):
         cmd='mogrify -auto-orient "%s"'%(self.fp)
