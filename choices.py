@@ -30,6 +30,8 @@ HUMANIZE_DATE_FULL_MONTH = '%B %d' #June 20
 HUMANIZE_FULL_DATE='%B %d, %Y' # 'September 20, 2012
 HUMANIZE_DW='%B %d, %a' # 'September 20, Thursday
 HUMANIZE_FULL_DATETIME=' %B %d %H%p' # September 20 18PM'
+MONTH_YEAR='%B %Y' #March 2012
+YEAR_MONTH='%Y %B' #2012 March
 
 
 DATE =DATE_DASH_REV

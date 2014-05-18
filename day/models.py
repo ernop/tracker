@@ -98,7 +98,7 @@ class Day(DayModel):
         try:
             from day.models import Measurement
             nextday=self.date+datetime.timedelta(days=1)
-            return Measurement.objects.filter(created__gte=self.date, created__lt=nextday).order_by('place__domain','place__name')
+            return Measurement.objects.filter(created__gte=self.date, created__lt=nextday).order_by('spot__domain','spot__name')
         except Exception, e:
             print 'bad'
             return []
@@ -245,13 +245,13 @@ class ExWeight(DayModel):
     def adm(self):
         return lnk('exweight',self.id, self)
 class Measurement(DayModel):
-    place=models.ForeignKey('MeasuringSpot', related_name='measurements')
+    spot=models.ForeignKey('MeasuringSpot', related_name='measurements')
     amount=models.FloatField()
     created=models.DateField()
     day=models.ForeignKey('Day',related_name='measurements')
 
     def __unicode__(self):
-        return '%s %s: %s'%(self.place, self.created.strftime(DATE), rstripz(self.amount))#','.join([str(s) for s in self.sets.all()]),)
+        return '%s %s: %s'%(self.spot, self.created.strftime(DATE), rstripz(self.amount))#','.join([str(s) for s in self.sets.all()]),)
 
     def get_amount(self):
         '''return int(amount) if it looks ok'''

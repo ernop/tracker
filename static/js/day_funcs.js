@@ -142,7 +142,7 @@ function setup_new_purch(){
 
 function setup_new_measurement(){
     var pz=$(".measurement-zone");
-    $("#measurement-place").select2({data:measurement_places});
+    $("#measurement-spot").select2({data:measurement_spots});
     $(".make-measurement").click(submit_measurement)
 }
 
@@ -182,7 +182,7 @@ function get_purchase_data(){
 
 function get_measurement_data(){
 	var dat={};
-	dat['place_id']=$("#measurement-place").select2('data').id;
+	dat['spot_id']=$("#measurement-spot").select2('data').id;
 	dat['amount']=$("#measurement-amount").val();
 	return dat;
 }
@@ -219,6 +219,7 @@ function submit_measurement(){
 	submitting=true;
 	data=get_measurement_data();
 	data['today']=today;
+	$('.measurement-loading-zone').append('<span style="float:left;" class="alert alert-error loading">saving</span>')
 	$.ajax({
 		type:'POST',
 		url:'/ajax/make_measurement/',
@@ -226,6 +227,8 @@ function submit_measurement(){
 		dataType:"json",
 		contentType: "application/json; charset=utf-8",
 		success:function(data){
+			$('.measurement-loading-zone').find($('.loading')).slideUp();
+			//$('.make-measurement').parent().
 			display_measurement();
 		},
 		error:function(a,b,c){
@@ -302,15 +305,28 @@ function who_with_clinks(purchase){
 }
 
 function obj2measurement(measurement){
-	return '<div class="measurement">'+m_clink(measurement)+' '+m_p_alink(measurement)+' '+ measurement.amount+'</div>';
+	//return '<div class="measurement">'+m_clink(measurement)+' '+m_p_alink(measurement)+' '+ measurement.amount+'</div>';
+	return '<tr class="measurement"><td>'+m_clink(measurement)+'<td>'+m_p_alink(measurement)+'<td>'+measurement_all_spot(measurement)+'<td>'+measurement_domain_clink(measurement)+'<td>'+ measurement.amount+'</tr>';
 }
 
+//function m_clink(m){
+	//return '<a href="/admin/day/measurement/?spot__id='+m.spot+'">'+m.name+'</a>'
+//}
+
+function measurement_domain_clink(m){
+	return '<a href="/admin/day/domain/?id='+m.domain_id+'">'+m.domain_name+'</a>'
+}	
+
 function m_clink(m){
-	return '<a href="/admin/day/measurement/?place__id='+m.place_id+'">'+m.name+'</a>'
+	return '<a href="/admin/day/measurement/?id='+m.id+'">'+m.id+'</a>'
 }
 
 function m_p_alink(m){
-	return '<a href="/admin/day/measuringspot/?id='+m.place_id+'">summary '+m.name+'</a>'
+	return '<a href="/admin/day/measuringspot/?id='+m.spot_id+'">'+m.name+'</a>'
+}
+
+function measurement_all_spot(m){
+	return '<a href="/admin/day/measurement/?spot__id='+m.spot_id+'">'+'all spot</a>'
 }
 
 function pur_alink(purch){//the direct purchase

@@ -39,14 +39,42 @@ class BetterDateWidget(admin.widgets.AdminDateWidget):
         return super(BetterDateWidget, self).render(name, value)
 
 
-def new_sparkline(results, width, height):
-    res = '<div class="sparkline-data">%s</div>'%(','.join([str(s) for s in results]))
+def simple_sparkline(results, width, height):
+    #itd be nice if this was way better for labelling and stuff.
+    res = '<div class="simple-sparkline-data">%s</div>'%(','.join([str(s) for s in results]))
     return res
+
+def two_sig(n):
+    #round to the left two significant digits.
+    ct=0
+    orign=n
+    while n>1:
+        n=n/10
+        ct+=1
+    return round(orign,-1*(ct-2))
+
+def nice_sparkline(results,width,height):
+    '''a better one, results now consists of value & label'''
+    '''stick the labels for x into labels[rnd]'''
+    ii=0
+    num_results=[]
+    labels={}
+    for total,label in results:
+        label+=' %d'%two_sig(total)
+        labels[ii]=label
+        ii+=1
+        num_results.append(total)
+    data=','.join([str(s) for s in num_results])
+    rnd=str(int(random.random()*100000))
+    res = '<div sparkid="%s" class="sparkline-data">%s</div>'%(rnd,data)    
+    res+='<script>$(document).ready(function(){labels[%s]=%s});</script>'%(rnd,json.dumps(labels))
+    return res
+    
 
 class ProductAdmin(OverriddenModelAdmin):
     search_fields = ['name', ]
-    list_display='name domain mydomain mypurchases mysources mywith myspark'.split()
-    list_editable = ['domain', ]
+    list_display='name mypurchases mysources mywith myspark'.split()
+    #list_editable = ['domain', ]
     list_per_page = 10
     list_filter = ['domain', ]
 
@@ -59,34 +87,36 @@ class ProductAdmin(OverriddenModelAdmin):
         alllink = '<a class="btn" href="../purchase/?product_id=%d">all</a>' % obj.id
         filters = ''
 
-        return links + '<br><br>' + '<br>' + alllink
+        return obj.domain.clink()+'<br>'+links + '<br><br>' + '<br>' + alllink
 
     def myspark(self, obj):
         purch=Purchase.objects.filter(product=obj)
         if not purch:
             spark= ''
         else:
-            mindate=None
+            mindate=settings.LONG_AGO_STR
             res={}
             costres = {}
             for pu in purch:
                 date=pu.created.strftime(DATE)
                 res[date]=res.get(date, 0)+pu.quantity
                 costres[date] = costres.get(date, 0) + pu.get_cost()
-                if not mindate or date<mindate:
-                    mindate=date
-            first=datetime.datetime.strptime(mindate, DATE)
-            now=datetime.datetime.now()
-            trying=first
-            res2=[]
-            costres2 = []
-            while trying<now:
-                dt = trying.strftime(DATE)
-                res2.append((res.get(dt, 0)))
-                costres2.append((costres.get(dt, 0)))
-                trying=datetime.timedelta(days=1)+trying
-            counts = new_sparkline(results=res2, width=5, height=30)
-            costs = new_sparkline(results=costres2, width=5, height=30)
+                #if not mindate or date<mindate:
+                    #mindate=date
+            res2=group_day_dat(res, by='month',mindate=mindate)
+            costres2=group_day_dat(costres, by='month',mindate=mindate)
+            #first=datetime.datetime.strptime(mindate, DATE)
+            #now=datetime.datetime.now()
+            #trying=first
+            #res2=[]
+            #costres2 = []
+            #while trying<now:
+                #dt = trying.strftime(DATE)
+                #res2.append((res.get(dt, 0)))
+                #costres2.append((costres.get(dt, 0)))
+                #trying=datetime.timedelta(days=1)+trying
+            counts = nice_sparkline(results=res2, width=5, height=30)
+            costs = nice_sparkline(results=costres2, width=5, height=30)
             return 'Counts %s<br>Costs%s' % (counts, costs)
             #tmp=savetmp(im)
             #spark='<img style="border:2px solid grey;"  src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
@@ -158,10 +188,14 @@ class PurchaseAdmin(OverriddenModelAdmin):
     def mycreated(self, obj):
         ct='<a href="/admin/day/purchase/?created__day=%d&created__month=%d&created__year=%d">%s</a>'%(obj.created.day, obj.created.month, obj.created.year, obj.created.strftime(DATE))
         try:
-            day=Day.objects.get(date=obj.created.date()).vlink()
+            vday=Day.objects.get(date=obj.created.date()).vlink()
         except Day.DoesNotExist:
-            day=None
-        return mktable([('clink',obj.clink()),('day',day),('ct',ct)], skip_false=True)
+            vday=None
+        try:
+            cday=Day.objects.get(date=obj.created.date()).clink()
+        except Day.DoesNotExist:
+            cday=None
+        return mktable([('clink',obj.clink()),('day vlink',vday),('day clink',cday),('day purchases',ct)], skip_false=True)
 
     @debu
     def mycost(self, obj):
@@ -227,21 +261,24 @@ class DomainAdmin(OverriddenModelAdmin):
         if not purch:
             costs=''
         else:
-            mindate=None
+            mindate=settings.LONG_AGO_STR
             res={}
             for pu in purch:
                 date=pu.created.strftime(DATE)
                 res[date]=res.get(date, 0)+pu.get_cost()
-                if not mindate or date<mindate:
-                    mindate=date
-            first=datetime.datetime.strptime(mindate, DATE)
-            now=datetime.datetime.now()
-            trying=first
-            res2=[]
-            while trying<now:
-                res2.append((res.get(trying.strftime(DATE), 0)))
-                trying=datetime.timedelta(days=1)+trying
-            costs= new_sparkline(results=res2, width=2, height=100)
+                #if not mindate or date<mindate:
+                    #mindate=date
+            #res is a dict of str datetime => total spent that day.
+            #itd be great to be able to group them by week / month / year and display here.
+            
+            res2=group_day_dat(res, by='month',mindate=mindate)
+            
+            #while trying<now:
+                #res2.append((res.get(trying.strftime(DATE), 0)))
+                #trying=datetime.timedelta(days=1)+trying
+            #import ipdb;ipdb.set_trace()
+            #res2=[r[0] for r in res2]
+            costs= nice_sparkline(results=res2, width=5, height=100)
             #tmp=savetmp(im)
             #graph='<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
         summary=obj.summary()
@@ -670,13 +707,14 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
             mes=mes.exclude(amount=0)
         if not mes:
             return
-        mindate=None
+        #mindate=None
         res={}
         for m in mes:
             date=m.created.strftime(DATE)
             res[date]=m.amount
-            if not mindate or date<mindate:
-                mindate=date
+            #if not mindate or date<mindate:
+                #mindate=date
+        mindate=settings.LONG_AGO_STR
         first=datetime.datetime.strptime(mindate, DATE)
         now=datetime.datetime.now()
         trying=first
@@ -687,7 +725,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
                 lastt=res.get(trying.strftime(DATE))
             res2.append(lastt)
             trying=datetime.timedelta(days=1)+trying
-        thang = new_sparkline(results=res2, width=2, height=100)
+        thang = simple_sparkline(results=res2, width=2, height=100)
         return '<div>%s</div>'% thang
 
 
@@ -698,19 +736,19 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
     adminify( myhistory, mydomain, mysets, myname)
 
 class MeasurementAdmin(OverriddenModelAdmin):
-    list_display='id myplace mycreated amount'.split()
-    list_filter=['place',]
+    list_display='id myspot mycreated amount'.split()
+    list_filter=['spot',]
 
-    def myplace(self, obj):
-        return obj.place.clink()
+    def myspot(self, obj):
+        return obj.spot.clink()
 
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
 
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
-    adminify(mycreated, myplace)
-    #fields='place amount created'.split()
-    fields=(('place','amount','created',),)
+    adminify(mycreated, myspot)
+    #fields='spot amount created'.split()
+    fields=(('spot','amount','created',),)
 
 class TagAdmin(OverriddenModelAdmin):
     list_display='name mydays'.split()

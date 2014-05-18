@@ -111,8 +111,8 @@ def purchase2obj(p):
             'hour': hour2name[p.hour],}
 
 def measurement2obj(m):
-    return {'id':m.id, 'place_id':m.place.id, 'amount':m.amount,
-            'name':m.place.name,'text':m.place.name,}
+    return {'id':m.id, 'spot_id':m.spot.id, 'amount':m.amount,
+            'name':m.spot.name,'text':m.spot.name,'domain_id':m.spot.domain.id,'domain_name':m.spot.domain.name}
 
 def per2obj(per):
     return {'id':per.id,'first_name':per.first_name,'last_name':per.last_name,'text':'%s %s'%(per.first_name, per.last_name),}

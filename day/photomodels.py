@@ -52,6 +52,8 @@ class PhotoTag(DayModel):
     def update_tag_counts(self):
         for pt in PhotoTag.objects.all():
             ct=pt.photos.count()
+            if pt.person:
+                ct=ct+ct.person.purchases.count()
             pt.use_count=ct
             pt.save()
     

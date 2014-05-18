@@ -132,6 +132,7 @@ LOGIN_URL = '/admin/'
 #time sequence stuff doesn't get messed up if you added it out of order.
 import datetime
 LONG_AGO = datetime.date(year=2012, month=5, day=1)
+LONG_AGO_STR= '2012-05-01'
 
 #INCOMING_PHOTO_DIR is set in local.
 assert os.path.exists(INCOMING_PHOTO_DIR),INCOMING_PHOTO_DIR

@@ -30,7 +30,7 @@ def do_measurementset(request, measurementset_id=None):
         msids=[]
         for spot in ms.measurement_spots.all():
             day=Day.objects.get(date=datetime.datetime.now().today())
-            m=Measurement(place=spot, created=datetime.datetime.now(), amount=0,day=day)
+            m=Measurement(spot=spot, created=datetime.datetime.now(), amount=0,day=day)
             m.save()
             msids.append(m.id)
         qs=Measurement.objects.filter(id__in=msids)
@@ -199,7 +199,7 @@ def aday(request, day):
     vals['hour']=name2hour[gethour()]
     vals['hours'] = [{'id': id, 'name': name, 'text': name,} for name, id in name2hour.items()]
     from day.models import MeasuringSpot
-    vals['measurement_places']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
+    vals['measurement_spots']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
 
     #calculate histories
     trydate=dtday.date()
@@ -244,7 +244,7 @@ def amonth(request, month):
     domaintable = mktable(bits, rights=[1, 2], bigs=[1, 2])
     #purchases summary by domain
     measurements = Measurement.objects.filter(created__gte=start, created__lt=end).exclude(amount=None)
-    spots = [MeasuringSpot.objects.get(id=ms) for ms in list(set([ms[0] for ms in measurements.values_list('place__id').distinct()]))]
+    spots = [MeasuringSpot.objects.get(id=ms) for ms in list(set([ms[0] for ms in measurements.values_list('spot__id').distinct()]))]
     vals['spots'] = sorted(spots, key=lambda x:(x.domain.name, x.name))
     vals['days'] = [d for d in Day.objects.filter(date__gte=start, date__lt=end).order_by('-date') if d.notes.exists() or d.getmeasurements().exclude(amount=None).exists()]
     

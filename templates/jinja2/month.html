@@ -25,7 +25,7 @@
     {% endfor %}
 
 {% for spot in spots %}
-    {% set ments=day.getmeasurements().filter(place=spot) %}
+    {% set ments=day.getmeasurements().filter(spot=spot) %}
     <td class="leftborder middle big">
     {% if ments %}
     {% for ment in ments %}{{ment.get_amount()}}{% endfor %}

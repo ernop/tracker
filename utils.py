@@ -436,3 +436,58 @@ def user_passes_test(test_func, login_url=None):
     
 def staff_test(user):
     return user and user.is_authenticated() and user.is_staff
+
+def group_day_dat(data, by=None,mindate=None):
+    from choices import DATE,MONTH_YEAR,YEAR_MONTH
+    adder_day=0
+    adder_month=0
+    adder_year=0
+    first=datetime.datetime.strptime(mindate, DATE)
+    now=datetime.datetime.now()
+    start=mindate
+    res2=[]
+    
+    if not by:
+        by='day'
+    if by=='day':
+        adder_day=1
+        #move start back to the monday
+        first=first.date()
+    elif by=='week':
+        adder_day=7
+        #move start back to the monday
+        while first.weekday()!=6:
+            first=first-datetime.timedelta(days=1)
+        first=first.date()
+    elif by=='month':
+        adder_month=1
+        #move start back to the 1st of the month
+        first=datetime.date(year=first.year,month=first.month,day=1)
+    elif by=='year':
+        adder_month=12
+        #move start back to jan 1
+        first=datetime.date(year=first.year,month=1,day=1)
+    
+    #start correctly defined, and the interval defined.    
+    trying=first
+    while 1:
+        #for every interval
+        thisinterval_start=trying
+        thisinterval_total=0
+        next_interval_start=add_months(trying,adder_month)
+        next_interval_start=next_interval_start+datetime.timedelta(days=adder_day)
+        while 1:
+            #for every day within it.
+            thisinterval_total+=data.get(trying.strftime(DATE),0)
+            trying=trying+datetime.timedelta(days=1)
+            if trying>=next_interval_start:
+                break
+        label=thisinterval_start.strftime(DATE)
+        if by=='month':
+            label=thisinterval_start.strftime(YEAR_MONTH)
+        res2.append((thisinterval_total,label))
+        if trying>now.date():
+            break
+    return res2
+    
+    

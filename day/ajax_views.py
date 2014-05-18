@@ -115,9 +115,10 @@ def ajax_make_measurement(request):
         today=dat['today']
         obj=datetime.datetime.strptime(today, DATE)
         dt=datetime.datetime(year=obj.year, month=obj.month, day=obj.day)
-        place_id=dat['place_id']
+        spot_id=dat['spot_id']
         amount=float(dat['amount'])
-        measurement=Measurement(place_id=place_id, amount=amount, created=dt)
+        day=Day.objects.get(date=dt.date())
+        measurement=Measurement(spot_id=spot_id, amount=amount, day=day,created=dt)
         measurement.save()
         res={'success':True,'message':'saved %s'%measurement}
         return r2j(res)
