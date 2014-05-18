@@ -5,24 +5,23 @@ var width = 2200;
 var height = 1300;
 //recent now shows edges which were created before the relevant time period.
 $(document).ready(function(){
-  width=$('body').width()-130;
+  width=$('body').width()-230;
   $("#control-area").height(window.innerHeight)-40
   height=window.innerHeight-10
 
   nodes=all_nodes;
   edges=all_edges;
   setup_dicts();
-    if (recent_only){
-	do_filter(together_last_year_filter);
-	}else{
-	do_filter(allfilter);
-	}
+    //if (recent_only){
+	//do_filter(together_last_year_filter);
+	//}else{
+  do_filter(allfilter);
+	//}
   draw();
   setup_buttons()
   })
 
 function do_filter(usefilter){
-
   var use_node_ids=fix_nodes(usefilter);
   nodes=[]
   $.each(use_node_ids, function(index,guy){
@@ -118,8 +117,9 @@ function tick() {
 
 function draw(){
   svg = d3.select("#people-graph").append("svg").attr("width", width).attr("height", height);
-  svg.append("svg:defs").selectAll("marker").data(["start"]).enter().append("svg:marker").attr("id", String).attr("viewBox", "0 -5 10 10")
-  .attr("refX", 20).attr("refY", -1.5).attr("markerWidth", -8).attr("markerHeight", 6).attr("orient", "auto").append("svg:path").attr("d", "M0,-5L10,0L0,5");
+  svg.append("svg:defs").selectAll("marker")
+  .data(["start"]).enter().append("svg:marker").attr("id", String).attr("viewBox", "0 -5 10 10").attr('color','#030')
+  .attr("refX", 20).attr("refY", -1.5).attr("markerWidth", 2).attr("markerHeight", 6).attr("orient", "auto").append("svg:path").attr("d", "M0,-5L10,0L0,5");
   force = d3.layout.force().charge(charge_func).linkDistance(distance_function).linkStrength(.5).friction(0.95).gravity(0.11).size([width, height]).nodes(nodes).links(edges).start().on("tick", tick)
   link = svg.selectAll(".link").data(force.links()).enter().append("line").attr('class','link').attr("marker-start", "url(#start)");
   gnodes = svg.selectAll('g.gnode').data(nodes).enter().append('g').classed('gnode', true);

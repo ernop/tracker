@@ -7,19 +7,30 @@
 	<script src="/static/js/day-d3.utils.js"></script>
 	<script src="/static/js/day-d3.js"></script>
 	<link rel="stylesheet" type="text/css" href="/static/css/day-d3.css" />
+	<link rel="stylesheet" type="text/css" href="/static/css/tracker.css" />
 	<script>
         var all_nodes={{nodes|jsonify|safe}};
         var all_edges={{edges|jsonify|safe}};
-		var recent_only={{recent_only|jsonify|safe}};
     </script>
+<style>
+.node {
+  stroke: red;
+  stroke-width: 1.5px;
+}
 
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
 <div id="control-area">{% if LOCAL %}LOCAL{% endif %}
 
-	<div class="button btn" id="perturb">perturb</div>
-	<div class="button btn" id="untangle">untangle</div>
+	<br><div class="button btn" id="perturb">perturb</div>
+	<br><div class="button btn" id="untangle">untangle</div>
 
 </div>
 

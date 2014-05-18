@@ -293,38 +293,56 @@ def simple_namefunc(person):
 
 @login_required
 def recent_connections(request, exclude_disabled=False):
-    return people_connections(request, recent_only=True, exclude_disabled=True)
+    now=datetime.datetime.today().date()
+    return people_connections(request, since=datetime.date(month=now.month,day=now.day,year=now.year-1), exclude_disabled=True)
 
 @login_required
-def people_connections(request, exclude_disabled=False, recent_only=False):
+def month_connections(request, exclude_disabled=False):
+    now=datetime.datetime.today().date()
+    return people_connections(request, since=now-datetime.timedelta(days=60), exclude_disabled=True)
+
+@login_required
+def people_connections(request, exclude_disabled=False, since=None):
     vals = {}
     people = Person.objects.all()
     if exclude_disabled:
         people = people.exclude(disabled=True)
-
     edges = []
     nodes = {}
     linked_ids = set()
-    for person in people:
-        if person.met_through.exists():
-            for operson in person.met_through.all():
-                edges.append({'target': operson.id, 'source': person.id, 'value': 1,})
-            for operson in person.introduced_to.all():
-                if recent_only and not operson.purchases.exists():
-                    continue
-                linked_ids.add(operson.id)
+    
+    
+    ID=45299
+    if since:
+        for person in people:
+            if person.id==ID:
+                import ipdb;ipdb.set_trace()
+            #include them if they've got purch in the last year, or they introduced me to sb in the last year.
+            if person.created>since or person.purchases.filter(created__gt=since).exists():
+                #at some point should also include them if they're in a new phototag.
                 linked_ids.add(person.id)
-            if recent_only and not person.purchases.exists():
-                continue
+                #also add the person who introduced me.
+                for from_person in person.met_through.all():
+                    if from_person.id==ID:
+                        import ipdb;ipdb.set_trace()
+                    linked_ids.add(from_person.id)
+    else:
+        for person in people:
             linked_ids.add(person.id)
     for person in people:
-        if recent_only and (not person.purchases.exists()) and person.id not in linked_ids:
-            print 'skipping', person
+        if person.id==ID:
+            import ipdb;ipdb.set_trace()
+        
+        if person.id not in linked_ids: #and (not person.purchases.exists()) 
             continue
+        for from_person in person.met_through.all():
+            #only include edges where both poeple are mentioned.
+            if from_person.id==ID or person.id==ID:
+                import ipdb;ipdb.set_trace()
+            edges.append({'target': from_person.id, 'source': person.id, 'value': 1,})
         nodes[person.id] = person2obj(person)
     vals['nodes'] = nodes
     vals['edges'] = edges
-    vals['recent_only'] = recent_only
     return r2r('jinja2/people_connections.html', request, vals)
 
 def person2obj(person):

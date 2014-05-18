@@ -61,11 +61,13 @@ font-size}
 }
 
 #control-area{
+    
 	display:inline-block;
 	float:left;
 	border:2px solid lightblue;
 	border-radius:4px;
 	width:100px;
+	float:left;
 }
 
 .big{font-size:1.3em;}

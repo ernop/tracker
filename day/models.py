@@ -359,7 +359,7 @@ class Person(DayModel):
     last_name=models.CharField(max_length=100, blank=True, null=True)
     birthday=models.DateField(blank=True, null=True)
     met_through=models.ManyToManyField('Person', symmetrical=False, blank=True, null=True, related_name='introduced_to')
-    created=models.DateField(auto_now_add=True, blank=True, null=True)
+    created=models.DateField(auto_now_add=True, blank=True, null=True) #when i met them.
     disabled = models.BooleanField()  #if they're gone forever / probably never meet again, just remove them form most convenience functions.
     gender=models.IntegerField() #1 male 2 female 3 organization 0 undefined
     rough_purchase_count = models.IntegerField()
