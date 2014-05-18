@@ -83,11 +83,14 @@ class ProductAdmin(OverriddenModelAdmin):
 
     def mypurchases(self, obj):
         #return obj.summary()
-        links = '<br>'.join([p.clink() for p in Purchase.objects.filter(product=obj)])
+        data= [(p.clink(),p.day.vlink()) for p in Purchase.objects.filter(product=obj)]
+        
         alllink = '<a class="btn" href="../purchase/?product_id=%d">all</a>' % obj.id
-        filters = ''
-
-        return obj.domain.clink()+'<br>'+links + '<br><br>' + '<br>' + alllink
+        data.append(alllink)
+        domainlink=obj.domain.clink()
+        data.insert(0, domainlink)
+        
+        return mktable(data)
 
     def myspark(self, obj):
         purch=Purchase.objects.filter(product=obj)
@@ -352,13 +355,30 @@ class PersonAdmin(OverriddenModelAdmin):
         met_through=', '.join([p.clink() for p in obj.met_through.all()])
         if obj.disabled:disabled='%sdisabled'%NO_ICON
         else:disabled=''
+        if obj.purchases.exists():
+            latest=obj.purchases.latest('created')
+            latest_clink=latest.clink()
+        else:
+            latest=''
+            latest_clink=None
+        if latest:
+            latest_dclink=latest.day.clink()
+        else:
+            latest_dclink=''
+        if latest:
+            latest_dvlink=latest.day.vlink()
+        else:
+            latest_dvlink=''
         
-        data=[('name'),'%s %s'%(obj.first_name,obj.last_name),
+        data=[('name','%s %s'%(obj.first_name,obj.last_name)),
               ('gender',obj.get_gender()),
             ('known since',known_since),
               ('met through',met_through),
               ('disabled',disabled),
               ('birthday','<div class="nb">%s</div>'%obj.birthday),
+              ('last purch',latest_clink),
+              ('cday',latest_dclink),
+              ('vday',latest_dvlink),
               ]
         if obj.as_tag.exists():
             photos='<br>'+''.join([p.photo.inhtml(size='thumb') for p in obj.as_tag.get().photos.all()])
