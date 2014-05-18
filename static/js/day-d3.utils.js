@@ -5,6 +5,11 @@ function gendercolor(d){
 	return 'grey'
 }
 
+function borderfunc(d){
+  debugger;
+  
+}
+
 function push_out(height, width, oldx,oldy, mult){
   var x=oldx-width/2;
   var y=oldy-height/2;

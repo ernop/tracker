@@ -384,9 +384,15 @@ class Person(DayModel):
     def __unicode__(self):
         return '%s%s'%(self.first_name, self.last_name and ' %s' % self.last_name)
 
-    def d3_name(self):
+    def short_name(self):
         return self.first_name.title().replace('\'S', '\'s')
-
+    
+    def initial(self):
+        fn=self.first_name and self.first_name[0] or ''
+        ln=self.last_name and self.last_name[0] or ''
+        if fn or ln:
+            return '%s%s'%(fn,ln)
+        return '?'
 
     def domain_summary_data(self):
         res = {}

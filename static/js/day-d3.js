@@ -113,6 +113,18 @@ function tick() {
 	  	  return 'translate(' + [d.x, d.y] + ')';
 	})}
 
+function widthfunc(d){
+  //debugger;
+  if (d.supporting){return 1}
+  return 4
+}
+
+function strokefunc(d){
+  //debugger;
+  if (d.newly_created){return '#3a3'}
+  return '#200'
+}
+
 
 
 function draw(){
@@ -123,7 +135,9 @@ function draw(){
   force = d3.layout.force().charge(charge_func).linkDistance(distance_function).linkStrength(.5).friction(0.95).gravity(0.11).size([width, height]).nodes(nodes).links(edges).start().on("tick", tick)
   link = svg.selectAll(".link").data(force.links()).enter().append("line").attr('class','link').attr("marker-start", "url(#start)");
   gnodes = svg.selectAll('g.gnode').data(nodes).enter().append('g').classed('gnode', true);
-  var node = gnodes.append("circle").attr("class", 'person-graph').attr("r", radius).style("fill", gendercolor).call(force.drag)
+  var node = gnodes.append("circle").attr("class", 'person-graph').attr("r", radius).style("fill", gendercolor)
+  .style('stroke-width', widthfunc)
+  .style('stroke', strokefunc).call(force.drag)
   var labels = gnodes.append("text").text(function(d) {return d.name;})
 	.attr('class', 'd3-person-label').attr('transform', function(d){
 	  return 'translate('+[11,0]+')'

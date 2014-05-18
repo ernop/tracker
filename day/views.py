@@ -294,7 +294,8 @@ def simple_namefunc(person):
 @login_required
 def recent_connections(request, exclude_disabled=False):
     now=datetime.datetime.today().date()
-    return people_connections(request, since=datetime.date(month=now.month,day=now.day,year=now.year-1), exclude_disabled=True)
+    yearago=datetime.date(month=now.month,day=now.day,year=now.year-1)
+    return people_connections(request, since=yearago, exclude_disabled=True)
 
 @login_required
 def month_connections(request, exclude_disabled=False):
@@ -302,7 +303,15 @@ def month_connections(request, exclude_disabled=False):
     return people_connections(request, since=now-datetime.timedelta(days=30), exclude_disabled=True)
 
 @login_required
-def people_connections(request, exclude_disabled=False, since=None):
+def initial_annual(request):
+    now=datetime.datetime.today().date()
+    yearago=datetime.date(month=now.month,day=now.day,year=now.year-1)
+    return people_connections(request,detail_level='initials',since=yearago)
+
+@login_required
+def people_connections(request, exclude_disabled=False, since=None,detail_level=None):
+    if not detail_level:
+        detail_level='short name'
     vals = {}
     people = Person.objects.all()
     if exclude_disabled:
@@ -310,53 +319,90 @@ def people_connections(request, exclude_disabled=False, since=None):
     edges = []
     nodes = {}
     linked_ids = set()
+    #the ones who really should be highlighted here.
     
+    supporting_linked_ids=set()
+    #just linkers, included because there was action in ppl they introduced me to.
     
     ID=45299
+    newly_created=set()
+    purch_existed=set()
     if since:
         for person in people:
             if person.id==ID:
                 import ipdb;ipdb.set_trace()
             #include them if they've got purch in the last year, or they introduced me to sb in the last year.
-            if person.created>since or person.purchases.filter(created__gt=since).exists():
+            if person.created>since :
                 #at some point should also include them if they're in a new phototag.
-                linked_ids.add(person.id)
+                newly_created.add(person.id)
+            if person.purchases.filter(created__gt=since).exists():
+                purch_existed.add(person.id)
+            
                 #also add the person who introduced me.
+        for person in people:
+            if person.id in newly_created or person.id in purch_existed:
                 for from_person in person.met_through.all():
                     if from_person.id==ID:
                         import ipdb;ipdb.set_trace()
-                    linked_ids.add(from_person.id)
+                    supporting_linked_ids.add(from_person.id)
     else:
         for person in people:
             linked_ids.add(person.id)
     for person in people:
         if person.id==ID:
             import ipdb;ipdb.set_trace()
-        
-        if person.id not in linked_ids: #and (not person.purchases.exists()) 
-            continue
-        for from_person in person.met_through.all():
-            #only include edges where both poeple are mentioned.
-            if from_person.id==ID or person.id==ID:
-                import ipdb;ipdb.set_trace()
-            edges.append({'target': from_person.id, 'source': person.id, 'value': 1,})
-        nodes[person.id] = person2obj(person)
+        #ordering matters.  default is supporting, then is purch existed
+        #then is newly created in green.
+        if person.id in supporting_linked_ids:
+            nodes[person.id]=person2obj(person,kind=detail_level)
+            nodes[person.id]['newly_created']=False
+            nodes[person.id]['supporting']=True
+        #make edges for these.
+        if person.id in purch_existed or person.id in newly_created:
+            for from_person in person.met_through.all():
+                #only include edges where both poeple are mentioned.
+                edges.append({'target': from_person.id, 'source': person.id, 'value': 1,})
+        if person.id in purch_existed: #and (not person.purchases.exists()) 
+            nodes[person.id] = person2obj(person,kind=detail_level)
+            nodes[person.id]['newly_created']=False
+            nodes[person.id]['supporting']=False
+        if person.id in newly_created: #and (not person.purchases.exists()) 
+            nodes[person.id] = person2obj(person,kind=detail_level)
+            nodes[person.id]['newly_created']=True
+            nodes[person.id]['supporting']=False
     vals['nodes'] = nodes
     vals['edges'] = edges
     return r2r('jinja2/people_connections.html', request, vals)
 
-def person2obj(person):
-    return {'id': person.id,
-                               'gender':person.gender,
-                               'reflexive':False,
-                               'left': True,
-                               'right': False,
-                               'name': person.d3_name(),
-                               'created': person.created.strftime(DATE_DASH_REV),
-                               'last_purchase': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).order_by('-created')[0].created.strftime(DATE_DASH_REV_DAY) or '2011-01-01',
-                               'purchases_together': Purchase.objects.filter(who_with=person).count(),
-                               'weight': 1,
-                               'spent_together': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).aggregate(Sum('cost'))['cost__sum'] or 0,}
+def person2obj(person, kind=None):
+    if not kind:
+        kind='full'
+    dat={'id': person.id,
+            'gender':person.gender,
+            'reflexive':False,
+            'left': True,
+            'right': False,
+            'name': person.short_name(),
+            'created': person.created.strftime(DATE_DASH_REV),
+            'last_purchase': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).order_by('-created')[0].created.strftime(DATE_DASH_REV_DAY) or '2011-01-01',
+            'purchases_together': Purchase.objects.filter(who_with=person).count(),
+            'weight': 1,
+            'spent_together': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).aggregate(Sum('cost'))['cost__sum'] or 0,}
+    if kind=='supporting':
+        dat['name']=person.initial()
+    elif kind=='anon':
+        dat['name']='?'
+        dat['gender']=1
+    elif kind=='initials':
+        dat['name']=person.initial()
+    elif kind=='extended':
+        dat['name']=unicode(person)
+    elif kind=='short name':
+        #the default.
+        pass
+    else:
+        import ipdb;ipdb.set_trace()
+    return dat
 
 @login_required
 def days(request):
