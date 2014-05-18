@@ -299,7 +299,7 @@ def recent_connections(request, exclude_disabled=False):
 @login_required
 def month_connections(request, exclude_disabled=False):
     now=datetime.datetime.today().date()
-    return people_connections(request, since=now-datetime.timedelta(days=60), exclude_disabled=True)
+    return people_connections(request, since=now-datetime.timedelta(days=30), exclude_disabled=True)
 
 @login_required
 def people_connections(request, exclude_disabled=False, since=None):

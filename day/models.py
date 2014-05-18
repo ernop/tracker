@@ -244,10 +244,11 @@ class ExWeight(DayModel):
 
     def adm(self):
         return lnk('exweight',self.id, self)
+    
 class Measurement(DayModel):
     spot=models.ForeignKey('MeasuringSpot', related_name='measurements')
     amount=models.FloatField()
-    created=models.DateField()
+    created=models.DateField() #bit weird these are not datetime...
     day=models.ForeignKey('Day',related_name='measurements')
 
     def __unicode__(self):
@@ -265,6 +266,18 @@ class Measurement(DayModel):
     class Meta:
         db_table='measurement'
         ordering=['-created',]
+        
+    def save(self):
+        if not self.created:
+            self.created=datetime.datetime.now()
+        try:
+            self.day
+        except:
+            self.day=Day.objects.get(date=self.created)
+        if not self.pk:
+            self.created=datetime.datetime.now()
+        super(Measurement, self).save()
+        
 class MeasuringSpot(DayModel):
     name=models.CharField(max_length=100, unique=True)
     domain=models.ForeignKey('Domain', related_name='measuring_spots')
