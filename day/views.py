@@ -327,27 +327,27 @@ def people_connections(request, exclude_disabled=False, since=None,detail_level=
     ID=45299
     newly_created=set()
     purch_existed=set()
-    if since:
-        for person in people:
-            if person.id==ID:
-                import ipdb;ipdb.set_trace()
-            #include them if they've got purch in the last year, or they introduced me to sb in the last year.
-            if person.created>since :
-                #at some point should also include them if they're in a new phototag.
-                newly_created.add(person.id)
+
+    for person in people:
+        if person.id==ID:
+            import ipdb;ipdb.set_trace()
+        #include them if they've got purch in the last year, or they introduced me to sb in the last year.
+        if since and person.created>since :
+            #at some point should also include them if they're in a new phototag.
+            newly_created.add(person.id)
+        if since:
             if person.purchases.filter(created__gt=since).exists():
                 purch_existed.add(person.id)
-            
-                #also add the person who introduced me.
-        for person in people:
-            if person.id in newly_created or person.id in purch_existed:
-                for from_person in person.met_through.all():
-                    if from_person.id==ID:
-                        import ipdb;ipdb.set_trace()
-                    supporting_linked_ids.add(from_person.id)
-    else:
-        for person in people:
-            linked_ids.add(person.id)
+        else:
+            purch_existed.add(person.id)
+        
+            #also add the person who introduced me.
+    for person in people:
+        if person.id in newly_created or person.id in purch_existed:
+            for from_person in person.met_through.all():
+                if from_person.id==ID:
+                    import ipdb;ipdb.set_trace()
+                supporting_linked_ids.add(from_person.id)
     for person in people:
         if person.id==ID:
             import ipdb;ipdb.set_trace()
@@ -370,6 +370,9 @@ def people_connections(request, exclude_disabled=False, since=None,detail_level=
             nodes[person.id] = person2obj(person,kind=detail_level)
             nodes[person.id]['newly_created']=True
             nodes[person.id]['supporting']=False
+        if not since:
+            nodes[person.id]['newly_created']=False
+            nodes[person.id]['supporting']=True
     vals['nodes'] = nodes
     vals['edges'] = edges
     return r2r('jinja2/people_connections.html', request, vals)

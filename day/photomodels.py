@@ -53,7 +53,7 @@ class PhotoTag(DayModel):
         for pt in PhotoTag.objects.all():
             ct=pt.photos.count()
             if pt.person:
-                ct=ct+ct.person.purchases.count()
+                ct=ct+pt.person.purchases.count()
             pt.use_count=ct
             pt.save()
     
