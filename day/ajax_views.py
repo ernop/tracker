@@ -67,7 +67,9 @@ def ajax_get_popular(request):
 def ajax_get_measurements(request):
     day=request.POST['today']
     day=datetime.datetime.strptime(day, DATE)
-    ms=Measurement.objects.filter(created__year=day.year, created__month=day.month, created__day=day.day)
+    dayobj=Day.objects.get(date=day.date())
+    #ms=Measurement.objects.filter(created__year=day.year, created__month=day.month, created__day=day.day)
+    ms=Measurement.objects.filter(day=dayobj)
     res={'success':True, 'message':'got', 'measurements':[measurement2obj(m) for m in ms]}
     return r2j(res)
 

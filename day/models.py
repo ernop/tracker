@@ -274,8 +274,8 @@ class Measurement(DayModel):
             self.day
         except:
             self.day=Day.objects.get(date=self.created)
-        if not self.pk:
-            self.created=datetime.datetime.now()
+        #if not self.pk:
+            #self.created=datetime.datetime.now()
         super(Measurement, self).save()
         
 class MeasuringSpot(DayModel):
