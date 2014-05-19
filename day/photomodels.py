@@ -413,8 +413,11 @@ class Photo(DayModel):
         return True
     
     def autoorient(self):
+        stat=os.stat(self.fp)
+        atime,mtime=stat.st_atime,stat.st_mtime
         cmd='mogrify -auto-orient "%s"'%(self.fp)
         res=os.system(cmd)
+        os.utime(self.fp, (atime, mtime))
         if res:
             log.error('error in cmd %s',cmd)
             return False
