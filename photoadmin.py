@@ -23,13 +23,13 @@ class PhotoAdmin(OverriddenModelAdmin):
     list_display='id myname myinfo myexif'.split()
     #list_filter=' product__domain currency source who_with'.split()
     list_filter='thumb_ok deleted incoming setup myphoto iso camera'.split()
-    list_filter=[PhotoHasDayFilter, PhotoHasSpotFilter, PhotoDoneFilter,PhotoExtensionFilter]+list_filter
+    list_filter=[PhotoHasDayFilter, PhotoHasSpotFilter, PhotoDoneFilter,PhotoExtensionFilter,MyCameraFilter]+list_filter
     
     #date_hierarchy='created'
     #list_editable=['note',]
     search_fields= ['name']
     list_per_page=100
-    actions=['undoable_delete','delete_file','undelete','reinitialize','force_recreate_thumbs','autoorient','redo_classification','kill_entry',]
+    actions=['undoable_delete','not_myphoto','delete_file','undelete','reinitialize','re_autoorient','force_recreate_thumbs','autoorient','redo_classification','kill_entry',]
     
     def redo_classification(self,request,queryset):
         for photo in queryset:
@@ -40,6 +40,16 @@ class PhotoAdmin(OverriddenModelAdmin):
     def reinitialize(self,request,queryset):
         for photo in queryset:
             photo.initialize()
+            
+    def not_myphoto(self,request,queryset):
+        for photo in queryset:
+            photo.day=None
+            photo.myphoto=False
+            photo.save()
+            
+    def re_autoorient(self,request,queryset):
+        for photo in queryset:
+            photo.auto_orient()
     
     
     def kill_entry(self,request,queryset):

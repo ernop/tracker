@@ -34,22 +34,8 @@ def check_incoming():
     for ii,fp in enumerate(new):
         if ii%50==0:
             log.info('have mogrified %d / %d photos this time.',ii,len(new))
-        stat=os.stat(fp)
-        atime,mtime=stat.st_atime,stat.st_mtime
-        cmd='mogrify -auto-orient "%s"'%fp
-        res=os.system(cmd)
-        os.utime(fp, (atime, mtime))
-        if res:
-            log.error("fail cmd %s for fp %s"%(cmd,fp))
-            ph=Photo(fp=fp,deleted=True,incoming=False)
-            #if mogrify fails, just mark them deleted and prepare to kill them later
-            ph.save()
-            continue
         ph=Photo(fp=fp,incoming=True)
-        try:
-            ph.save()
-        except:
-            log.error('error saving photo fp %s',fp)
+        res=ph.auto_orient()
 
 def photo2obj(photo):
     res={'fp':photo.get_external_fp(),

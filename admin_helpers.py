@@ -12,6 +12,23 @@ from django.contrib.admin.views.main import SuspiciousOperation, ImproperlyConfi
 from django.contrib.admin.util import lookup_needs_distinct
 from django.db.models import Q, Count
 
+class MyCameraFilter(SimpleListFilter):
+    title='My Camera'
+    parameter_name='mycam'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    
+    def queryset(self, request, queryset):
+        NEXUS='Nexus S'
+        CANON='Canon EOS 500D'
+        if self.value()=='yes':
+            return queryset.filter(camera=NEXUS)|queryset.filter(camera=CANON)
+        elif self.value()=='no':
+            return queryset.exclude(camera=NEXUS).exclude(camera=CANON)
+
 class PhotoExtensionFilter(SimpleListFilter):
     title='extension'
     parameter_name='extension'

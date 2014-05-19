@@ -176,6 +176,23 @@ class Photo(DayModel):
     class Meta:
         db_table='photo'
 
+    def auto_orient(self):
+        '''mogrify, while preserving a,mtime.  ffs.'''
+        stat=os.stat(self.fp)
+        atime,mtime=stat.st_atime,stat.st_mtime
+        cmd='mogrify -auto-orient "%s"'%self.fp
+        res=os.system(cmd)
+        os.utime(self.fp, (atime, mtime))
+        
+        if res:
+            log.error("fail cmd %s for fp %s"%(cmd,self.fp))
+            self.deleted=True
+            self.save()
+            #if mogrify fails, just mark them deleted and prepare to kill them later
+            return False
+        self.save()
+        return True
+
     def file_exists(self):
         if not self.fp:
             log.error('image missing fp. %s',fp)
@@ -393,7 +410,16 @@ class Photo(DayModel):
             except Day.DoesNotExist:
                 day=Day(date=date)
                 day.save()
-            self.day=day
+            #first time through myphoto is null.
+            if self.id:
+                if self.myphoto==False:
+                    #do nothing, don't re-add the day
+                    pass
+                elif self.myphoto:
+                    self.day=day
+            else: #when you are first saved, treat as myphoto.
+                self.day=day
+                self.myphoto=True
         super(Photo, self).save(*args, **kwargs)
     
     def filename(self):    
