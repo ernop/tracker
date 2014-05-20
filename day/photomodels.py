@@ -367,7 +367,10 @@ class Photo(DayModel):
         self.filesize=stat.st_size
         #should create thumb.
         self.setup=True
-        self.save()
+        try:
+            self.save()
+        except Exception,e:
+            log.error('could not save. %s %d',e,self.id)
         return True
     
     def get_exif(self,im=None):
