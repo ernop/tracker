@@ -27,7 +27,7 @@ class MyCameraFilter(SimpleListFilter):
         if self.value()=='yes':
             return queryset.filter(camera=NEXUS)|queryset.filter(camera=CANON)
         elif self.value()=='no':
-            return queryset.exclude(camera=NEXUS).exclude(camera=CANON)
+            return queryset.exclude(camera=NEXUS).exclude(camera=CANON).exclude(camera=None).exclude(camera='')
 
 class PhotoExtensionFilter(SimpleListFilter):
     title='extension'
