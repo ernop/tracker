@@ -394,11 +394,14 @@ class Photo(DayModel):
                 return
         if self.incoming==None:
             self.incoming=True
-        if not self.name:
-            if '/' in self.fp:
-                self.name=self.fp.rsplit('/')[-1]
-            else:
-                self.name=self.fp
+        try:
+            if not self.name:
+                if '/' in self.fp:
+                    self.name=self.fp.rsplit('/')[-1]
+                else:
+                    self.name=self.fp
+        except:
+            log.error('bad name. %d',self.id)
         self.name=make_safe_filename(self.name)[:100]
         if self.taken and not self.day:
             #make the day
