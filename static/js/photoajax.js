@@ -218,6 +218,7 @@ function maybe_goto_next(tagids){
         }else if (TAGIDS_WHICH_FORCE_PREV.indexOf(parseInt(tagid))!=-1){
             show_prev()
             return false;
+        }
     })
 }
 
