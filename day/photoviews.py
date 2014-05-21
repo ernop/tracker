@@ -34,7 +34,8 @@ def photoajax(request):
     vals={}
     vals['full_phototags']=get_full_phototags()
     vals['full_photospots']=get_full_photospots()
-    vals['TAGIDS_WHICH_FORCE_NEXT']=[tt.id for tt in PhotoTag.objects.filter(name__in=settings.CLOSING_TAGS)]
+    vals['TAGIDS_WHICH_FORCE_NEXT']=[tt.id for tt in PhotoTag.objects.filter(name__in=settings.ADVANCING_TAGS)]
+    vals['TAGIDS_WHICH_FORCE_PREV']=[tt.id for tt in PhotoTag.objects.filter(name__in=['back','undo','last'])]
     #get the tags
     return r2r('jinja2/photo/photoajax.html',request,vals)
 
@@ -43,7 +44,7 @@ def photoajax(request):
         #vals={}
     #vals['full_phototags']=get_full_phototags()
     #vals['full_photospots']=get_full_photospots()
-    ##vals['TAGIDS_WHICH_FORCE_NEXT']=[tt.id for tt in PhotoTag.objects.filter(name__in=settings.CLOSING_TAGS)]
+    ##vals['TAGIDS_WHICH_FORCE_NEXT']=[tt.id for tt in PhotoTag.objects.filter(name__in=settings.ADVANCING_TAGS)]
     ##get the tags
     #return r2r('jinja2/photo/incoming_photospot_ajax.html',request,vals)
 
@@ -241,7 +242,7 @@ def ajax_photo_data(request):
                 #move on from incoming guys once "done" is entered
                 photo.myphoto=True
                 photo.save()
-            if photo.tags.filter(tag__name__in=settings.CLOSING_TAGS).exclude(tag__id__in=kept_tagids):
+            if photo.tags.filter(tag__name__in=settings.ADVANCING_TAGS).exclude(tag__id__in=kept_tagids):
                 #actually was assigned this tag
                 photo.done()
             vals['message']='saved %d tags.'%photo.tags.count()

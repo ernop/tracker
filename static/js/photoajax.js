@@ -215,7 +215,9 @@ function maybe_goto_next(tagids){
         if (TAGIDS_WHICH_FORCE_NEXT.indexOf(parseInt(tagid))!=-1){
             show_next()
             return false;
-        }
+        }else if (TAGIDS_WHICH_FORCE_PREV.indexOf(parseInt(tagid))!=-1){
+            show_prev()
+            return false;
     })
 }
 
@@ -327,8 +329,8 @@ function get_phototag(tagid){
 function get_photospot(photospot_id){
   var res=null
   $.each(full_photospots, function(index, photospot){
-    if (photospot.id==photospot_id){res=photospot;return false}
-    
+    if (photospot.id==photospot_id){
+        res=photospot;return false}
   })
   return res
 }
@@ -428,7 +430,6 @@ function make_photozone(photo){
     return photo
 }
 
-
 function setup_keynav(){
   $(document.documentElement).keydown(function (event) {
     if (!keynav_active){return}
@@ -440,30 +441,5 @@ function setup_keynav(){
             pop_photospot()
             keynav_active=false;
     }
-     //if (event.keyCode == 37) {
-        //show_prev()
-    //} else if (event.keyCode == 39) {
-    
-      //show_next()
-    //}
-    //else if (event.keyCode==87){//up
-      //crop_current(0,1);
-    //}
-    //else if (event.keyCode==65){//left
-      //crop_current(-1,0);
-    //}
-    //else if (event.keyCode==83){//down
-      //crop_current(0,-1);
-    //}
-    //else if (event.keyCode==68){//right
-      //crop_current(1,0);
-    //}
-    //else if (event.keyCode==88){//x
-      //kill_current();
-    //}
-    //else if (event.keyCode==72){//x
-      //flip_first();
-    //}
-    
 });
 }

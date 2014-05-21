@@ -5,6 +5,7 @@
 <script>
     full_phototags={{full_phototags|jsonify|safe}};
     TAGIDS_WHICH_FORCE_NEXT={{TAGIDS_WHICH_FORCE_NEXT|jsonify|safe}}
+    TAGIDS_WHICH_FORCE_PREV={{TAGIDS_WHICH_FORCE_PREV|jsonify|safe}}
     
     full_photospots={{full_photospots|jsonify|safe}};
 </script>
@@ -31,15 +32,10 @@
     <button id="phototagselect2" value=""></button>        
     <br><br>
     <form id="create-new-tag-form" onsubmit="return false;">
-        <input id="create-new-tag-input" /><i class="icon-plus"></i>Add Tag</a>
+        <input id="create-new-tag-input" /> <i class="icon-plus"></i>Add Tag</a>
     </form>
-    
-   
-        
-        
-        
-        <p><div class="btn prev-btn">prev</div>
-<div class="btn next-btn">next</div></p>
+    <p><div class="btn prev-btn">prev</div>
+    <div class="btn next-btn">next</div></p>
     </div>
     <div class="photozone">
         Photo Goes Here

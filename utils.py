@@ -491,3 +491,30 @@ def group_day_dat(data, by=None,mindate=None):
     return res2
     
     
+def insert_defaults():
+    from day.models import *
+    for name,symbol,val in settings.DEFAULT_CURRENCIES:
+        cc=Currency(name=name,symbol=symbol,rmb_value=val)
+        cc.save()
+    for name in settings.DEFAULT_DOMAINS:
+        dd=Domain(name=name)
+        dd.save()
+    for name,curname in settings.DEFAULT_REGIONS:
+        rr=Region(name=name,currency=Currency.objects.get(name=curname))
+        rr.save()
+    name2id={}    
+    for fn,ln,mt,gender in settings.DEFAULT_PEOPLE:
+        pp=Person(first_name=fn,last_name=ln,gender=gender)
+        pp.save()
+        name2id[pp.first_name]=pp.id
+        if mt:
+            for personname in mt:
+                otherperson=Person.objects.get(id=name2id[personname])
+                pp.met_through.add(otherperson)
+    for name,dname in settings.DEFAULT_PRODUCTS:
+        print name,dname
+        pp=Product(name=name, domain=Domain.objects.get(name=dname))
+        pp.save()
+    for name in settings.DEFAULT_PHOTOTAGS:
+        pt=PhotoTag(name=name)
+        pt.save()

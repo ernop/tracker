@@ -375,7 +375,7 @@ class Person(DayModel):
     created=models.DateField(auto_now_add=True, blank=True, null=True) #when i met them.
     disabled = models.BooleanField()  #if they're gone forever / probably never meet again, just remove them form most convenience functions.
     gender=models.IntegerField() #1 male 2 female 3 organization 0 undefined
-    rough_purchase_count = models.IntegerField()
+    rough_purchase_count = models.IntegerField(default=0)
 
     class Meta:
         db_table='person'
@@ -526,7 +526,8 @@ class Purchase(DayModel):
 
         if self.currency.name != 'rmb':
             return self.currency.rmb_value * self.cost
-        return cost
+        return self.cost
+    
 class Region(DayModel):
     '''geographical region'''
     name=models.CharField(max_length=100)

@@ -18,6 +18,16 @@ from day.models import *
 #from tracker.utils import adminify, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
 from admin_helpers import *
 
+def test_defaults():
+    "if basic stuff is missing, set that up."
+    try:
+        usd=Currency.objects.get(id=1)
+    except:
+        from utils import insert_defaults
+        insert_defaults()
+
+test_defaults()
+
 RMBSYMBOL=Currency.objects.get(id=1).symbol
 class PurchaseForm(forms.ModelForm):
     who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False), required=False)

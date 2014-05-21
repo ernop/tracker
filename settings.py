@@ -1,9 +1,7 @@
 import os
 
-DEFAULT_TAG_NAMES='delete undelete done myphoto timelapse friends \
-family meme background mosaic graphics\
-painting'.split()
-CLOSING_TAGS=[]
+
+ADVANCING_TAGS=[]
 EXCLUDED_TAGS=['done','delete','undelete',]
 #tags which if you add them, automatically advance to the next photo.
 #these are in addition to "done" etc. which are built in.
@@ -142,3 +140,11 @@ assert os.path.exists(DONE_PHOTO_DIR),DONE_PHOTO_DIR
 assert os.path.exists(THUMB_PHOTO_DIR),THUMB_PHOTO_DIR
 PHOTO_SCALED=750
 THUMB_HEIGHT=120
+
+DEFAULT_CURRENCIES=(('dollar','$',6.1),('rmb','rmb',1),)
+DEFAULT_DOMAINS=('money','life','work','transportation','body','health','clothes','friends','fun','food','drink','alcohol',)
+DEFAULT_REGIONS=(('home','rmb',),('new york','dollar'),('beijing','rmb'),('shanghai','rmb'),('internet','dollar'),)
+DEFAULT_PRODUCTS=(('milk','drink',),('water','drink'),('chicken','food',),('vitamins','body',),('taxi','transportation',),('bike','transportation'),)
+DEFAULT_PEOPLE=(('existence','the fact of',[],3),('father','',['existence'],1),('mother','',['existence',],2),)
+DEFAULT_SOURCES=(('7-11','shanghai'),('corner store','shanghai'),('amazon','internet'),('starbucks','shanghai'))
+DEFAULT_PHOTOTAGS='delete undelete done myphoto timelapse friends family meme background mosaic graphics painting done next last undo prev'.split()
