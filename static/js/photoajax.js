@@ -104,8 +104,8 @@ function show_prev(){
 function show_next(going_backwards){
     console.log('show next start')
     next=loaded_photos.shift()
-    console.log('got next',next.id)
     if (next){
+        console.log('got next',next.id)
         if (current_photo){
         
             if (going_backwards)

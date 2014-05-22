@@ -201,6 +201,8 @@ class Photo(DayModel):
         res=os.path.exists(self.fp)
         if not res:
             log.error('fp not exist. %d %s',self.id,self.fp)
+            self.delete()
+            
         return res
     
     def kill_this(self):
