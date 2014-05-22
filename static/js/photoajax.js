@@ -214,7 +214,6 @@ function get_photospot_for_current_photo(){
 
 function maybe_goto_next(tagids){
     //console.log('tagids are',tagids);
-    debugger;
     $.each(tagids, function(index, tagid){
         if (TAGIDS_WHICH_FORCE_NEXT.indexOf(parseInt(tagid))!=-1){
             show_next()
