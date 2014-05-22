@@ -4,6 +4,8 @@ current_photo=null
 past_photos=[]
 keynav_active=true;
 ii=0
+initial_load_done=false
+
 $(document).ready(function(){
     load_show();
     setup_buttons();
@@ -21,7 +23,7 @@ function load_one(){
     load(null, true)}
 
 function load(donefunc, only_one){
-    if (loaded_photos.length>25){return}
+    if (loaded_photos.length>25){initial_load_done=true;return}
     ii=ii+1
     
     var fake=0
@@ -102,6 +104,7 @@ function show_prev(){
 }
 
 function show_next(going_backwards){
+    if (initial_load_done && loaded_photos.length<23){initial_load_done=false;load();console.log('restarted load process.')}
     console.log('show next start')
     next=loaded_photos.shift()
     if (next){
