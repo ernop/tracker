@@ -12,12 +12,13 @@ $(document).ready(function(){
 })
 
 function load_show(){
-    console.log('load show start')
+    console.log('in load show, calling load')
     load(maybe_show)
-    console.log('load show end')
 }
 
-function load_one(){load(null, true)}
+function load_one(){
+    console.log('calling load one.')
+    load(null, true)}
 
 function load(donefunc, only_one){
     if (loaded_photos.length>25){return}
@@ -45,7 +46,7 @@ function load(donefunc, only_one){
         if (exclude_ids && exclude_ids.length){
             dat['exclude_ids']=exclude_ids
         }
-        console.log('doing dat',exclude_ids)
+        console.log('doing load',exclude_ids.length)
         $.ajax({
             url:'/ajax/photo_data/',
             type:'post',
@@ -73,7 +74,8 @@ function load(donefunc, only_one){
                         if (donefunc){donefunc.call(json)}
                     }
                     if (!only_one){
-                        setTimeout(load(),0);
+                        console.log('calling load in success of load')
+                        setTimeout(load(),1000);
                     }
                 }
             },
@@ -86,11 +88,11 @@ function load(donefunc, only_one){
 
 
 function maybe_show(){
-    console.log('maybe show start')
+    //console.log('maybe show start')
     if (!showing){
         show_next()
     }
-    console.log('maybe show end')
+    //console.log('maybe show end')
 }
 
 function show_prev(){
@@ -102,7 +104,7 @@ function show_prev(){
 function show_next(going_backwards){
     console.log('show next start')
     next=loaded_photos.shift()
-    console.log('got next',next)
+    console.log('got next',next.id)
     if (next){
         if (current_photo){
         
@@ -124,9 +126,10 @@ function show_next(going_backwards){
     }else{
         notify('no photo was ready',false)
     }
-    console.log('show next end')
-    if (loaded_photos.length<20)
-        {load_one();}
+    //console.log('show next end')
+    //if (loaded_photos.length<20)
+        //{console.log('calling load one since loaded photos length < 20')
+        //load_one();}
 }
 
 function pop_tag(){
@@ -170,7 +173,7 @@ function reset_photospot_select2(){
 function reset_photo_tags(){
     //after loading a photo, set the phototags for it
     //based on the current_photo object
-    console.log('reset photo tags start')
+    //console.log('reset photo tags start')
     var sel=$('#phototagselect2');
     sel.attr('value',current_photo.tagids.join(','))
     //sucks that even if you setup initselection based, select2 won't call it
@@ -184,7 +187,7 @@ function reset_photo_tags(){
     //first time you set it up its empty.  each re-getting data will re-set it.
     //fix_phototags()
     sel.unbind('change').on('change', change_phototag)
-    console.log('reset photo tags end')
+    //console.log('reset photo tags end')
 }
 
 function get_tags_for_current_photo(){
@@ -210,7 +213,8 @@ function get_photospot_for_current_photo(){
 }
 
 function maybe_goto_next(tagids){
-    console.log('tagids are',tagids);
+    //console.log('tagids are',tagids);
+    debugger;
     $.each(tagids, function(index, tagid){
         if (TAGIDS_WHICH_FORCE_NEXT.indexOf(parseInt(tagid))!=-1){
             show_next()
@@ -223,14 +227,14 @@ function maybe_goto_next(tagids){
 }
 
 function change_phototag(e){
-    console.log('change phototag start')
+    //console.log('change phototag start')
     if (e){var target=$(e.target)}else{
     var target=$('#phototagselect2')}
     data_changed(target, 'phototag');
     fix_phototags();
     current_photo.tagids=target.attr('value').split(',');
     maybe_goto_next(current_photo.tagids)
-    console.log('change phototag end')
+    //console.log('change phototag end')
 }
 
 function change_photospot(e){
@@ -409,11 +413,11 @@ function clear_photozone(){
 }
 
 function put_infozone(photo){
-    console.log('put infozone')
+    //console.log('put infozone')
     $('.infozone').append(make_infozone(photo))
 }
 function put_photozone(photo){
-    console.log('put photozone')
+    //console.log('put photozone')
     $('.photozone').append(make_photozone(photo))
     $('.photozone').attr('photo_id',photo.id)
 }
