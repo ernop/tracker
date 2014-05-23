@@ -445,12 +445,17 @@ class Photo(DayModel):
         return fn
     
     def undoable_delete(self):
+        log.info('test file exists. %s', self.fp)
         if self.file_exists():
+            log.info('it did exists. %s', self.fp)
             fn=self.filename()
             delfp=get_nonexisting_fp(settings.DELETED_PHOTO_DIR,fn)
             self.tags.filter(tag__name='undelete').delete()
             shutil.move(self.fp,delfp)
             self.fp=delfp
+        else:
+            #if file not exist, its been deleted in the file exist check.
+            return
         self.deleted=True
         self.incoming=False
         self.save()
