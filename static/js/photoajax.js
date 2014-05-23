@@ -453,8 +453,10 @@ function setup_keynav(){
         keynav_active=false;
     }
     else if (event.keyCode==68){
-        data_changed(null,'phototag',(delete_phototag_id+''))
-        show_next();
+        if (keynav_active){
+            data_changed(null,'phototag',(delete_phototag_id+''))
+            show_next();
+        }
     }
 });
 }
