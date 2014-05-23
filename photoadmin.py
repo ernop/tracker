@@ -23,7 +23,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     list_display='id myname myinfo myexif'.split()
     #list_filter=' product__domain currency source who_with'.split()
     list_filter='thumb_ok deleted incoming setup myphoto iso camera'.split()
-    list_filter=[PhotoHasDayFilter, PhotoHasSpotFilter, PhotoDoneFilter,PhotoExtensionFilter,MyCameraFilter]+list_filter
+    list_filter=[PhotoHasDayFilter, PhotoTaggedWithFilter, PhotoHasSpotFilter, PhotoDoneFilter,PhotoExtensionFilter,MyCameraFilter]+list_filter
     
     #date_hierarchy='created'
     #list_editable=['note',]
@@ -109,7 +109,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     #list_editable=['note',]
     search_fields= ['name']
     list_filter=['control_tag', TagHasPersonFilter]
-    list_display='id myname myphotos'.split()
+    list_display='id myname myphotos mytags'.split()
     actions=['reinitialize_tags','create_people_tags','redo_classification']
     
     def redo_classification(self,request,queryset):
@@ -140,11 +140,31 @@ class PhotoTagAdmin(OverriddenModelAdmin):
             realpho=pho.photo
             res.append(realpho.inhtml(size='thumb'))
         pres=''.join(res)
-        alllink='<a href="../photo/?photohastag__photo__id=%d">All Photos</a>'%obj.id
+        alllink='<a href="../photo/?tagged_with=%s">All Photos</a>'%obj.id
         res='<div class="big">%d</div>%s<br>%s'%(ct,pres,alllink)
         return res
         
-    @debu
+    def mytags(self,obj):
+        '''co-occuring tags'''
+        #import ipdb;ipdb.set_trace()
+        photos=Photo.objects.filter(tags__tag=obj)
+        photoids=[ph.id for ph in photos]
+        reltags=PhotoTag.objects.filter(photos__photo__id__in=photoids).distinct()
+        comma_separated_photoids=','.join([str(pid) for pid in photoids])
+        grouped_tags=PhotoTag.objects.raw('select pt.id, pt.name,count(*) as ct from phototag pt inner join photohastag pht on pht.tag_id=pt.id inner join photo p on p.id=pht.photo_id where p.id in (%s) group by 1 order by ct desc'%comma_separated_photoids)
+        res=[]
+        for n in range(50):
+            try:
+                gt=grouped_tags[n]
+                res.append((gt.id,gt.name,gt.ct))
+            except:
+                break
+        res2=[('<h2>Related Tags</h2>')]
+        
+        for rr in res:
+            res2.append(('<a href="/admin/day/phototag/?id=%d">%s</a>'%(rr[0],rr[1]),rr[2]))
+        return mktable(res2)
+        
     def myname(self,obj):
         data=(('vlink',obj.vlink()),
               ('use count',obj.use_count),
@@ -152,7 +172,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
               )
         return mktable(data)
         
-    adminify(myname, myphotos)
+    adminify(myname, myphotos, mytags)
 
 class PhotoSpotAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
