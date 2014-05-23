@@ -128,8 +128,8 @@ def get_next_incoming(exclude=None):
             log.info('returning img %s', img)
             return img
         else:
-            log.error('deleting img because file not exist. %s',img)
-            img.undoable_delete()
+            #its already deleted
+            pass
         ii=ii+1
         log.info("ii %d",ii)
 
