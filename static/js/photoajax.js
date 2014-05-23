@@ -193,6 +193,8 @@ function reset_photo_tags(){
     //console.log('reset photo tags end')
 }
 
+
+
 function get_tags_for_current_photo(){
     console.log('get current tags start')
     //grab the tags from the full tag js object.
@@ -342,20 +344,21 @@ function get_photospot(photospot_id){
   return res
 }
 
-function data_changed(target, kind){
+function data_changed(target, kind, override){
     var data={'kind':kind};
     if (kind=='phototag'){
+        if (override){data['phototag_ids']=override}else{
         data['phototag_ids']=target.attr('value');
-        update_tag_info(target.attr('value').split(','));
+        update_tag_info(target.attr('value').split(','));}
     }else if (kind=='photospot'){
         data['photospot_id']=target.attr('value');
         update_spot_info(target.attr('value'))
     }
     data['photo_id']=$(".photozone").attr('photo_id')
-    send_data(data, target);
+    send_data(data);
 }
 
-function send_data(data, target){
+function send_data(data){
     $.ajax({
         url:'/ajax/photo_data/',
         type:'POST',
@@ -439,14 +442,19 @@ function make_photozone(photo){
 
 function setup_keynav(){
   $(document.documentElement).keydown(function (event) {
+    notify(event.keyCode,1);
     if (!keynav_active){return}
     if (event.keyCode==84){ //t
         pop_tag()
         keynav_active=false;
     }
-    if (event.keyCode==80){ //p
-            pop_photospot()
-            keynav_active=false;
+    else if (event.keyCode==80){ //p
+        pop_photospot()
+        keynav_active=false;
+    }
+    else if (event.keyCode==68){
+        data_changed(null,'phototag',(delete_phototag_id+''))
+        show_next();
     }
 });
 }
