@@ -303,7 +303,6 @@ def photostats(request):
     
     photos=Photo.objects.all()
     res={}
-    import ipdb;ipdb.set_trace()
     for exiffield in exiffields:
         #statfield='%s_%d'%(field,val)
         res[exiffield]=[]
