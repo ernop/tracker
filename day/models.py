@@ -415,7 +415,6 @@ class Person(DayModel):
         return 'undef'
     
     def save(self,*args,**kwargs):
-        import ipdb;ipdb.set_trace()
         super(Person, self).save(*args, **kwargs)
         try:
             from day.photomodels import PhotoTag
