@@ -413,7 +413,7 @@ class Person(DayModel):
         if self.gender==3:return 'org'
         return 'undef'
     
-    def save(self):
+    def save(self,*args,**kwargs):
         try:
             from day.photomodels import PhotoTag
             PhotoTag.setup_people_tags()
