@@ -1,0 +1,26 @@
+{% extends 'jinja2/photo_base.html' %}
+{% block title %}Photo Stats{% endblock %}
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<table class="table">
+<tr><td>
+{% for key in res.keys() %}
+    <td>{{key}}
+{% endfor %}
+<tr><td>
+{% for key,val in res.items()%}<!--val is a list of pairs.-->
+    <td><table>
+    {% for a,v in val %}
+        <tr><td>{{a}}<td>{{v}}
+    {% endfor %}
+    </table>
+{% endfor %}
+</table>
+
+
+{% endblock %}
+
+{% block footer %}{{super()}}{% include "jinja2/photo/photofooter.html" %}
+{% endblock %}

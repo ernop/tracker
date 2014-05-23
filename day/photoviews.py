@@ -285,3 +285,36 @@ def ajax_photo_data(request):
         vals['success']=False
         vals['message']=str(e)
         return r2j(vals)
+    
+
+@user_passes_test(staff_test)
+def photostats(request):
+    #axes
+    #incoming
+    #deleted
+    
+    #iso
+    #camera
+    #mm
+    #aperture
+    #exposure
+    fields='incoming deleted'.split()
+    exiffields='iso camera mm aperture exposure'.split()
+    
+    photos=Photo.objects.all()
+    res={}
+    import ipdb;ipdb.set_trace()
+    for exiffield in exiffields:
+        #statfield='%s_%d'%(field,val)
+        res[exiffield]=[]
+        guys=Photo.objects.raw('select id,count(*) as ct,%s from photo group by 3 order by 2 desc'%(exiffield))
+        for nn in range(100):
+            try:
+                guy=guys[nn]
+            except:
+                break
+            exifval=(getattr(guy,exiffield))
+            res[exiffield].append(exifval,guy.ct)
+    vals={'res':res}
+    return r2r('jinja2/photo/photostats.html',request,vals)
+        
