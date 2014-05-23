@@ -354,12 +354,17 @@ class Photo(DayModel):
                         except:return False
                     setattr(self,v,val)
             if 'ApertureValue' in tags:
-                val='%0.2f'%(1.0*tags['ApertureValue'][0]/tags['ApertureValue'][1])
-                self.aperture=val
+                try:
+                    self.aperture='%0.2f'%(1.0*tags['ApertureValue'][0]/tags['ApertureValue'][1])
+                except:
+                    self.aperture=''
             if 'FocalLength' in tags:
                 self.mm=tags['FocalLength'][0]
             if 'ExposureTime' in tags:
-                self.exposure='%0.5f'%(1.0*tags['ExposureTime'][0]/tags['ExposureTime'][1])
+                try:
+                    self.exposure='%0.5f'%(1.0*tags['ExposureTime'][0]/tags['ExposureTime'][1])
+                except:
+                    self.exposure=''
         else:
             pass
         self.resolutionx=im.size[0]
