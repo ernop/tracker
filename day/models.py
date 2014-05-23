@@ -367,6 +367,7 @@ class NoteKind(DayModel):
         if not text:
             text='%s (%d)'%(self.name, self.notes.count())
         return '<a class="btn"  href="/notekind/%s/">%s </a>'%(self.id, text)
+    
 class Person(DayModel):
     first_name=models.CharField(max_length=100)
     last_name=models.CharField(max_length=100, blank=True, null=True)
@@ -414,13 +415,14 @@ class Person(DayModel):
         return 'undef'
     
     def save(self,*args,**kwargs):
+        import ipdb;ipdb.set_trace()
+        super(Person, self).save(*args, **kwargs)
         try:
             from day.photomodels import PhotoTag
             PhotoTag.setup_my_person_tag(self)
             #setting up the related tag for this person.
         except:
             pass
-        super(Person, self).save(*args, **kwargs)
         
     
 class PersonDay(DayModel):
