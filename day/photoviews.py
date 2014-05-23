@@ -313,7 +313,7 @@ def photostats(request):
             except:
                 break
             exifval=(getattr(guy,exiffield))
-            res[exiffield].append(exifval,guy.ct)
+            res[exiffield].append((exifval,guy.ct))
     vals={'res':res}
     return r2r('jinja2/photo/photostats.html',request,vals)
         
