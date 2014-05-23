@@ -30,13 +30,17 @@ class PhotoTag(DayModel):
     use_count=models.IntegerField()
     
     @classmethod
+    def setup_my_person_tag(self,person):
+        if PhotoTag.objects.filter(person=person).exists():
+            return
+        tg=PhotoTag(name=unicode(person), person=person)
+        tg.save()
+    
+    @classmethod
     def setup_people_tags(self):
         from day.models import Person
         for person in Person.objects.all():
-            if PhotoTag.objects.filter(person=person).exists():
-                continue
-            tg=PhotoTag(name=unicode(person), person=person)
-            tg.save()
+            self.setup_my_person_tag(person)
     
     @classmethod
     def setup_initial_tags(self):

@@ -416,7 +416,7 @@ class Person(DayModel):
     def save(self,*args,**kwargs):
         try:
             from day.photomodels import PhotoTag
-            PhotoTag.setup_people_tags()
+            PhotoTag.setup_my_person_tag(self)
             #setting up the related tag for this person.
         except:
             pass
