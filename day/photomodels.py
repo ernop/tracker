@@ -206,7 +206,7 @@ class Photo(DayModel):
         if not res:
             log.error('fp not exist. hard deleting. %d %s',self.id,self.fp)
             self.delete()
-            
+            return False            
         return res
     
     def kill_this(self):
@@ -216,6 +216,7 @@ class Photo(DayModel):
             os.remove(self.thumbfp)
         log.info('killing this. %s',self)
         self.delete()
+        return True
     
     def delete_file(self):
         if self.file_exists():
