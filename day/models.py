@@ -412,6 +412,17 @@ class Person(DayModel):
         if self.gender==2:return 'female'
         if self.gender==3:return 'org'
         return 'undef'
+    
+    def save(self):
+        try:
+            from day.photomodels import PhotoTag
+            PhotoTag.setup_people_tags()
+            #setting up the related tag for this person.
+        except:
+            pass
+        super(Person, self).save(*args, **kwargs)
+        
+    
 class PersonDay(DayModel):
     #not used
     person=models.ForeignKey('Person', related_name='persondays')
