@@ -214,6 +214,7 @@ class Photo(DayModel):
             os.remove(self.fp)  
         if self.thumbfp and os.path.exists(self.thumbfp):
             os.remove(self.thumbfp)
+        log.info('killing this. %s',self)
         self.delete()
     
     def delete_file(self):

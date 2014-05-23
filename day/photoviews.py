@@ -283,7 +283,7 @@ def ajax_photo_data(request):
         return r2j(vals)
     except Exception,e:
         vals['success']=False
-        vals['message']=str(e)
+        vals['message']='%s %s %s'%(todo,kind,e)
         return r2j(vals)
     
 
