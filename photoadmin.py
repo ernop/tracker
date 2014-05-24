@@ -179,7 +179,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     
     def myhistory(self,obj):
         #photos=Photo.objects.filter(tags__tag=obj)
-        photos=Photo.objects.raw('select p.id,date(p.created) as date,\
+        photos=Photo.objects.raw('select p.id,date(p.photo_created) as date,\
         count(*) as ct from photo p inner join \
         photohastag pht on pht.photo_id=p.id inner join phototag pt on \
         pt.id=pht.tag_id where pt.id=%d group by 2'%obj.id)
