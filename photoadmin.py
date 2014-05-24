@@ -182,7 +182,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         photos=Photo.objects.raw('select p.id,date(p.created) as date,\
         count(*) as ct from photo p inner join \
         photohastag pht on pht.photo_id=p.id inner join phototag pt on \
-        pt.id=pht.tag_id group by 2')
+        pt.id=pht.tag_id where pt.id=%d group by 2'%obj.id)
         nn=0
         res={}
         md=settings.LONG_AGO
