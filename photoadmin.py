@@ -136,7 +136,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     def myphotos(self,obj):
         res=[]
         ct=obj.photos.count()
-        for pho in obj.photos.order_by('photo_created').all()[:80]:
+        for pho in obj.photos.order_by('photo__photo_created').all()[:80]:
             realpho=pho.photo
             res.append(realpho.inhtml(size='thumb'))
         pres=''.join(res)
