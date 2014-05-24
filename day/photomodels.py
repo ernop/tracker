@@ -102,13 +102,18 @@ class Photo(DayModel):
         if os.path.exists(self.thumbfp):
             os.remove(self.thumbfp)
 
-    def vlink(self,text=None):
+    def vlink(self,text=None, wrap=False):
+        if wrap:
+            wrap=' nb'
+        else:
+            wrap=''
+        
         if not text:
             if self.name:
                 text=self.name
             else:
                 text='no name photo'
-        return '<a class="btn" href="%s">%s</a>'%(self.exhref(), text)
+        return '<a class="btn%s" href="%s">%s</a>'%(wrap,self.exhref(), text)
     
     def exhref(self):
         return '/photo/photo/%d/'%self.id
