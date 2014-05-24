@@ -146,7 +146,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         
     def mytags(self,obj):
         '''co-occuring tags'''
-        EXCLUDE_PHOTOTAGS='done next last'.split()
+        EXCLUDE_PHOTOTAGS='done next last autoorient'.split()
         photoids=[ph.id for ph in Photo.objects.filter(tags__tag=obj)]
         comma_separated_photoids=','.join([str(pid) for pid in photoids])
         bad_ptids=','.join([str(pt.id) for pt in PhotoTag.objects.filter(name__in=EXCLUDE_PHOTOTAGS)])
@@ -211,15 +211,25 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
     #date_hierarchy='created'
     #list_editable=['note',]
     #search_fields= ['name']
-    list_display='id mylinks'.split()
-    def mylinks(self,obj):
-        data=[('vlink',obj.vlink()),
-              ('count',obj.photos.count()),
+    list_display='id myinfo tour_order myphotos'.split()
+    list_filter=['tour','tour_order',]
+  
+    def myinfo(self,obj):
+        data=[('tour',obj.tour or ''),
+              ('description',obj.description),
+              ('photo count',obj.photos.count()),
+              ('vlink',obj.vlink()),
               ]
-        
         return mktable(data)
-    adminify(mylinks)
-    pass
+    
+    def myphotos(self,obj):
+        photos=[]
+        for ph in obj.photos.order_by('taken')[:10]:
+            photos.append(ph.inhtml(size='thumb'))
+        return ''.join(photos)
+    
+    
+    adminify(myinfo,myphotos)
 
 admin.site.register(Photo, PhotoAdmin)
 admin.site.register(PhotoTag, PhotoTagAdmin)
