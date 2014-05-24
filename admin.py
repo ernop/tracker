@@ -394,7 +394,7 @@ class PersonAdmin(OverriddenModelAdmin):
               ('last purch',latest_clink),
               ('cday',latest_dclink),
               ('vday',latest_dvlink),
-              ('personlink', obj.as_tag.exists() and obj.as_tag.get().clink() or ''),
+              ('taglink', obj.as_tag.exists() and obj.as_tag.get().clink() or ''),
               ]
         if obj.as_tag.exists():
             photos='<br>'+''.join([p.photo.inhtml(size='thumb') for p in obj.as_tag.get().photos.all()])

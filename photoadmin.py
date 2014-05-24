@@ -136,7 +136,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     def myphotos(self,obj):
         res=[]
         ct=obj.photos.count()
-        for pho in obj.photos.all()[:50]:
+        for pho in obj.photos.order_by('photo_created').all()[:80]:
             realpho=pho.photo
             res.append(realpho.inhtml(size='thumb'))
         pres=''.join(res)
@@ -147,8 +147,8 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     def mytags(self,obj):
         '''co-occuring tags'''
         #import ipdb;ipdb.set_trace()
-        photos=Photo.objects.filter(tags__tag=obj)
-        photoids=[ph.id for ph in photos]
+        EXCLUDE_PHOTOTAGS='done next last'.split()
+        photoids=[ph.id for ph in Photo.objects.filter(tags__tag=obj) if ph.name not in EXCLUDE_PHOTOTAGS]
         reltags=PhotoTag.objects.filter(photos__photo__id__in=photoids).distinct()
         comma_separated_photoids=','.join([str(pid) for pid in photoids])
         grouped_tags=PhotoTag.objects.raw('select pt.id, pt.name,count(*) as ct \
@@ -160,6 +160,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         for n in range(20):
             try:
                 gt=grouped_tags[n]
+                if gt.id==obj.id:continue
                 res.append((gt.id,gt.name,gt.ct))
             except:
                 break

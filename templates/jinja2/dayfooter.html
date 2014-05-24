@@ -8,8 +8,11 @@
         <div class="bignav"><a class="btn"  href="/recent_connections/">recent people</a><a class="btn"  href="/people_connections/">people</a></div>
         <div class="bignav"><a class="btn"  href="/month_connections/">month people</a>
         <a class="btn"  href="/initial_annual/">year ppl initial</a>
-        <div class="bignav"><a class="btn"  href="/amonth/{{day.plus(months=0)}}">this month</a><a class="btn"  href="/amonth/{{day.plus(months=-1)}}">last month</a></div>
-        <div class="bignav"><a class="btn" href="/photo/incoming/">incoming photos</a></div>
+        <div class="bignav"><a class="btn"  href="/amonth/{{day.plus(months=0)}}">this month</a>
+        <a class="btn"  href="/amonth/{{day.plus(months=-1)}}">last month</a>
+        <br><a class="btn" href="/photo/incoming/">incoming photos</a>
+        <a class="btn" href="/admin/day/person/?created__year={{day.date.year}}&created__month={{day.date.month}}">this month people</a></div>
+        
         
         
 </div>
