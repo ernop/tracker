@@ -18,131 +18,7 @@ from day.photoutil import *
 
 from choices import *
 
-class PhotoTag(DayModel):
-    created=models.DateTimeField(auto_now_add=True)
-    modified=models.DateTimeField(auto_now=True)
-    name=models.CharField(max_length=100)
-    description=models.CharField(max_length=100,blank=True,null=True) #to describe "control" tags
-    person=models.ForeignKey('Person', blank=True,null=True,related_name='as_tag')
-    
-    #admin
-    control_tag=models.BooleanField(default=False) #ajax/js will take more actions
-    use_count=models.IntegerField()
-    
-    @classmethod
-    def setup_my_person_tag(self,person):
-        if PhotoTag.objects.filter(person=person).exists():
-            return
-        tg=PhotoTag(name=unicode(person), person=person)
-        tg.save()
-    
-    @classmethod
-    def setup_people_tags(self):
-        from day.models import Person
-        for person in Person.objects.all():
-            self.setup_my_person_tag(person)
-    
-    @classmethod
-    def setup_initial_tags(self):
-        tagnames=settings.DEFAULT_TAG_NAMES
-        for tn in tagnames:
-            exi=PhotoTag.objects.filter(name=tn)
-            if exi.exists():
-                continue
-            pt=PhotoTag(name=tn)
-            pt.save()
-    
-    @classmethod
-    def update_tag_counts(self):
-        for pt in PhotoTag.objects.all():
-            ct=pt.photos.count()
-            if pt.person:
-                ct=ct+pt.person.purchases.count()
-            pt.use_count=ct
-            pt.save()
-    
-    def save(self, *args, **kwargs):
-        if self.use_count is None:
-            self.use_count=0
-        super(PhotoTag, self).save(*args, **kwargs)
-    
-    #when this tag is added.  f.e. delete / undelete
-    def get_external_page(self):
-        return '/photo/phototag/%s/'%self.name
-    class Meta:
-        db_table='phototag'
-        
-    def __unicode__(self):
-        return '%s'%(self.name)
-    
-    def vlink(self,text=None):
-        if not text:
-            if self.name:
-                text=self.name
-            else:
-                text='no name phototag'
-        return '<a class="btn" href="/photo/phototag/%s/">%s</a>'%(self.name, text)
 
-
-        #
-
-class PhotoSpot(DayModel):
-    '''a specific spot & angle to take photos from'''
-    created=models.DateTimeField(auto_now_add=True)
-    modified=models.DateTimeField(auto_now=True)
-    name=models.CharField(max_length=100)
-    description=models.CharField(max_length=500,blank=True,null=True)
-    tour=models.CharField(max_length=100,blank=True,null=True)
-    tour_order=models.IntegerField(blank=True,null=True)
-    slug=models.CharField(max_length=100,blank=True,null=True)
-    latitude=models.CharField(max_length=30,blank=True,null=True)
-    longitude=models.CharField(max_length=30,blank=True,null=True)
-    
-    class Meta:
-        db_table='photospot'
-    
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug=make_safe_filename(self.name)
-        self.slug=make_safe_filename(self.slug)
-        super(PhotoSpot, self).save(*args, **kwargs)
-        
-    def __unicode__(self):
-        return self.name
-    
-    def vlink(self,text=None):
-        if not text:
-            if self.name:
-                text=self.name
-            else:
-                text='no name photospot'
-        return '<a class="btn" href="/photo/photospot/%s/">%s</a>'%(self.name.replace(' ','_'), text)
-
-class PhotoHasTag(DayModel):
-    '''through object for photo&phototag'''
-    created=models.DateTimeField(auto_now_add=True)
-    modified=models.DateTimeField(auto_now=True)
-    photo=models.ForeignKey('Photo',related_name='tags')
-    tag=models.ForeignKey('PhotoTag',related_name='photos')
-    
-    class Meta:
-        db_table='photohastag'
-        
-    def __unicode__(self):
-        return '%s has "%s"'%(self.photo.name,self.tag.name)
-    
-#class PhotoHasPhotospot(DayModel):
-    #'''linkage between photo and photospot'''
-    #created=models.DateTimeField(auto_now_add=True)
-    #modified=models.DateTimeField(auto_now=True)
-    #photo=models.ForeignKey('Photo',related_name='photospot')
-    #photospot=models.ForeignKey('PhotoSpot',related_name='photos')
-    
-    #class Meta:
-        #db_table='photohasphotospot'
-        
-    #def __unicode__(self):
-        #return '%s has "%s"'%(self.photo.name,self.photospot.name)
 
 class Photo(DayModel):
     ''''''
@@ -240,7 +116,9 @@ class Photo(DayModel):
     def __unicode__(self):
         return self.name or self.fp or 'no name'
     
-    def inhtml(self,link=True,size='scaled'):
+    def inhtml(self,clink=True,vlink=False,size='scaled'):
+        if not vlink and not clink:
+            clink=True
         thumb=False
         width=None
         height=None
@@ -273,8 +151,10 @@ class Photo(DayModel):
                 img='<img src="%s" height=%d>'%(src, height)
         else:
             img='<img src="%s">'%(self.get_external_fp())
-        if link:
+        if vlink:
             return self.vlink(text=img)
+        elif clink:
+            return self.clink(text=img)
         return img
         
     def is_thumb_ok(self):
@@ -520,22 +400,23 @@ class Photo(DayModel):
         dat=(('deleted',dd),
              ('id',self.clink(text=self.id)),
              ('day',daylink),
-             ('taken',self.taken and self.taken.strftime(DATE_DASH_REV_DAY) or ''),
-             ('photo created',self.photo_created.strftime(DATE_DASH_REV_DAY)),
-             ('photo modified',self.photo_modified.strftime(DATE_DASH_REV_DAY)),
-             ('obj created',self.created.strftime(DATE_DASH_REV)),
-             ('obj modified',self.modified.strftime(DATE_DASH_REV)),
+             
              ('incoming',icon(self.incoming)),
              ('setup',icon(self.setup)),
              ('myphoto',icon(self.myphoto)),
              ('thumb ok',icon(self.thumb_ok)),
              ('done',icon(self.done)),
              ('crop',(self.xcrop or self.ycrop) and ('%dx%d'%(self.xcrop,self.ycrop)) or ''),
+             ('taken',self.taken and self.taken.strftime(DATE_DASH_REV_DAY) or ''),
+             ('photo created',self.photo_created.strftime(DATE_DASH_REV_DAY)),
+             ('photo modified',self.photo_modified.strftime(DATE_DASH_REV_DAY)),
+             ('obj created',self.created.strftime(DATE_DASH_REV)),
+             ('obj modified',self.modified.strftime(DATE_DASH_REV)),
              )
         res=mktable(dat,skip_false=True)
         return res
 
-    def name_table(self,include_image=True):
+    def name_table(self,include_image=True,clink=False,vlink=False):
         from trackerutils import div
         vtags=div(klass='vtagzone',contents=', '.join([tag.tag.vlink() for tag in self.tags.all()]))
         ctags=div(klass='ctagzone',contents=', '.join([tag.tag.clink() for tag in self.tags.all()]))
@@ -556,7 +437,7 @@ class Photo(DayModel):
              ('photospot vlink',vspot),
              ]
         if include_image:
-            dat.insert(2,('img',self.inhtml(size='thumb',link=True)),)
+            dat.insert(2,('img',self.inhtml(size='thumb',clink=clink,vlink=vlink)),)
         res=mktable(dat,skip_false=True)
         return res
     
@@ -582,8 +463,6 @@ class Photo(DayModel):
     def is_private(self):
         return self.tags.filter(tag__name__in=settings.EXCLUDED_TAGS).exists()
     
-    
-    
     def get_photospothtml(self):
         if self.photospot:
             cl=self.photospot.clink()
@@ -604,3 +483,130 @@ class Photo(DayModel):
         else:
             exfp='/static/'+'/'.join(self.fp.rsplit('/')[-2:])
         return exfp
+
+
+class PhotoTag(DayModel):
+    created=models.DateTimeField(auto_now_add=True)
+    modified=models.DateTimeField(auto_now=True)
+    name=models.CharField(max_length=100)
+    description=models.CharField(max_length=100,blank=True,null=True) #to describe "control" tags
+    person=models.ForeignKey('Person', blank=True,null=True,related_name='as_tag')
+    
+    #admin
+    control_tag=models.BooleanField(default=False) #ajax/js will take more actions
+    use_count=models.IntegerField()
+    
+    @classmethod
+    def setup_my_person_tag(self,person):
+        if PhotoTag.objects.filter(person=person).exists():
+            return
+        tg=PhotoTag(name=unicode(person), person=person)
+        tg.save()
+    
+    @classmethod
+    def setup_people_tags(self):
+        from day.models import Person
+        for person in Person.objects.all():
+            self.setup_my_person_tag(person)
+    
+    @classmethod
+    def setup_initial_tags(self):
+        tagnames=settings.DEFAULT_TAG_NAMES
+        for tn in tagnames:
+            exi=PhotoTag.objects.filter(name=tn)
+            if exi.exists():
+                continue
+            pt=PhotoTag(name=tn)
+            pt.save()
+    
+    @classmethod
+    def update_tag_counts(self):
+        for pt in PhotoTag.objects.all():
+            ct=pt.photos.count()
+            if pt.person:
+                ct=ct+pt.person.purchases.count()
+            pt.use_count=ct
+            pt.save()
+    
+    def save(self, *args, **kwargs):
+        if self.use_count is None:
+            self.use_count=0
+        super(PhotoTag, self).save(*args, **kwargs)
+    
+    #when this tag is added.  f.e. delete / undelete
+    def get_external_page(self):
+        return '/photo/phototag/%s/'%self.name
+    class Meta:
+        db_table='phototag'
+        
+    def __unicode__(self):
+        return '%s'%(self.name)
+    
+    def vlink(self,text=None):
+        if not text:
+            if self.name:
+                text=self.name
+            else:
+                text='no name phototag'
+        return '<a class="btn" href="/photo/phototag/%s/">%s</a>'%(self.name, text)
+
+
+        #
+
+class PhotoSpot(DayModel):
+    '''a specific spot & angle to take photos from'''
+    created=models.DateTimeField(auto_now_add=True)
+    modified=models.DateTimeField(auto_now=True)
+    name=models.CharField(max_length=100)
+    description=models.CharField(max_length=500,blank=True,null=True)
+    tour=models.CharField(max_length=100,blank=True,null=True)
+    tour_order=models.IntegerField(blank=True,null=True)
+    slug=models.CharField(max_length=100,blank=True,null=True)
+    latitude=models.CharField(max_length=30,blank=True,null=True)
+    longitude=models.CharField(max_length=30,blank=True,null=True)
+    
+    class Meta:
+        db_table='photospot'
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug=make_safe_filename(self.name)
+        self.slug=make_safe_filename(self.slug)
+        super(PhotoSpot, self).save(*args, **kwargs)
+        
+    def __unicode__(self):
+        return self.name
+    
+    def vlink(self,text=None):
+        if not text:
+            if self.name:
+                text=self.name
+            else:
+                text='no name photospot'
+        return '<a class="btn" href="/photo/photospot/%s/">%s</a>'%(self.name.replace(' ','_'), text)
+
+class PhotoHasTag(DayModel):
+    '''through object for photo&phototag'''
+    created=models.DateTimeField(auto_now_add=True)
+    modified=models.DateTimeField(auto_now=True)
+    photo=models.ForeignKey('Photo',related_name='tags')
+    tag=models.ForeignKey('PhotoTag',related_name='photos')
+    
+    class Meta:
+        db_table='photohastag'
+        
+    def __unicode__(self):
+        return '%s has "%s"'%(self.photo.name,self.tag.name)
+    
+#class PhotoHasPhotospot(DayModel):
+    #'''linkage between photo and photospot'''
+    #created=models.DateTimeField(auto_now_add=True)
+    #modified=models.DateTimeField(auto_now=True)
+    #photo=models.ForeignKey('Photo',related_name='photospot')
+    #photospot=models.ForeignKey('PhotoSpot',related_name='photos')
+    
+    #class Meta:
+        #db_table='photohasphotospot'
+        
+    #def __unicode__(self):
+        #return '%s has "%s"'%(self.photo.name,self.photospot.name)

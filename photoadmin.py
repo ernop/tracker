@@ -30,6 +30,12 @@ class PhotoAdmin(OverriddenModelAdmin):
     search_fields= ['name']
     list_per_page=100
     actions=['undoable_delete','not_myphoto','delete_file','undelete','reinitialize','re_autoorient','force_recreate_thumbs','autoorient','redo_classification','kill_entry',]
+    actions.extend(['remove_photospot',])
+    
+    def remove_photospot(self,request,queryset):
+        for pho in queryset:
+            pho.photospot=None
+            pho.save()
     
     def redo_classification(self,request,queryset):
         for photo in queryset:
@@ -85,7 +91,7 @@ class PhotoAdmin(OverriddenModelAdmin):
         return obj.info_table()
     @debu
     def myname(self,obj):
-        return obj.name_table()
+        return obj.name_table(vlink=True)
     
     def myexif(self,obj):
         return obj.exif_table()
@@ -209,10 +215,23 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
     #list_filter=' product__domain currency source who_with'.split()
     #date_hierarchy='created'
-    #list_editable=['note',]
+    list_editable=['tour_order',]
     #search_fields= ['name']
     list_display='id myinfo tour_order myphotos'.split()
     list_filter=['tour','tour_order',]
+    actions=[]
+    
+    def make_assign(tn):
+        def assign_guy(self,request,queryset):
+            for photospot in queryset:
+                photospot.tour=tn
+                photospot.save()
+        assign_guy.__name__=str(('assign to tour %s'%tn).replace(' ','_'))
+        return assign_guy
+    
+    for guy in PhotoSpot.objects.all().values_list('tour').distinct():
+        tourname=guy[0]
+        actions.append(make_assign(tourname))
   
     def myinfo(self,obj):
         data=[('tour',obj.tour or ''),
@@ -225,7 +244,7 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
     def myphotos(self,obj):
         photos=[]
         for ph in obj.photos.order_by('taken')[:10]:
-            photos.append(ph.inhtml(size='thumb'))
+            photos.append(ph.inhtml(size='thumb', clink=True))
         return ''.join(photos)
     
     
