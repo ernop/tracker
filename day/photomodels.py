@@ -152,9 +152,9 @@ class Photo(DayModel):
         else:
             img='<img src="%s">'%(self.get_external_fp())
         if vlink:
-            return self.vlink(text=img)
+            return self.vlink(text=img,wrap=False)
         elif clink:
-            return self.clink(text=img)
+            return self.clink(text=img,wrap=False)
         return img
         
     def is_thumb_ok(self):
@@ -405,7 +405,7 @@ class Photo(DayModel):
              ('myphoto',icon(self.myphoto)),
              ('thumb ok',icon(self.thumb_ok)),
              ('done',icon(self.done)),
-             ('crop',(self.xcrop or self.ycrop) and ('%dx%d'%(self.xcrop,self.ycrop)) or ''),
+             ('crop',(self.xcrop or self.ycrop) and ('x=%d y=%d'%(self.xcrop,self.ycrop)) or ''),
              ('taken',self.taken and self.taken.strftime(DATE_DASH_REV_DAY) or ''),
              ('photo created',self.photo_created.strftime(DATE_DASH_REV_DAY)),
              ('photo modified',self.photo_modified.strftime(DATE_DASH_REV_DAY)),
