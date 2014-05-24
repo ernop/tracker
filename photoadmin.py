@@ -146,8 +146,6 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         
     def mytags(self,obj):
         '''co-occuring tags'''
-        #import ipdb;ipdb.set_trace()
-        import ipdb;ipdb.set_trace()
         EXCLUDE_PHOTOTAGS='done next last'.split()
         photoids=[ph.id for ph in Photo.objects.filter(tags__tag=obj)]
         comma_separated_photoids=','.join([str(pid) for pid in photoids])
