@@ -439,6 +439,8 @@ def staff_test(user):
 
 def group_day_dat(data, by=None,mindate=None):
     from choices import DATE,MONTH_YEAR,YEAR_MONTH
+    if type(mindate)==datetime.date:
+        mindate=datetime.datetime.strftime(mindate,DATE)
     adder_day=0
     adder_month=0
     adder_year=0

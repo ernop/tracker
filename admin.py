@@ -65,7 +65,12 @@ def two_sig(n):
 
 def nice_sparkline(results,width,height):
     '''a better one, results now consists of value & label'''
-    '''stick the labels for x into labels[rnd]'''
+    '''stick the labels for x into labels[rnd]
+    
+    to produce: make {'2014-05-24': 15.0, '2014-05-21': 155.0}
+    then produce results with costres2=group_day_dat(costres, by='month',mindate=mindate)
+    
+    '''
     ii=0
     num_results=[]
     labels={}

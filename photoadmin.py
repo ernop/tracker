@@ -109,7 +109,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     #list_editable=['note',]
     search_fields= ['name']
     list_filter=['control_tag', TagHasPersonFilter]
-    list_display='id myname myphotos mytags'.split()
+    list_display='id myname myphotos myhistory mytags'.split()
     actions=['reinitialize_tags','create_people_tags','redo_classification']
     
     def redo_classification(self,request,queryset):
@@ -136,7 +136,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     def myphotos(self,obj):
         res=[]
         ct=obj.photos.count()
-        for pho in obj.photos.all()[:500]:
+        for pho in obj.photos.all()[:50]:
             realpho=pho.photo
             res.append(realpho.inhtml(size='thumb'))
         pres=''.join(res)
@@ -151,9 +151,13 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         photoids=[ph.id for ph in photos]
         reltags=PhotoTag.objects.filter(photos__photo__id__in=photoids).distinct()
         comma_separated_photoids=','.join([str(pid) for pid in photoids])
-        grouped_tags=PhotoTag.objects.raw('select pt.id, pt.name,count(*) as ct from phototag pt inner join photohastag pht on pht.tag_id=pt.id inner join photo p on p.id=pht.photo_id where p.id in (%s) group by 1 order by ct desc'%comma_separated_photoids)
+        grouped_tags=PhotoTag.objects.raw('select pt.id, pt.name,count(*) as ct \
+        from phototag pt \
+        inner join photohastag pht on pht.tag_id=pt.id inner join photo p on \
+        p.id=pht.photo_id where p.id in (%s) group by 1 order by ct desc,pt.name'\
+                                          %comma_separated_photoids)
         res=[]
-        for n in range(50):
+        for n in range(20):
             try:
                 gt=grouped_tags[n]
                 res.append((gt.id,gt.name,gt.ct))
@@ -172,7 +176,34 @@ class PhotoTagAdmin(OverriddenModelAdmin):
               )
         return mktable(data)
         
-    adminify(myname, myphotos, mytags)
+    
+    def myhistory(self,obj):
+        #photos=Photo.objects.filter(tags__tag=obj)
+        photos=Photo.objects.raw('select p.id,date(p.created) as date,\
+        count(*) as ct from photo p inner join \
+        photohastag pht on pht.photo_id=p.id inner join phototag pt on \
+        pt.id=pht.tag_id group by 2')
+        nn=0
+        res={}
+        md=settings.LONG_AGO
+        while 1:
+            
+            try:
+                pho=photos[nn]
+                nn+=1
+                res[datetime.datetime.strftime(pho.date,DATE)]=pho.ct
+                md=min(md,pho.date)
+            except IndexError,e:
+                break
+        #
+        dat2=group_day_dat(res,by='month',mindate=md)
+        #
+        from admin import nice_sparkline
+        spl=nice_sparkline(dat2,500,300)
+        return spl
+    
+    
+    adminify(myname, myphotos, mytags,myhistory)
 
 class PhotoSpotAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
