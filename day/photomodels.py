@@ -97,9 +97,7 @@ class Photo(DayModel):
         else:
             #already deleted.
             return True
-        if self.thumbfp and os.path.exists(self.thumbfp):
-            os.remove(self.thumbfp)
-        
+        self.kill_thumb()
         self.delete()
         return True
     
