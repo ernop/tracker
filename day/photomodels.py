@@ -78,21 +78,28 @@ class Photo(DayModel):
     def file_exists(self):
         if not self.fp:
             log.error('image missing fp, hard deleting obj. %s',fp)
+            self.kill_thumb()
             self.delete()
             return False
         res=os.path.exists(self.fp)
         if not res:
             log.error('fp not exist. hard deleting. %d %s',self.id,self.fp)
+            self.kill_thumb()
             self.delete()
             return False            
         return res
     
     def kill_this(self):
-        if self.file_exists():
+        log.info('killing this. %s',self)
+        res=self.file_exists():
+        if res:
             os.remove(self.fp)  
+        else:
+            #already deleted.
+            return True
         if self.thumbfp and os.path.exists(self.thumbfp):
             os.remove(self.thumbfp)
-        log.info('killing this. %s',self)
+        
         self.delete()
         return True
     
@@ -331,6 +338,10 @@ class Photo(DayModel):
     def filename(self):    
         fn=os.path.split(self.fp)[-1]
         return fn
+    
+    def kill_thumb(self):
+        if self.thumbfp and os.path.exists(self.thumbfp):
+            os.remove(self.thumbfp)
     
     def undoable_delete(self):
         log.info('test file exists. %s', self.fp)
