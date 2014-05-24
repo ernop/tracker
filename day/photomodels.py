@@ -91,7 +91,7 @@ class Photo(DayModel):
     
     def kill_this(self):
         log.info('killing this. %s',self)
-        res=self.file_exists():
+        res=self.file_exists()
         if res:
             os.remove(self.fp)  
         else:
