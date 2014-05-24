@@ -147,15 +147,16 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     def mytags(self,obj):
         '''co-occuring tags'''
         #import ipdb;ipdb.set_trace()
+        import ipdb;ipdb.set_trace()
         EXCLUDE_PHOTOTAGS='done next last'.split()
-        photoids=[ph.id for ph in Photo.objects.filter(tags__tag=obj) if ph.name not in EXCLUDE_PHOTOTAGS]
-        reltags=PhotoTag.objects.filter(photos__photo__id__in=photoids).distinct()
+        photoids=[ph.id for ph in Photo.objects.filter(tags__tag=obj)]
         comma_separated_photoids=','.join([str(pid) for pid in photoids])
+        bad_ptids=','.join([str(pt.id) for pt in PhotoTag.objects.filter(name__in=EXCLUDE_PHOTOTAGS)])
         grouped_tags=PhotoTag.objects.raw('select pt.id, pt.name,count(*) as ct \
         from phototag pt \
         inner join photohastag pht on pht.tag_id=pt.id inner join photo p on \
-        p.id=pht.photo_id where p.id in (%s) group by 1 order by ct desc,pt.name'\
-                                          %comma_separated_photoids)
+        p.id=pht.photo_id where p.id in (%s) and pt.id not in (%s) group by 1 order by ct desc,pt.name'\
+                                          %(comma_separated_photoids,bad_ptids))
         res=[]
         for n in range(20):
             try:
