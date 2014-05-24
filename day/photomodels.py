@@ -400,7 +400,6 @@ class Photo(DayModel):
         dat=(('deleted',dd),
              ('id',self.clink(text=self.id)),
              ('day',daylink),
-             
              ('incoming',icon(self.incoming)),
              ('setup',icon(self.setup)),
              ('myphoto',icon(self.myphoto)),
@@ -560,7 +559,7 @@ class PhotoSpot(DayModel):
     name=models.CharField(max_length=100)
     description=models.CharField(max_length=500,blank=True,null=True)
     tour=models.CharField(max_length=100,blank=True,null=True)
-    tour_order=models.IntegerField(blank=True,null=True)
+    tour_order=models.FloatField(blank=True,null=True)
     slug=models.CharField(max_length=100,blank=True,null=True)
     latitude=models.CharField(max_length=30,blank=True,null=True)
     longitude=models.CharField(max_length=30,blank=True,null=True)
