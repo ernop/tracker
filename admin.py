@@ -49,42 +49,7 @@ class BetterDateWidget(admin.widgets.AdminDateWidget):
         return super(BetterDateWidget, self).render(name, value)
 
 
-def simple_sparkline(results, width, height):
-    #itd be nice if this was way better for labelling and stuff.
-    res = '<div class="simple-sparkline-data">%s</div>'%(','.join([str(s) for s in results]))
-    return res
 
-def two_sig(n):
-    #round to the left two significant digits.
-    ct=0
-    orign=n
-    while n>1:
-        n=n/10
-        ct+=1
-    return round(orign,-1*(ct-2))
-
-def nice_sparkline(results,width,height):
-    '''a better one, results now consists of value & label'''
-    '''stick the labels for x into labels[rnd]
-    
-    to produce: make {'2014-05-24': 15.0, '2014-05-21': 155.0}
-    then produce results with costres2=group_day_dat(costres, by='month',mindate=mindate)
-    
-    '''
-    ii=0
-    num_results=[]
-    labels={}
-    for total,label in results:
-        label+=' %d'%two_sig(total)
-        labels[ii]=label
-        ii+=1
-        num_results.append(total)
-    data=','.join([str(s) for s in num_results])
-    rnd=str(int(random.random()*100000))
-    res = '<div sparkid="%s" class="sparkline-data">%s</div>'%(rnd,data)    
-    res+='<script>$(document).ready(function(){labels[%s]=%s});</script>'%(rnd,json.dumps(labels))
-    return res
-    
 
 class ProductAdmin(OverriddenModelAdmin):
     search_fields = ['name', ]

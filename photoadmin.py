@@ -115,7 +115,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     #list_editable=['note',]
     search_fields= ['name']
     list_filter=['control_tag', TagHasPersonFilter]
-    list_display='id myname myphotos myhistory mytags'.split()
+    list_display='id myname myphotos mytags'.split()
     actions=['reinitialize_tags','create_people_tags','redo_classification']
     
     def redo_classification(self,request,queryset):
@@ -140,6 +140,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         PhotoTag.update_tag_counts()
         
     def myphotos(self,obj):
+        sparkline=obj.history_sparkline()
         res=[]
         ct=obj.photos.count()
         for pho in obj.photos.order_by('photo__photo_created').all()[:80]:
@@ -147,7 +148,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
             res.append(realpho.inhtml(size='thumb'))
         pres=''.join(res)
         alllink='<a href="../photo/?tagged_with=%s">All Photos</a>'%obj.id
-        res='<div class="big">%d</div>%s<br>%s'%(ct,pres,alllink)
+        res='<div class="big">%d</div><div style="display:inline-block;float:right;">%s</div>%s<br>%s'%(ct,sparkline,pres,alllink)
         return res
         
     def mytags(self,obj):
@@ -156,7 +157,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         photoids=[ph.id for ph in Photo.objects.filter(tags__tag=obj)]
         comma_separated_photoids=','.join([str(pid) for pid in photoids])
         bad_ptids=','.join([str(pt.id) for pt in PhotoTag.objects.filter(name__in=EXCLUDE_PHOTOTAGS)])
-        grouped_tags=PhotoTag.objects.raw('select pt.id, pt.name,count(*) as ct \
+        grouped_tags=PhotoTag.objects.raw('select pt.id, pt.name,pt.use_count,count(*) as ct \
         from phototag pt \
         inner join photohastag pht on pht.tag_id=pt.id inner join photo p on \
         p.id=pht.photo_id where p.id in (%s) and pt.id not in (%s) group by 1 order by ct desc,pt.name'\
@@ -166,7 +167,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
             try:
                 gt=grouped_tags[n]
                 if gt.id==obj.id:continue
-                res.append((gt.id,gt.name,gt.ct))
+                res.append((gt.id,'%s (%d)'%(gt.name,gt.use_count),gt.ct))
             except:
                 break
         res2=[('<h2>Related Tags</h2>')]
@@ -183,33 +184,9 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         return mktable(data)
         
     
-    def myhistory(self,obj):
-        #photos=Photo.objects.filter(tags__tag=obj)
-        photos=Photo.objects.raw('select p.id,date(p.photo_created) as date,\
-        count(*) as ct from photo p inner join \
-        photohastag pht on pht.photo_id=p.id inner join phototag pt on \
-        pt.id=pht.tag_id where pt.id=%d group by 2'%obj.id)
-        nn=0
-        res={}
-        md=settings.LONG_AGO
-        while 1:
-            
-            try:
-                pho=photos[nn]
-                nn+=1
-                res[datetime.datetime.strftime(pho.date,DATE)]=pho.ct
-                md=min(md,pho.date)
-            except IndexError,e:
-                break
-        #
-        dat2=group_day_dat(res,by='month',mindate=md)
-        #
-        from admin import nice_sparkline
-        spl=nice_sparkline(dat2,500,300)
-        return spl
     
     
-    adminify(myname, myphotos, mytags,myhistory)
+    adminify(myname, myphotos, mytags)
 
 class PhotoSpotAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()

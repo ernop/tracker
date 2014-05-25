@@ -566,6 +566,31 @@ class PhotoTag(DayModel):
 
         #
 
+    def history_sparkline(self):
+        #photos=Photo.objects.filter(tags__tag=obj)
+        photos=Photo.objects.raw('select p.id,date(p.photo_created) as date,\
+        count(*) as ct from photo p inner join \
+        photohastag pht on pht.photo_id=p.id inner join phototag pt on \
+        pt.id=pht.tag_id where pt.id=%d group by 2'%self.id)
+        nn=0
+        res={}
+        md=settings.LONG_AGO
+        while 1:
+            
+            try:
+                pho=photos[nn]
+                nn+=1
+                res[datetime.datetime.strftime(pho.date,DATE)]=pho.ct
+                md=min(md,pho.date)
+            except IndexError,e:
+                break
+        #
+        dat2=group_day_dat(res,by='month',mindate=md)
+        #
+        from utils import nice_sparkline
+        spl=nice_sparkline(dat2,500,300)
+        return spl
+
 class PhotoSpot(DayModel):
     '''a specific spot & angle to take photos from'''
     created=models.DateTimeField(auto_now_add=True)
