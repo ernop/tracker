@@ -189,6 +189,7 @@ function reset_photo_tags(){
     //unless you ALSO define a "value" field on the select2 element, EVEN if you never use that!
     sel.select2({data:full_phototags,
         multiple:true,
+        minimumInputLength: 2,
         initSelection: function(element,callback){
             callback(get_tags_for_current_photo())
         }
