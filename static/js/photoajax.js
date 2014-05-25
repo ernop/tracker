@@ -448,7 +448,7 @@ function make_photozone(photo){
 
 function setup_keynav(){
   $(document.documentElement).keydown(function (event) {
-    //notify(event.keyCode,1);
+    notify(event.keyCode,1);
     if (!keynav_active){return}
     if (event.keyCode==84){ //t
         pop_tag()
@@ -458,9 +458,15 @@ function setup_keynav(){
         pop_photospot()
         keynav_active=false;
     }
-    else if (event.keyCode==68){
+    else if (event.keyCode==68){ //d for delete
         if (keynav_active){
             data_changed(null,'phototag',(delete_phototag_id+''))
+            show_next();
+        }
+    }
+    else if (event.keyCode==78){ //done, go to next.
+        if (keynav_active){
+            data_changed(null,'phototag',(done_phototag_id+''))
             show_next();
         }
     }

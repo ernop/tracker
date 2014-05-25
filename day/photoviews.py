@@ -38,6 +38,7 @@ def photoajax(request):
     vals['TAGIDS_WHICH_FORCE_PREV']=[tt.id for tt in PhotoTag.objects.filter(name__in=['back','undo','last'])]
     #get the tags
     vals['delete_phototag_id']=PhotoTag.objects.get(name='delete').id
+    vals['done_phototag_id']=PhotoTag.objects.get(name='done').id
     return r2r('jinja2/photo/photoajax.html',request,vals)
 
 #def incoming_photospot_photos_ajax(request):
