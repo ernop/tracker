@@ -55,9 +55,13 @@ def phototag2obj(phototag):
             name+=' (organization)'
         else:
             name+=' (person)'
+    #return {'id':phototag.id,
+            #'name':name,
+            #'text':name,}
     return {'id':phototag.id,
             'name':name,
-            'text':name,}
+            'text':name,
+            }
 
 def photospot2obj(photospot):
     name=photospot.name
@@ -108,7 +112,7 @@ def get_next_incoming(exclude=None):
         exclude=[]
     elif type(exclude) is not list:
         exclude=[exclude]
-    imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img')
+    imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('fp')
     for img in imgexis:
         if img.file_exists():
             log.info('returning img %s', img)
