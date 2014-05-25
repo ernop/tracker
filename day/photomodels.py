@@ -72,7 +72,11 @@ class Photo(DayModel):
             self.save()
             #if mogrify fails, just mark them deleted and prepare to kill them later
             return False
-        self.save()
+        try:
+            self.save()
+        except Exception, e:
+            log.error("error saving self. %s %s",self,e)
+            return False
         return True
 
     def file_exists(self):
@@ -444,8 +448,6 @@ class Photo(DayModel):
              ('fp',self.fp),
              ('tags clink',ctags),
              ('tags vlink',vtags),
-             
-             
              ('photospot clink',cspot),
              ('photospot vlink',vspot),
              ]
