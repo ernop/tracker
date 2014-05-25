@@ -724,7 +724,7 @@ class WorkoutAdmin(OverriddenModelAdmin):
 
 linesample = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]
 class MeasuringSpotAdmin(OverriddenModelAdmin):
-    list_display='myname myhistory'.split()
+    list_display='id myname myhistory'.split()
     list_filter=['domain',]
     def myname(self, obj):
         ct=obj.measurements.all()

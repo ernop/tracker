@@ -116,7 +116,8 @@ def get_next_incoming(exclude=None):
     #no IMG ones, so return
     exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True)
     #exis=exis.order_by('-day__date','-id','taken','created','modified','id')
-    exis=exis.order_by('fp')
+    #exis=exis.order_by('fp')
+    exis=exis.order_by('taken','photo_created')
     ii=0
     found=False
     ct=exis.count()
