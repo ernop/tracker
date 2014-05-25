@@ -133,7 +133,7 @@ def source2obj(source):
 def currency2obj(cur):
     return {'id':cur.id,'name':cur.name,'text':'%s %s'%(cur.symbol, cur.name),'symbol':cur.symbol,}
 
-def mktable(dat, rights=None, bigs=None, skip_false=False):
+def mktable(dat, rights=None, bigs=None, skip_false=False, nb=False):
     rows = []
     for row in dat:
         if not row:
@@ -145,6 +145,8 @@ def mktable(dat, rights=None, bigs=None, skip_false=False):
         res = '<tr>'
         for ii, thing in enumerate(row):
             klasses = []
+            if nb:
+                klasses.append('nb')
             if rights and ii in rights:
                 klasses.append('right')
             if bigs and ii in bigs:

@@ -416,7 +416,7 @@ class Photo(DayModel):
         else:
             daylink=None
         dat=(('deleted',dd),
-             ('id',self.clink(text=self.id)),
+             
              ('day',daylink),
              ('incoming',icon(self.incoming)),
              ('setup',icon(self.setup)),
@@ -430,10 +430,22 @@ class Photo(DayModel):
              ('obj created',self.created.strftime(DATE_DASH_REV)),
              ('obj modified',self.modified.strftime(DATE_DASH_REV)),
              )
-        res=mktable(dat,skip_false=True)
+        res=mktable(dat,skip_false=True,nb=True)
         return res
 
     def name_table(self,include_image=True,clink=False,vlink=False):
+        
+        dat=[('id',self.clink(text=self.id)),
+            ('name',self.name),
+             ('fp',self.fp),
+             
+             ]
+        if include_image:
+            dat.insert(2,('img',self.inhtml(size='thumb',clink=clink,vlink=vlink)),)
+        res=mktable(dat,skip_false=True)
+        return res
+    
+    def links_table(self):
         from trackerutils import div
         vtags=div(klass='vtagzone',contents=', '.join([tag.tag.vlink() for tag in self.tags.all()]))
         ctags=div(klass='ctagzone',contents=', '.join([tag.tag.clink() for tag in self.tags.all()]))
@@ -444,16 +456,11 @@ class Photo(DayModel):
             vspot=self.photospot.vlink()
         cspot=div(klass='cspotzone',contents=cspot or '&nbsp;')
         vspot=div(klass='vspotzone',contents=vspot or '&nbsp;')
-        dat=[('name',self.name),
-             ('fp',self.fp),
-             ('tags clink',ctags),
-             ('tags vlink',vtags),
-             ('photospot clink',cspot),
-             ('photospot vlink',vspot),
-             ]
-        if include_image:
-            dat.insert(2,('img',self.inhtml(size='thumb',clink=clink,vlink=vlink)),)
-        res=mktable(dat,skip_false=True)
+        data=(('tags clink',ctags),
+        ('tags vlink',vtags),
+        ('photospot clink',cspot),
+        ('photospot vlink',vspot),)
+        res=mktable(data,skip_false=False)
         return res
     
     def exif_table(self):

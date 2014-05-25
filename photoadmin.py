@@ -94,7 +94,7 @@ class PhotoAdmin(OverriddenModelAdmin):
         return obj.name_table(vlink=True)
     
     def myexif(self,obj):
-        return obj.exif_table()
+        return obj.exif_table()+obj.links_table()
     
     def queryset(self, request):
         queryset = super(PhotoAdmin, self).queryset(request)
