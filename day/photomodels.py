@@ -448,22 +448,23 @@ class Photo(DayModel):
     def links_table(self):
         from trackerutils import div
         vtags=div(klass='vtagzone',contents=', '.join([tag.tag.vlink() for tag in self.tags.all()]))
-        ctags=div(klass='ctagzone',contents=', '.join([tag.tag.clink() for tag in self.tags.all()]))
-        cspot=''
         vspot=''
         if self.photospot:
-            cspot=self.photospot.clink()
             vspot=self.photospot.vlink()
-        cspot=div(klass='cspotzone',contents=cspot or '&nbsp;')
+        
         vspot=div(klass='vspotzone',contents=vspot or '&nbsp;')
-        data=(('tags clink',ctags),
-        ('tags vlink',vtags),
-        ('photospot clink',cspot),
+        data=(('tags vlink',vtags),
         ('photospot vlink',vspot),)
         res=mktable(data,skip_false=False)
         return res
     
     def exif_table(self):
+        from trackerutils import div
+        ctags=div(klass='ctagzone',contents=', '.join([tag.tag.clink() for tag in self.tags.all()]))
+        cspot=''
+        if self.photospot:
+            cspot=self.photospot.clink()
+        cspot=div(klass='cspotzone',contents=cspot or '&nbsp;')
         if self.resolutionx and self.resolutiony:
             size='%dx%d'%(self.resolutionx,self.resolutiony)
         else:
@@ -473,6 +474,8 @@ class Photo(DayModel):
              ('mm',self.mm),
              ('size',size),
              ('filesize',humanize_size(self.filesize)),
+             ('tags clink',ctags),
+             ('photospot clink',cspot),
              )
         res=mktable(dat,skip_false=True)
         return res

@@ -449,7 +449,7 @@ function make_photozone(photo){
 
 function setup_keynav(){
   $(document.documentElement).keydown(function (event) {
-    notify(event.keyCode,1);
+    //notify(event.keyCode,1);
     if (!keynav_active){return}
     if (event.keyCode==84){ //t
         pop_tag()
