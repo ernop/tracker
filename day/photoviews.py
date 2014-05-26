@@ -164,7 +164,6 @@ def ajax_photo_data(request):
                               'dayvlink':nextphoto.day and nextphoto.day.vlink() or '',
                               'photospothtml':nextphoto.get_photospothtml(),
                               }
-                
                 vals['nextphoto']=nextphoto_js
                 vals['success']=True
                 vals['message']='preloaded fp %s'%nextphoto_js['fp']
