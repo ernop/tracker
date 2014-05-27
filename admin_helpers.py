@@ -106,7 +106,21 @@ class PhotoHasSpotFilter(SimpleListFilter):
             return queryset.exclude(photospot=None)
         elif self.value()=='no':
             return queryset.filter(photospot=None)
-    
+
+class NullHashFilter(SimpleListFilter):
+    title = 'has a hash'
+    parameter_name = 'has hash'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            return queryset.exclude(hash=None).exclude(hash='')
+        elif self.value()=='no':
+            return queryset.filter(hash=None)
+        
 class PhotoHasDayFilter(SimpleListFilter):
     title = 'has taken day'
     parameter_name = 'has_taken_day'
