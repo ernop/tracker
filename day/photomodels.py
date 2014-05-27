@@ -31,6 +31,7 @@ class Photo(DayModel):
     day=models.ForeignKey('Day',blank=True,null=True,related_name='photos') #related day, probably when taken.
     resolutionx=models.IntegerField(blank=True,null=True)
     resolutiony=models.IntegerField(blank=True,null=True)
+    hash=models.CharField(max_length=100,blank=True,null=True)    
     
     #photospot
     photospot=models.ForeignKey('PhotoSpot',related_name='photos',blank=True,null=True)
@@ -65,6 +66,7 @@ class Photo(DayModel):
         cmd='mogrify -auto-orient "%s"'%self.fp
         res=os.system(cmd)
         os.utime(self.fp, (atime, mtime))
+        self.rehash()
         
         if res:
             log.error("fail cmd %s for fp %s"%(cmd,self.fp))
@@ -293,9 +295,20 @@ class Photo(DayModel):
                 return False
         return get_exif(im)
     
+    
+    def rehash(self):
+        '''hash the first few K of data'''
+        import hashlib
+        if os.path.exists(self.fp):
+            data=open(self.fp,'rb').read(100000)
+            hsh=hashlib.md5(data).hexdigest()
+            self.hash=hsh
+    
     def save(self, *args, **kwargs):
         #TODO: when settings not incoming, should move to storage.
         #but for now, probably fine.
+        if not self.hash:
+            self.rehash()
         if self.xcrop == None:
             self.xcrop=0
         if self.ycrop == None:
@@ -368,6 +381,8 @@ class Photo(DayModel):
         cmd='mogrify -auto-orient "%s"'%(self.fp)
         res=os.system(cmd)
         os.utime(self.fp, (atime, mtime))
+        self.rehash()
+        self.save()
         if res:
             log.error('error in cmd %s',cmd)
             return False
@@ -434,11 +449,10 @@ class Photo(DayModel):
         return res
 
     def name_table(self,include_image=True,clink=False,vlink=False):
-        
         dat=[('id',self.clink(text=self.id)),
             ('name',self.name),
-             ('fp',self.fp),
-             
+            ('hash',self.hash),
+            ('fp',self.fp),
              ]
         if include_image:
             dat.insert(2,('img',self.inhtml(size='thumb',clink=clink,vlink=vlink)),)

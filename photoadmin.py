@@ -30,7 +30,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     search_fields= ['name']
     list_per_page=100
     actions=['undoable_delete','not_myphoto','delete_file','undelete','reinitialize','re_autoorient','force_recreate_thumbs','autoorient','redo_classification','kill_entry',]
-    actions.extend(['remove_photospot',])
+    actions.extend(['remove_photospot','rehash',])
     
     def remove_photospot(self,request,queryset):
         for pho in queryset:
@@ -61,7 +61,10 @@ class PhotoAdmin(OverriddenModelAdmin):
     def kill_entry(self,request,queryset):
         for photo in queryset:
             photo.kill_this()
-    
+    def rehash(self,request,queryset):
+        for pic in queryset:
+            pic.rehash()
+            pic.save()
     def delete_file(self,request,queryset):    
         for photo in queryset:
             photo.delete_file()
@@ -92,6 +95,9 @@ class PhotoAdmin(OverriddenModelAdmin):
     @debu
     def myname(self,obj):
         return obj.name_table(vlink=True)
+    
+    
+    myname.admin_order_field='hash'
     
     def myexif(self,obj):
         return obj.exif_table()+obj.links_table()
