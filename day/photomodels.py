@@ -70,11 +70,9 @@ class Photo(DayModel):
             cmd='mogrify -auto-orient "%s"'%self.fp
             res=os.system(cmd)
             os.utime(self.fp, (atime, mtime))
-            self.rehash()
+        self.rehash()
         if res:
             log.error("fail cmd %s for fp %s"%(cmd,self.fp))
-            #self.deleted=True
-            #actually don't kill them, cause it may be just a resource problem.
             self.save()
             return False
         try:
@@ -261,7 +259,8 @@ class Photo(DayModel):
         try:
             im=Image.open(self.fp)
         except IOError:
-            return False
+            #just return right away and maybe not die.
+            return True
         tags=self.get_exif(im)
         exif2db={'Model':'camera','ISOSpeedRatings':'iso','DateTime':'taken'}
         if tags:
