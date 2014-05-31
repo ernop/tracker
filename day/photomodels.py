@@ -118,7 +118,6 @@ class Photo(DayModel):
             wrap=' nb'
         else:
             wrap=''
-        
         if not text:
             if self.name:
                 text=self.name
@@ -126,14 +125,26 @@ class Photo(DayModel):
                 text='no name photo'
         return '<a class="btn%s" href="%s">%s</a>'%(wrap,self.exhref(), text)
     
+    
+    def ajaxlink(self,text=None,wrap=False):
+        if wrap:
+            wrap=' nb'
+        else:
+            wrap=''
+        if not text:
+            text='ajax link'
+        '''link to /photo/photoajax/#!id'''
+        res='<a class="btn%s" href="/photo/photoajax/#!id=%d">%s</a>'%(wrap, self.id, text)
+        return res
+    
     def exhref(self):
         return '/photo/photo/%d/'%self.id
 
     def __unicode__(self):
         return self.name or self.fp or 'no name'
     
-    def inhtml(self,clink=True,vlink=False,size='scaled'):
-        if not vlink and not clink:
+    def inhtml(self,clink=True,vlink=False,size='scaled',ajaxlink=False):
+        if not vlink and not clink and not ajaxlink:
             clink=True
         thumb=False
         width=None
@@ -171,6 +182,8 @@ class Photo(DayModel):
             return self.vlink(text=img,wrap=False)
         elif clink:
             return self.clink(text=img,wrap=False)
+        elif ajaxlink:
+            return self.ajaxlink(text=img,wrap=False)
         return img
         
     def is_thumb_ok(self):
@@ -448,14 +461,14 @@ class Photo(DayModel):
         res=mktable(dat,skip_false=True,nb=True)
         return res
 
-    def name_table(self,include_image=True,clink=False,vlink=False):
+    def name_table(self,include_image=True,clink=False,vlink=False,ajaxlink=False):
         dat=[('id',self.clink(text=self.id)),
             ('name',self.name),
             ('hash',self.hash),
             ('fp',self.fp),
              ]
         if include_image:
-            dat.insert(2,('img',self.inhtml(size='thumb',clink=clink,vlink=vlink)),)
+            dat.insert(2,('img',self.inhtml(size='thumb',clink=clink,vlink=vlink,ajaxlink=ajaxlink)),)
         res=mktable(dat,skip_false=True)
         return res
     

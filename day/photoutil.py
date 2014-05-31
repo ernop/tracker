@@ -103,41 +103,44 @@ def get_nonexisting_fp(basedir,basefn):
             import ipdb;ipdb.set_trace()
     return testfp
 
-def get_next_incoming(exclude=None):
+def get_next_incoming(exclude=None, force_id=None):
     #goto next incoming photo by id for quick shifting.
     #actually i should preload this...
     from day.models import Photo
     log.info('getting next incoming with exclude %s', str(exclude))
-    if not exclude:
-        exclude=[]
-    elif type(exclude) is not list:
-        exclude=[exclude]
-    imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('fp')
-    for img in imgexis:
-        if img.file_exists():
-            log.info('returning img %s', img)
-            return img
-    #no IMG ones, so return
-    exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True)
-    #exis=exis.order_by('-day__date','-id','taken','created','modified','id')
-    #exis=exis.order_by('fp')
-    exis=exis.order_by('taken','photo_created')
-    ii=0
-    found=False
-    ct=exis.count()
-    while 1:
-        if ii>=ct:
-            log.info("return false. %d",ii)
-            return False
-        img=exis[ii]
-        if img.file_exists():
-            log.info('returning img %s', img)
-            return img
-        else:
-            #its already deleted
-            pass
-        ii=ii+1
-        log.info("ii %d",ii)
+    if force_id:
+        return Photo.objects.get(id=force_id)
+    else:
+        if not exclude:
+            exclude=[]
+        elif type(exclude) is not list:
+            exclude=[exclude]
+        imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('fp')
+        for img in imgexis:
+            if img.file_exists():
+                log.info('returning img %s', img)
+                return img
+        #no IMG ones, so return
+        exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True)
+        #exis=exis.order_by('-day__date','-id','taken','created','modified','id')
+        #exis=exis.order_by('fp')
+        exis=exis.order_by('taken','photo_created')
+        ii=0
+        found=False
+        ct=exis.count()
+        while 1:
+            if ii>=ct:
+                log.info("return false. %d",ii)
+                return False
+            img=exis[ii]
+            if img.file_exists():
+                log.info('returning img %s', img)
+                return img
+            else:
+                #its already deleted
+                pass
+            ii=ii+1
+            log.info("ii %d",ii)
 
 def get_next_photopaths(count,excludes=None):
     #if settings.LOCAL:

@@ -130,6 +130,7 @@ def photo_passthrough(request, id, thumb=False):
 
 @user_passes_test(staff_test)
 def ajax_photo_data(request):
+    '''also if "force id" is sent just return that photo.'''
     vals={}
     try:
         vals['success']=True
@@ -150,7 +151,10 @@ def ajax_photo_data(request):
                     exclude_ids=None
             except Exception,e:
                 import ipdb;ipdb.set_trace()
-            nextphoto=get_next_incoming(exclude=exclude_ids)
+            if 'force id' in todo and todo['force id']:
+                nextphoto=get_next_incoming(force_id=todo['force id'], exclude=exclude_ids)
+            else:
+                nextphoto=get_next_incoming(exclude=exclude_ids)
             if not nextphoto:
                 vals['success']=False
                 vals['message']='could not get next incoming'

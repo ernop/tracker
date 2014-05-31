@@ -92,10 +92,9 @@ class PhotoAdmin(OverriddenModelAdmin):
     
     def myinfo(self,obj):
         return obj.info_table()
-    @debu
-    def myname(self,obj):
-        return obj.name_table(vlink=True)
     
+    def myname(self,obj):
+        return obj.name_table(ajaxlink=True)
     
     myname.admin_order_field='hash'
     

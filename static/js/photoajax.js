@@ -5,15 +5,28 @@ past_photos=[]
 keynav_active=true;
 ii=0
 initial_load_done=false
+force_id=null;
+
+function get_hash_id(){
+    //check if there's something like #!id=<id> and if so, load that one first.
+    hsh=document.location.hash;
+    if (hsh.indexOf('id=')!=-1){
+        var id=hsh.slice(5);   
+        id=parseInt(id);
+        if (id){
+            return id;        
+        }
+    }
+}
 
 $(document).ready(function(){
-    load_show();
+    force_id=get_hash_id();
+    load_show()
     setup_buttons();
-    //setup_phototagselect(); //empty tags when first load, but all choices.
     setup_keynav();
 })
 
-function load_show(){
+function load_show(id){
     console.log('in load show, calling load')
     load(maybe_show)
 }
@@ -47,6 +60,10 @@ function load(donefunc, only_one){
         var dat={'kind':'ajax photo preload','smithee':'blather'}
         if (exclude_ids && exclude_ids.length){
             dat['exclude_ids']=exclude_ids
+        }
+        if (force_id){
+            dat['force id']=force_id;
+            force_id=null;
         }
         console.log('doing load',exclude_ids.length)
         $.ajax({
