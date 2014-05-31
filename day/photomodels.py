@@ -258,36 +258,39 @@ class Photo(DayModel):
         from PIL import Image
         try:
             im=Image.open(self.fp)
+            
+            tags=self.get_exif(im)
+            exif2db={'Model':'camera','ISOSpeedRatings':'iso','DateTime':'taken'}
+            if tags:
+                for k,v in exif2db.items():
+                    if k in tags:
+                        val=tags[k]
+                        if v=='taken':
+                            try:
+                                val=datetime.datetime.strptime(val,EXIF_TAKEN_FORMAT)
+                            except:return False
+                        setattr(self,v,val)
+                if 'ApertureValue' in tags:
+                    try:
+                        self.aperture='%0.2f'%(1.0*tags['ApertureValue'][0]/tags['ApertureValue'][1])
+                    except:
+                        self.aperture=''
+                if 'FocalLength' in tags:
+                    self.mm=tags['FocalLength'][0]
+                if 'ExposureTime' in tags:
+                    try:
+                        self.exposure='%0.5f'%(1.0*tags['ExposureTime'][0]/tags['ExposureTime'][1])
+                    except:
+                        self.exposure=''
+            else:
+                pass
+            self.resolutionx=im.size[0]
+            self.resolutiony=im.size[1]
+            
         except IOError:
-            #just return right away and maybe not die.
-            return True
-        tags=self.get_exif(im)
-        exif2db={'Model':'camera','ISOSpeedRatings':'iso','DateTime':'taken'}
-        if tags:
-            for k,v in exif2db.items():
-                if k in tags:
-                    val=tags[k]
-                    if v=='taken':
-                        try:
-                            val=datetime.datetime.strptime(val,EXIF_TAKEN_FORMAT)
-                        except:return False
-                    setattr(self,v,val)
-            if 'ApertureValue' in tags:
-                try:
-                    self.aperture='%0.2f'%(1.0*tags['ApertureValue'][0]/tags['ApertureValue'][1])
-                except:
-                    self.aperture=''
-            if 'FocalLength' in tags:
-                self.mm=tags['FocalLength'][0]
-            if 'ExposureTime' in tags:
-                try:
-                    self.exposure='%0.5f'%(1.0*tags['ExposureTime'][0]/tags['ExposureTime'][1])
-                except:
-                    self.exposure=''
-        else:
+            #just continue with stat stuff.
             pass
-        self.resolutionx=im.size[0]
-        self.resolutiony=im.size[1]
+        
         #get resolution
         #get exif data etc.
         stat=os.stat(self.fp)
