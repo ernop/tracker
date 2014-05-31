@@ -70,9 +70,9 @@ class Photo(DayModel):
         
         if res:
             log.error("fail cmd %s for fp %s"%(cmd,self.fp))
-            self.deleted=True
+            #self.deleted=True
+            #actually don't kill them, cause it may be just a resource problem.
             self.save()
-            #if mogrify fails, just mark them deleted and prepare to kill them later
             return False
         try:
             self.save()
@@ -99,7 +99,10 @@ class Photo(DayModel):
         log.info('killing this. %s',self)
         res=self.file_exists()
         if res:
-            os.remove(self.fp)  
+            if Photo.objects.exclude(id=self.id).filter(fp=self.fp).exists():
+                #another photo db object for the same thing exists, so dont kill fp.
+            else:
+                os.remove(self.fp)  
         else:
             #already deleted.
             return True
