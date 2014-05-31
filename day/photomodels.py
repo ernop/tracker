@@ -202,7 +202,7 @@ class Photo(DayModel):
         if self.is_thumb_ok() and not force:
             return True
         else:
-            self._create_thumb()
+            return self._create_thumb()
             
     def _create_thumb(self):
         '''really create it'''
@@ -242,11 +242,13 @@ class Photo(DayModel):
         return thumbfp
         
     def get_external_fp(self, thumb=False):
-        
         if thumb:
-            self.create_thumb(force=False)
-            return self.get_photo_external_link(thumb=True)
-            return '/photo_thumb_passthrough/%d.jpg'%self.id
+            res=self.create_thumb(force=False)
+            if res:
+                return self.get_photo_external_link(thumb=True)
+            else:
+                return self.get_photo_external_link(thumb=False)
+            #return '/photo_thumb_passthrough/%d.jpg'%self.id
         if 1 or not settings.LOCAL:
             return self.get_photo_external_link()
         return '/photo_passthrough/%d.jpg'%self.id
