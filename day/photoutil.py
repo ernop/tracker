@@ -115,7 +115,7 @@ def get_next_incoming(exclude=None, force_id=None):
             exclude=[]
         elif type(exclude) is not list:
             exclude=[exclude]
-        imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('fp')
+        imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('fp','id',)
         for img in imgexis:
             if img.file_exists():
                 log.info('returning img %s', img)
@@ -124,7 +124,7 @@ def get_next_incoming(exclude=None, force_id=None):
         exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True)
         #exis=exis.order_by('-day__date','-id','taken','created','modified','id')
         #exis=exis.order_by('fp')
-        exis=exis.order_by('taken','photo_created')
+        exis=exis.order_by('taken','photo_created','fp')
         ii=0
         found=False
         ct=exis.count()
