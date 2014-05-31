@@ -63,10 +63,14 @@ class Photo(DayModel):
         '''mogrify, while preserving a,mtime.  ffs.'''
         stat=os.stat(self.fp)
         atime,mtime=stat.st_atime,stat.st_mtime
-        cmd='mogrify -auto-orient "%s"'%self.fp
-        res=os.system(cmd)
-        os.utime(self.fp, (atime, mtime))
-        self.rehash()
+        if self.fp.endswith('webp'):
+            #mogrify doesn't work on webp anyway.
+            res=0
+        else:
+            cmd='mogrify -auto-orient "%s"'%self.fp
+            res=os.system(cmd)
+            os.utime(self.fp, (atime, mtime))
+            self.rehash()
         
         if res:
             log.error("fail cmd %s for fp %s"%(cmd,self.fp))
