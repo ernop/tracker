@@ -71,7 +71,6 @@ class Photo(DayModel):
             res=os.system(cmd)
             os.utime(self.fp, (atime, mtime))
             self.rehash()
-        
         if res:
             log.error("fail cmd %s for fp %s"%(cmd,self.fp))
             #self.deleted=True
@@ -103,8 +102,9 @@ class Photo(DayModel):
         log.info('killing this. %s',self)
         res=self.file_exists()
         if res:
-            if Photo.objects.exclude(id=self.id).filter(fp=self.fp).exists():
+            if Photo.objects.exclude(id=self.id).filter(fp=self.fp,deleted=False).exists():
                 #another photo db object for the same thing exists, so dont kill fp.
+                pass
             else:
                 os.remove(self.fp)  
         else:
