@@ -148,3 +148,5 @@ DEFAULT_PRODUCTS=(('milk','drink',),('water','drink'),('chicken','food',),('vita
 DEFAULT_PEOPLE=(('existence','the fact of',[],3),('father','',['existence'],1),('mother','',['existence',],2),)
 DEFAULT_SOURCES=(('7-11','shanghai'),('corner store','shanghai'),('amazon','internet'),('starbucks','shanghai'))
 DEFAULT_PHOTOTAGS='delete undelete done myphoto timelapse friends family meme background mosaic graphics painting done next last undo prev'.split()
+
+TEMPLATE_DEBUG = True

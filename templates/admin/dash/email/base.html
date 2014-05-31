@@ -17,29 +17,33 @@
 <div id="container">
     {% if not is_popup %}
     <!-- Header -->
-    <div id="header" style="height:67px;line-height:15px;padding:10px 0 0 10px;background:#417690;">
-	<!--<div id="branding">-->
-
-        <!--</div>-->
-
-
-		{% if user.is_active and user.is_staff %}
-        <div id="user-tools" style="float:right;position:inherit;">
-            {% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}
+    <div id="header">
+        <div id="branding">
+        {% block branding %}{% endblock %}
+        </div>
+        {% if user.is_active and user.is_staff %}
+        <div id="user-tools">
+            {% trans 'Welcome,' %}
+            <strong>{% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong>.
             {% block userlinks %}
                 {% url 'django-admindocs-docroot' as docsroot %}
                 {% if docsroot %}
                     <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
                 {% endif %}
-				/
+                <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
                 <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
             {% endblock %}
         </div>
         {% endif %}
-		{% block nav-global %}{% endblock %}
+        {% block nav-global %}{% endblock %}
     </div>
     <!-- END Header -->
-
+    {% block breadcrumbs %}
+    <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    {% if title %} &rsaquo; {{ title }}{% endif %}
+    </div>
+    {% endblock %}
     {% endif %}
 
     {% block messages %}
@@ -62,6 +66,7 @@
         <br class="clear" />
     </div>
     <!-- END Content -->
+
     {% block footer %}<div id="footer"></div>{% endblock %}
 </div>
 <!-- END Container -->

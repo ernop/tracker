@@ -50,16 +50,23 @@
 {% block coltype %}flex{% endblock %}
 
 {% block content %}
+  {% if request.filter_descriptions %}
+    <div class="current-filter-zone" style="padding-bottom:18px;padding-top:3px;">
+    <table class="table admintable" style="width:inherit;">
+      <tr><td style="border:0;"><h3>Current Filters:</h3>
+      {% for desc,val,untoggle in request.filter_descriptions%}
+        <td style="border:0;"><div style="margin-left:5px;padding:4px;display:inline-block;border-radius:6px;border:1px solid lightgrey;">{{desc}} = {{val|safe}}<div class="btn" style="margin-left:12px;">{{untoggle|safe}}</div></div></td>
+      {% endfor %}
+      </tr>
+    </table>
+    </div>
+  {% endif %}
   <div id="content-main">
     {% block object-tools %}
       {% if has_add_permission %}
         <ul class="object-tools">
           {% block object-tools-items %}
-            <li>
-              <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}" class="addlink">
-                {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
-              </a>
-            </li>
+
           {% endblock %}
         </ul>
       {% endif %}
@@ -71,8 +78,11 @@
         {{ cl.formset.non_form_errors }}
     {% endif %}
     <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
-      {% block search %}{% search_form cl %}{% endblock %}
-      {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+  <div id="toolbar" style="padding:0;border-bottom:0;height:30px;">
+      <span class="search-zone">{% block search %}{% search_form cl %}{% endblock %}</span>
+      <span class="date-hierarchy">{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}</span>
+      </div>
+
 
       {% block filters %}
         {% if cl.has_filters %}

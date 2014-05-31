@@ -85,7 +85,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST='mail.fuseki.net'
 EMAIL_PORT=26
 #EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-#EMAIL_FILE_PATH = '/home/ernie/vericant/outgoing-emails' # change this to a proper location
 SERVER_EMAIL='error@django.fuseki.net'#for my email error reports.
 #SEND_BROKEN_LINK_EMAILS=True
 DJANGO_BASE='/home/ernop/django.fuseki.net/tracker/'
