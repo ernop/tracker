@@ -29,8 +29,19 @@ class PhotoAdmin(OverriddenModelAdmin):
     #list_editable=['note',]
     search_fields= ['name']
     list_per_page=100
-    actions=['undoable_delete','not_myphoto','delete_file','undelete','reinitialize','re_autoorient','force_recreate_thumbs','autoorient','redo_classification','kill_entry',]
+    date_hierarchy='taken'
+    
+    actions=['undoable_delete','not_myphoto','delete_file',
+             'undelete','reinitialize','re_autoorient','force_recreate_thumbs',
+             'autoorient','redo_classification','kill_entry',
+             'unlink_from_day',]
     actions.extend(['remove_photospot','rehash',])
+    actions.sort()
+    
+    def unlink_from_day(self,request,queryset):
+        for pho in queryset:
+            pho.day=None
+            pho.save()
     
     def remove_photospot(self,request,queryset):
         for pho in queryset:
