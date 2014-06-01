@@ -48,7 +48,11 @@ class PhotoAdmin(OverriddenModelAdmin):
                 if ot.tag.name not in has:
                     ht=PhotoHasTag(tag=ot.tag,photo=lowest)
                     ht.save()
-            other.undoable_delete()
+            lowest.photo_created=min(lowest.photo_created,other.photo_created)
+            lowest.created=min(lowest.created,other.created)
+            lowest.photo_modified=min(lowest.photo_modified,other.photo_modified)
+            other.delete()
+        lowest.save()
     
     def unlink_from_day(self,request,queryset):
         for pho in queryset:
