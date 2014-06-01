@@ -322,7 +322,7 @@ def photostats(request):
     return r2r('jinja2/photo/photostats.html',request,vals)
 
 def photodups(request):
-    photos=Photo.objects.raw('select id,name,count(*) as ct from photo group by 2 having ct>1')
+    photos=Photo.objects.raw('select id,name,count(*) as ct from photo group by 2 having ct>1 order by ct desc,name')
     done_names=set()
     links=[]
     ii=0
