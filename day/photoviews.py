@@ -342,4 +342,26 @@ def photodups(request):
     vals={}
     vals['links']=links
     return r2r('jinja2/photo/photodups.html',request,vals)
+
+def photohashdups(request):
+    photos=Photo.objects.raw('select id,hash,count(*) as ct from photo group by 2 having ct>1 order by ct desc,fp')
+    done_names=set()
+    links=[]
+    ii=0
+    while 1:
+        try:
+            photo=photos[ii]
+            if photo.hash in done_names:
+                continue
+            done_names.add(photo.hash)
+            link='<a href="/admin/day/photo/?hash=%s">%s</a>'%(photo.hash, photo.hash)
+            links.append(link)
+        except:
+            break
+        ii+=1
+        if ii>30:
+            break
+    vals={}
+    vals['links']=links
+    return r2r('jinja2/photo/photodups.html',request,vals)
         
