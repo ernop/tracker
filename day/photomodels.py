@@ -47,7 +47,7 @@ class Photo(DayModel):
     mm=models.CharField(max_length=100,blank=True,null=True)
     exposure=models.CharField(max_length=100,blank=True,null=True)
     aperture=models.CharField(max_length=100,blank=True,null=True)
-    filesize=models.CharField(max_length=20,blank=True,null=True)
+    filesize=models.IntegerField(blank=True,null=True)
     
     #admin
     deleted=models.BooleanField(default=False)

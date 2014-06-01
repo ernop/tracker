@@ -1,7 +1,6 @@
 {% extends 'jinja2/photo_base.html' %}
 {% block title %}Ajax Photo Viewer{% endblock %}
-{% block head %}
-    {{super()}}
+{% block head %}{{super()}}
 <script>
     full_phototags={{full_phototags|jsonify|safe}};
     delete_phototag_id={{delete_phototag_id}}

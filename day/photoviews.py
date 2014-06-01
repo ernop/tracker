@@ -320,4 +320,24 @@ def photostats(request):
             res[exiffield].append((exifval,guy.ct))
     vals={'res':res}
     return r2r('jinja2/photo/photostats.html',request,vals)
+
+def photodups(request):
+    photos=Photo.objects.raw('select id,name,count(*) as ct from photo group by 2 having ct>1')
+    done_names=set()
+    links=[]
+    ii=0
+    while 1:
+        try:
+            photo=photos[ii]
+            if photo.name in done_names:
+                continue
+            done_name.append(photo.name)
+            link='<a href="/admin/day/photo/?name=%s">%s</a>'%(photo.name, photo.name)
+            links.append(link)
+        except:
+            break
+        ii+=1
+    vals={}
+    vals['links']=links
+    return r2r('jinja2/photo/photodups.html',request,vals)
         

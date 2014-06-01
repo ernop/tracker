@@ -1,0 +1,16 @@
+{% extends 'jinja2/photo_base.html' %}
+{% block title %}Photo Dup Names{% endblock %}
+{% block head %}{{super()}}
+{% endblock %}
+
+{% block content %}
+    <table class="table">
+    <tr><td>
+    {% for link in links %}
+        <tr><td>{{link|safe}}
+    {% endfor %}
+    </table>
+{% endblock %}
+
+{% block footer %}{{super()}}{% include "jinja2/photo/photofooter.html" %}
+{% endblock %}

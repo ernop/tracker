@@ -35,8 +35,20 @@ class PhotoAdmin(OverriddenModelAdmin):
              'undelete','reinitialize','re_autoorient','force_recreate_thumbs',
              'autoorient','redo_classification','kill_entry',
              'unlink_from_day',]
-    actions.extend(['remove_photospot','rehash',])
+    actions.extend(['remove_photospot','rehash','merge_photos_lowest_id',])
     actions.sort()
+    
+    def merge_photos_lowest_id(self, request, queryset):
+        lowest=queryset.order_by('-filesize')[0]
+        #combine tags & undoable delete the others
+        has=[t.tag.name for t in lowest.tags.all()]
+        for other in queryset.exclude(id=lowest.id):
+            tags=other.tags.all()
+            for ot in tags:
+                if ot.tag.name not in has:
+                    ht=PhotoHasTag(tag=ot.tag,photo=lowest)
+                    ht.save()
+            other.undoable_delete()
     
     def unlink_from_day(self,request,queryset):
         for pho in queryset:

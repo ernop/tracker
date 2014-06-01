@@ -49,6 +49,7 @@ urlpatterns = patterns('',
     url(r'^product/d3/(?P<id>[0-9]+)/$','tracker.day.jumping.jumping_product',name='jumping_product'),
     
     url(r'^photo/stats/$','tracker.day.photoviews.photostats', name='photostats'),
+    url(r'^photo/dups/$','tracker.day.photoviews.photodups', name='photodups'),
     url(r'^photo/photo/(?P<id>[0-9]+)/$','tracker.day.photoviews.photo',name='photo'),
     url(r'^photo/phototag/(?P<name>[a-zA-Z_\-0-9 \%]+)/$','tracker.day.photoviews.phototag',name='phototag'),
     url(r'^photo/photospot/(?P<name>[a-zA-Z_\-0-9 \%]+)/$','tracker.day.photoviews.photospot',name='photospot'),
