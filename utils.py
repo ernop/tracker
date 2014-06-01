@@ -365,6 +365,7 @@ class OverriddenModelAdmin(admin.ModelAdmin):
               '/static/js/jquery.sparkline.min.js',
               '/static/js/admin_init.js',
               )
+        #css=('/static/css/select2.css',)
         med=Media(js=js)
         return med
 
