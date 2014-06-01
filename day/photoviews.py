@@ -331,12 +331,14 @@ def photodups(request):
             photo=photos[ii]
             if photo.name in done_names:
                 continue
-            done_name.append(photo.name)
+            done_names.add(photo.name)
             link='<a href="/admin/day/photo/?name=%s">%s</a>'%(photo.name, photo.name)
             links.append(link)
         except:
             break
         ii+=1
+        if ii>30:
+            break
     vals={}
     vals['links']=links
     return r2r('jinja2/photo/photodups.html',request,vals)

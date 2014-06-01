@@ -120,7 +120,7 @@ class NullHashFilter(SimpleListFilter):
             return queryset.exclude(hash=None).exclude(hash='')
         elif self.value()=='no':
             return queryset.filter(hash=None)
-        
+
 class PhotoHasDayFilter(SimpleListFilter):
     title = 'has taken day'
     parameter_name = 'has_taken_day'
