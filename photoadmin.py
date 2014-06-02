@@ -51,6 +51,8 @@ class PhotoAdmin(OverriddenModelAdmin):
             lowest.photo_created=min(lowest.photo_created,other.photo_created)
             lowest.created=min(lowest.created,other.created)
             lowest.photo_modified=min(lowest.photo_modified,other.photo_modified)
+            if other.taken and not lowest.taken:
+                lowest.taken=other.taken
             other.kill_this()
         lowest.save()
     
