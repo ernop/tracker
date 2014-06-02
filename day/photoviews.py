@@ -39,6 +39,7 @@ def photoajax(request):
     #get the tags
     vals['delete_phototag_id']=PhotoTag.objects.get(name='delete').id
     vals['done_phototag_id']=PhotoTag.objects.get(name='done').id
+    vals['screenshot_phototag_id']=PhotoTag.objects.get(name='screenshot').id
     return r2r('jinja2/photo/photoajax.html',request,vals)
 
 #def incoming_photospot_photos_ajax(request):

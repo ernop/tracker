@@ -186,7 +186,7 @@ class Photo(DayModel):
         if vlink:
             return self.vlink(text=img,wrap=False)
         elif clink:
-            return self.clink(text=img,wrap=False)
+            return self.clink(text=img,wrap=False,skip_btn=True)
         elif ajaxlink:
             return self.ajaxlink(text=img,wrap=False)
         return img

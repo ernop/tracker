@@ -18,54 +18,60 @@
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
 <div id="day_id" day_id="{{day.id}}"></div>
 <div class="row">
-    <div class="span8">
+    <div>
         <h2>{{day.date}} {{day.show_day()}}</h2>
+        <div class="historybox">
+        {% for photo in day.get_photos_for_history(user) %}
+            {% if loop.counter==0%}Today{%endif %}
+            <div class="photolink">{{photo.inhtml(size='thumb')|safe}}</div>
+        {% endfor %}
+        </div>
+        
         {% for historyday in histories %}
             <div class="historybox">
+            <span class="float:left;">{{historyday.vlink(text=historyday.get_history_description(),max_length=True)|safe}}</span>
+            <br>
+            
             {% set show_photos=historyday.get_photos_for_history(user)%}
             {% if show_photos %}
                 {% for photo in show_photos %}
-                    <div class="photolink">{{photo.inhtml(size='thumb')|safe}}</div>
+                    <div class="photolink" style="float:left;">{{photo.inhtml(size='thumb')|safe}}</div>
                 {% endfor %}
                 <br>
             {% endif %}
-            <span>{{historyday.vlink(text=historyday.get_history_description(),max_length=True)|safe}}</span>
             </div>
         {% endfor %}
     </div>
-    <hr>
-    <div class="span2">
-        <div class="btn add-note">
-            <i class="icon-plus"></i>
-        </div>
+    
+</div>
+
+<br>
+<div class="span2">
+    <div class="btn add-note">
+        <i class="icon-plus"></i>
     </div>
 </div>
-<div class="photozone">
-{% for photo in day.get_photos_for_history(user) %}
-    
-    <div class="photolink">{{photo.inhtml(size='thumb')|safe}}</div>
-    
-{% endfor %}
-</div>
+<hr>
 <div class="notezone">
 {% for note in notes %}
     {% include "jinja2/noteedit.html" %}
 {% endfor %}
 </div>
 
-<div class="row"><div class="span8">
+<br>
+
+<div class="row"><div>
     <div id="notification" class="notification-zone">&nbsp;</div>
 </div></div>
 
-<div class="row"><div class="span8">
+<div class="row"><div>
     <a href="/admin/day/notekind/add" class="btn">add notekind</a>
 </div></div>
 
-<div class="row"><div class="span12">
-
+<div class="row"><div>
     <h2>Purchases</h2>
     <table class="purchase-list table"></table>
-    <div class="purchase-zone">
+    <div class="purchase-zone span12">
         <table class="table"><tr>
         <td><input id="purchase-product" style="width:190px;"></input>
         <td style="vertical-align:middle;"><input type=text style="width:30px;" id="purchase-cost"></input> money for
@@ -98,22 +104,24 @@
     </div>
 </div></div>
 
-<div class="row"><div class="span8">
+<div class="row"><div>
 <h2>Workouts</h2>
     {% for workout in day.getworkouts() %}
     {{workout.mysets()|safe}}<br>{% endfor %}
     <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/day/add"><i class="icon-plus"></i> new</a><br>
 </div></div>
 
-
-
-
 <div id="notemodel" class="note-row" note_id="new" style="display:none;">
-    <div class="row"><div class="span8 note note-2">
-    <textarea class="textarea" id="note" note_id="new"></textarea></div>
-    <div class="span2"><div class="notekindzone">
-    <div class="notekind-available"></div>
-    <button class="notekindselect" value=""></button></div></div></div>
+    <div class="row">
+        <span class="span8 note note-2">
+            <textarea class="textarea" id="note" note_id="new"></textarea>
+        </span>
+        <span class="span2"><div class="notekindzone">
+            <span class="notekind-available"></span>
+                <button class="notekindselect" value=""></button>
+            </span>
+        </span>
+    </div>
 </div>
 
 <div class="notification fixed-notification">

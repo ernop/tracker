@@ -466,7 +466,7 @@ function make_photozone(photo){
 
 function setup_keynav(){
   $(document.documentElement).keydown(function (event) {
-    //notify(event.keyCode,1);
+    notify(event.keyCode,1);
     if (!keynav_active){return}
     if (event.keyCode==84){ //t
         pop_tag()
@@ -488,5 +488,12 @@ function setup_keynav(){
             show_next();
         }
     }
+    else if (event.keyCode==83){ //done, go to next.
+        if (keynav_active){
+            data_changed(null,'phototag',(screenshot_phototag_id+''))
+            show_next();
+        }
+    }
+    
 });
 }
