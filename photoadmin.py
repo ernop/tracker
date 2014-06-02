@@ -175,9 +175,13 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         sparkline=obj.history_sparkline()
         res=[]
         ct=obj.photos.count()
+        done_ids=set()
         for pho in obj.photos.order_by('photo__photo_created').all()[:80]:
+            if pho.photo.id in done_ids:
+                continue
             realpho=pho.photo
             res.append(realpho.inhtml(size='thumb'))
+            done_ids.add(pho.photo.id)
         pres=''.join(res)
         alllink='<a href="../photo/?tagged_with=%s">All Photos</a>'%obj.id
         res='<div class="big">%d</div><div style="display:inline-block;float:right;">%s</div>%s<br>%s'%(ct,sparkline,pres,alllink)
@@ -206,7 +210,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         
         for rr in res:
             res2.append(('<a href="/admin/day/phototag/?id=%d">%s</a>'%(rr[0],rr[1]),rr[2]))
-        return mktable(res2)
+        return mktable(res2,nb=True)
         
     def myname(self,obj):
         data=(('vlink',obj.vlink()),
