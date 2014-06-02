@@ -24,14 +24,17 @@ def get_fps_from_incoming():
         if fpclean!=fp:
             shutil.move(fp, fpclean)
         fps.append(fpclean)
-        if len(fps)>500:
-            break
     return fps
         
 def check_incoming():
     photos=get_fps_from_incoming()
     from day.photomodels import Photo
-    new=[fp for fp in photos if not Photo.objects.filter(fp=fp, incoming=True).exists()]
+    new=[]
+    for fp in photos:
+        if not Photo.objects.filter(fp=fp, incoming=True).exists():
+            new.append(fp)
+        if len(new)>500:
+            break
     log.info('noticed %d new photos in incoming dir.',len(new))
     for ii,fp in enumerate(new):
         if ii%50==0:
