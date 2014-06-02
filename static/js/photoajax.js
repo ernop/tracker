@@ -28,7 +28,10 @@ $(document).ready(function(){
 
 function load_show(id){
     console.log('in load show, calling load')
-    load(maybe_show)
+    var only_one=false;
+    if (force_id){var only_one=true}
+    //if its a force_id only load one.
+    load(maybe_show, only_one)
 }
 
 function load_one(){
