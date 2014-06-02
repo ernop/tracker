@@ -24,6 +24,8 @@ def get_fps_from_incoming():
         if fpclean!=fp:
             shutil.move(fp, fpclean)
         fps.append(fpclean)
+        if len(fps)>500:
+            break
     return fps
         
 def check_incoming():
