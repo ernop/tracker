@@ -21,21 +21,22 @@ function get_hash_id(){
 
 $(document).ready(function(){
     force_id=get_hash_id();
+    was_force_id=force_id;
     load_show()
     setup_buttons();
     setup_keynav();
 })
 
 function load_show(id){
-    console.log('in load show, calling load')
+    //console.log('in load show, calling load')
     var only_one=false;
-    if (force_id){var only_one=true}
+    if (was_force_id){var only_one=true}
     //if its a force_id only load one.
     load(maybe_show, only_one)
 }
 
 function load_one(){
-    console.log('calling load one.')
+    //console.log('calling load one.')
     load(null, true)}
 
 function load(donefunc, only_one){
@@ -68,7 +69,7 @@ function load(donefunc, only_one){
             dat['force id']=force_id;
             force_id=null;
         }
-        console.log('doing load',exclude_ids.length)
+        //console.log('doing load',exclude_ids.length)
         $.ajax({
             url:'/ajax/photo_data/',
             type:'post',
@@ -80,13 +81,13 @@ function load(donefunc, only_one){
                     $.each(loaded_photos, function(index, lp){
                         if (lp.id==nextphoto.id){
                             exi=true
-                            console.log("got duplicate",nextphoto.fp)
+                            //console.log("got duplicate",nextphoto.fp)
                             notify('dup, loaded:'+loaded_photos.length,true);
                             setTimeout(load_one(),0);
                             return false}
                     })
                     if (!exi){//we actually got a new one...
-                        console.log("got new",nextphoto.id)
+                        //console.log("got new",nextphoto.id)
                         notify(json['message']+' preloaded this many:'+loaded_photos.length,json['success'])
                         loaded_photos.push(nextphoto)
                         var im=new Image()
@@ -96,7 +97,7 @@ function load(donefunc, only_one){
                         if (donefunc){donefunc.call(json)}
                     }
                     if (!only_one){
-                        console.log('calling load in success of load')
+                        //console.log('calling load in success of load')
                         setTimeout(load(),1000);
                     }
                 }
@@ -124,11 +125,13 @@ function show_prev(){
 }
 
 function show_next(going_backwards){
-    if (initial_load_done && loaded_photos.length<23){initial_load_done=false;load();console.log('restarted load process.')}
-    console.log('show next start')
+    if (initial_load_done && loaded_photos.length<23){initial_load_done=false;load();
+    //console.log('restarted load process.')
+    }
+    //console.log('show next start')
     next=loaded_photos.shift()
     if (next){
-        console.log('got next',next.id)
+        //console.log('got next',next.id)
         if (current_photo){
         
             if (going_backwards)
@@ -185,7 +188,7 @@ function pop_photospot(){
 function reset_photospot_select2(){
     var sel=$('#photospotselect2');
     if (current_photo.photospot){
-        console.log('setting current')
+        //console.log('setting current')
         sel.attr('value',current_photo.photospot.id);
     }else{
         sel.attr('value',null);
@@ -223,7 +226,7 @@ function reset_photo_tags(){
 
 
 function get_tags_for_current_photo(){
-    console.log('get current tags start')
+    //console.log('get current tags start')
     //grab the tags from the full tag js object.
     var data = [];
     var ids = current_photo.tagids;
@@ -234,7 +237,7 @@ function get_tags_for_current_photo(){
             }
         })
     })
-    console.log('get current tags end',data)
+    //console.log('get current tags end',data)
     return data;
 }
 
@@ -269,14 +272,14 @@ function change_phototag(e){
 }
 
 function change_photospot(e){
-    console.log('change photospot start')
+    //console.log('change photospot start')
     if (e){var target=$(e.target)}else{
     var target=$('#photospotselect2')}
     current_photo.photoid=target.attr('value');
     data_changed(target, 'photospot');
     
     //maybe_goto_next(current_photo.tagids)
-    console.log('change photospot end')
+    //console.log('change photospot end')
 }
 
 function create_tag(tagname, success_func){
@@ -469,7 +472,7 @@ function make_photozone(photo){
 
 function setup_keynav(){
   $(document.documentElement).keydown(function (event) {
-    notify(event.keyCode,1);
+    //notify(event.keyCode,1);
     if (!keynav_active){return}
     if (event.keyCode==84){ //t
         pop_tag()
