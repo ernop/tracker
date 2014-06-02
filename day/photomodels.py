@@ -302,6 +302,12 @@ class Photo(DayModel):
         self.filesize=stat.st_size
         #should create thumb.
         self.setup=True
+        if self.modified<self.created:
+            self.created=self.modified
+        if self.taken and self.created and self.created<self.taken:
+            #weird, some editing software apparently updates exif without updating created date of the file.
+            #this messes up using exif taken to link to a day, so might as well at least link it to the file created day.
+            self.taken=self.created
         try:
             self.save()
         except Exception,e:
