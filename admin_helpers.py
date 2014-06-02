@@ -24,10 +24,11 @@ class MyCameraFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         NEXUS='Nexus S'
         CANON='Canon EOS 500D'
+        OLDCAM='KODAK DC280 ZOOM DIGITAL CAMERA'
         if self.value()=='yes':
-            return queryset.filter(camera=NEXUS)|queryset.filter(camera=CANON)
+            return queryset.filter(camera=NEXUS)|queryset.filter(camera=CANON)|queryset.filter(camera=OLDCAM)
         elif self.value()=='no':
-            return queryset.exclude(camera=NEXUS).exclude(camera=CANON).exclude(camera=None).exclude(camera='')
+            return queryset.exclude(camera=NEXUS).exclude(camera=CANON).exclude(camera=OLDCAM).exclude(camera=None).exclude(camera='')
 
 class PhotoExtensionFilter(SimpleListFilter):
     title='extension'

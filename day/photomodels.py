@@ -69,7 +69,10 @@ class Photo(DayModel):
         else:
             cmd='mogrify -auto-orient "%s"'%self.fp
             res=os.system(cmd)
-            os.utime(self.fp, (atime, mtime))
+            try:
+                os.utime(self.fp, (atime, mtime))
+            except OSError,e:
+                log.error('error doing utime %s',e)
         self.rehash()
         if res:
             log.error("fail cmd %s for fp %s"%(cmd,self.fp))
