@@ -51,7 +51,7 @@ class PhotoAdmin(OverriddenModelAdmin):
             lowest.photo_created=min(lowest.photo_created,other.photo_created)
             lowest.created=min(lowest.created,other.created)
             lowest.photo_modified=min(lowest.photo_modified,other.photo_modified)
-            other.delete()
+            other.kill_this()
         lowest.save()
     
     def unlink_from_day(self,request,queryset):
