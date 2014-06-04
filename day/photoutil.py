@@ -33,7 +33,7 @@ def check_incoming():
     for fp in photos:
         if not Photo.objects.filter(fp=fp, incoming=True).exists():
             new.append(fp)
-        if len(new)>500:
+        if len(new)>3500:
             break
     log.info('noticed %d new photos in incoming dir.',len(new))
     for ii,fp in enumerate(new):
