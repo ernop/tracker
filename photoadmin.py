@@ -34,9 +34,15 @@ class PhotoAdmin(OverriddenModelAdmin):
     actions=['undoable_delete','not_myphoto','delete_file',
              'undelete','reinitialize','re_autoorient','force_recreate_thumbs',
              'autoorient','redo_classification','kill_entry',
-             'unlink_from_day',]
+             'unlink_from_day','rename_name']
     actions.extend(['remove_photospot','rehash','merge_photos_lowest_id',])
     actions.sort()
+    
+    def rename_name(self, request, queryset):
+        for ph in queryset:
+            for n in range(5):
+                ph.name+=getletter()
+            ph.save()
     
     def merge_photos_lowest_id(self, request, queryset):
         lowest=queryset.order_by('-filesize')[0]
