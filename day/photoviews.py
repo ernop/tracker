@@ -90,6 +90,8 @@ def photoset(request,tagset):
     jumps=[]
     photos=rawphotos
     for name in names:
+        #clean it cause this is a bit messy
+        name=name.replace("(organization)",'').strip()
         photos=photos.filter(tags__tag__name=name)
         nt=names[:]
         nt.remove(name)
