@@ -7,7 +7,7 @@ div {box-sizing:border-box;}
 .big{font-size:2em;}
 .photofooter{position:fixed; bottom:120px;left:10px;height:90px;width:100px;}
 
-.infozone{width:280px;float:right;display:inline-block;}
+.infozone{width:280px;float:right;display:inline-block;overflow:hidden;}
 .tagzone{clear:both;float:right;margin-top:40px;}
 .photozone{text-align:center;}
 

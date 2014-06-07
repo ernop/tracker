@@ -103,6 +103,7 @@ def photoset(request,tagset):
             killtext=name
         killnames.append((','.join(nt),killtext))
         jumps.append((name,name))
+    photos=photos.distinct()
     photoids=[p.id for p in photos]
     #PhotoHasTag.objects.filter(photo__id__in=photoids)
     #import ipdb;ipdb.set_trace()
