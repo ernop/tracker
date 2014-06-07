@@ -80,7 +80,7 @@ def photoset(request,tagset):
     vals={}
     #import ipdb;ipdb.set_trace()
     from urllib import unquote
-    names=unquote(tagset)
+    names=unquote(unquote(tagset))
     names=names.split(',')
     
     
