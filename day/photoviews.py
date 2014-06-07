@@ -80,7 +80,8 @@ def photoset(request,tagset):
     vals={}
     #import ipdb;ipdb.set_trace()
     names=tagset.split(',')
-    
+    tagset=tagset.replace('%2C',',').replace('%20',' ')
+    #this sucks, i know.
     rawphotos=Photo.objects.filter(deleted=False)
     addnames=[]
     killnames=[]
