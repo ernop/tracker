@@ -72,6 +72,55 @@ def phototag(request,name):
     vals['phototag']=phototag
     return r2r('jinja2/photo/phototag.html',request,vals)
 
+def photoset(request,tagset):
+    '''show a bunch of photo thumbnails.  clicking one results in a nice fast preloaded display (like photoajax)
+    with/without edit options.  along the top are the currently defined tags & links to +1 tag / -1 tag
+    
+    v1 just thumbnails.'''
+    vals={}
+    #import ipdb;ipdb.set_trace()
+    names=tagset.split(',')
+    
+    rawphotos=Photo.objects.filter(deleted=False)
+    addnames=[]
+    killnames=[]
+    photos=rawphotos
+    for name in names:
+        photos=photos.filter(tags__tag__name=name)
+        nt=names[:]
+        nt.remove(name)
+        nt.sort()
+        if len(nt)>1:
+            subphotos=rawphotos
+            for subnt in nt:
+                subphotos.filter(tags__tag__name=subnt)
+            killtext='%s (%d)'%(name, subphotos.count())
+        else:
+            killtext=name
+        killnames.append((','.join(nt),killtext))
+    photoids=[p.id for p in photos]
+    #PhotoHasTag.objects.filter(photo__id__in=photoids)
+    #import ipdb;ipdb.set_trace()
+    rel_tags=PhotoTag.objects.filter(photos__photo__id__in=photoids)
+    from django.db.models import Count
+    rel_tags=rel_tags.annotate(ct=Count('name')).order_by('-ct')
+    for rt in rel_tags[:25]:
+        if rt.name in names:
+            continue
+        nt=names[:]
+        nt.append(rt.name)
+        nt.sort()
+        addlinkname='%s (%d)'%(rt.name,rt.ct)
+        addnames.append((','.join(nt),addlinkname))
+    vals['photocount']=photos.count()
+    photos=photos[:30]
+    #addnames=[]
+    vals['photos']=photos
+    vals['phototags']=[PhotoTag.objects.get(name=name) for name in names]
+    vals['killnames']=killnames
+    vals['addnames']=addnames
+    return r2r('jinja2/photo/photoset.html',request,vals)
+
 @user_passes_test(staff_test)
 def photospot(request,name):
     name=name.replace('%20',' ').replace('_',' ')

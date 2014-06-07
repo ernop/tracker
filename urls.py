@@ -60,6 +60,7 @@ urlpatterns = patterns('',
     url(r'^ajax/photo_data/$','tracker.day.photoviews.ajax_photo_data',name='ajax_photo_data'),
     url(r'^photo/photoajax/$','tracker.day.photoviews.photoajax',name='ajax_photoajax'),
     #url(r'^photo/photospotajax/$','tracker.day.photoviews.incoming_photospot_photos_ajax',name='ajax_photospotajax'),
+    url(r'^photo/photoset/(?P<tagset>.*)/','tracker.day.photoviews.photoset')
 )
 
 

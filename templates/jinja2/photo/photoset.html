@@ -1,0 +1,30 @@
+{% extends 'jinja2/photo_base.html' %}
+{% block title %}Photoset for {% for tag in phototags %}{{tag}} {% endfor %}{% endblock title %}
+{% block head %}{{super()}}{% endblock head %}
+
+{% block content %}{% if LOCAL %}LOCAL{% endif %}
+<div class="row">
+    <div class="span8">
+        <h1>Tagged with {% for tag in phototags %}{{tag}} {% endfor %} ({{photocount}})</h1>
+    </div>
+</div>
+    <div id="notification" class="notification-zone" style="display:inline-block;float:right;">&nbsp;</div>
+<div class="addnamezone"><h3>Add</h3>{% for lnk,name in addnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-plus"></i></a>{% endfor %}</div>
+<div class="killnameone"><h3>Remove</h3>{% for lnk,name in killnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-remove"></i></a>{% endfor %}</div>
+
+{% for photo in photos %}
+    <div class="photolink">{{photo.inhtml(size='thumb')|safe}}</div>
+{% endfor %}
+
+<div class="linkzone">
+    <h3>admin phototag link zone</h3>
+    {% for phototag in phototags %}
+        <a href="/admin/day/phototag/?id={{phototag.id}}">{{phototag}}</a>
+    {% endfor %}
+</div>
+
+
+{% endblock %}
+
+{% block footer %}{{super()}}{% include "jinja2/photo/photofooter.html" %}
+{% endblock %}
