@@ -79,9 +79,11 @@ def photoset(request,tagset):
     v1 just thumbnails.'''
     vals={}
     #import ipdb;ipdb.set_trace()
-    names=tagset.split(',')
-    tagset=tagset.replace('%2C',',').replace('%20',' ')
-    #this sucks, i know.
+    from urllib import unquote
+    names=unquote(tagset)
+    names=names.split(',')
+    
+    
     rawphotos=Photo.objects.filter(deleted=False)
     addnames=[]
     killnames=[]
