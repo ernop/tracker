@@ -91,15 +91,16 @@ def photoset(request,tagset):
     photos=rawphotos
     for name in names:
         #clean it cause this is a bit messy
-        name=name.replace("(organization)",'').strip()
-        photos=photos.filter(tags__tag__name=name)
+        lookupname=name.replace("(organization)",'').strip()
+        photos=photos.filter(tags__tag__name=lookupname)
         nt=names[:]
         nt.remove(name)
         nt.sort()
         if len(nt)>1:
             subphotos=rawphotos
             for subnt in nt:
-                subphotos.filter(tags__tag__name=subnt)
+                lookupsub=subnt.replace("(organization)",'').strip()
+                subphotos.filter(tags__tag__name=lookupsub)
             killtext='%s (%d)'%(name, subphotos.count())
         else:
             killtext=name
