@@ -150,3 +150,4 @@ DEFAULT_SOURCES=(('7-11','shanghai'),('corner store','shanghai'),('amazon','inte
 DEFAULT_PHOTOTAGS='delete undelete done myphoto timelapse friends family meme background mosaic graphics painting done next last undo prev'.split()
 
 TEMPLATE_DEBUG = True
+EXCLUDE_FROM_PHOTOSET_TAGS=['done',]

@@ -91,6 +91,8 @@ def photoset(request,tagset):
     photos=rawphotos
     phototags=[]
     for name in names:
+        if name in settings.EXCLUDE_FROM_PHOTOSET_TAGS:
+            continue
         #clean it cause this is a bit messy
         lookupname=name.replace("(organization)",'').strip()
         photos=photos.filter(tags__tag__name=lookupname)
@@ -129,6 +131,7 @@ def photoset(request,tagset):
     #addnames=[]
     vals['photos']=photos
     #vals['phototags']=[PhotoTag.objects.get(name=name) for name in names]
+    vals['phototags']=phototags
     vals['killnames']=killnames
     vals['addnames']=addnames
     vals['jumps']=sorted(list(set(jumps)))
@@ -230,6 +233,8 @@ def ajax_photo_data(request):
                               'infozone':infozone,
                               'dayvlink':nextphoto.day and nextphoto.day.vlink() or '',
                               'photospothtml':nextphoto.get_photospothtml(),
+                              'resolutionx':nextphoto.resolutionx,
+                              'resolutiony':nextphoto.resolutiony,
                               }
                 vals['nextphoto']=nextphoto_js
                 vals['success']=True

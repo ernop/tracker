@@ -90,8 +90,29 @@ function load(donefunc, only_one){
                         //console.log("got new",nextphoto.id)
                         notify(json['message']+' preloaded this many:'+loaded_photos.length,json['success'])
                         loaded_photos.push(nextphoto)
+                        //should calculate the display height here.
+                        //maxes: height 800, width 1100
                         var im=new Image()
-                        im.height=800
+                        var xmax=1100;
+                        var ymax=800;
+                        if (nextphoto.resolutionx>xmax && nextphoto.resolutiony>ymax){
+                            //scale both
+                            var scale=Math.max(nextphoto.resolutionx/xmax,nextphoto.resolutiony/ymax)
+                            im.height=nextphoto.resolutiony/scale
+                            im.width=nextphoto.resolutionx/scale
+                        }else if (nextphoto.resolutionx>=xmax){
+                            var scale=nextphoto.resolutionx/xmax
+                            im.height=nextphoto.resolutiony/scale
+                            im.width=xmax
+                        }else if (nextphoto.resolutiony>=ymax){
+                            var scale=nextphoto.resolutiony/ymax
+                            im.height=ymax
+                            im.width=nextphoto.resolutionx/scale
+                        }else{
+                            im.height=nextphoto.resolutiony
+                            im.width=nextphoto.resolutionx
+                        }
+                        //im.height=800
                         im.src=nextphoto.fp;
                         nextphoto.image=im
                         if (donefunc){donefunc.call(json)}

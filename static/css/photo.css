@@ -21,3 +21,6 @@ div {box-sizing:border-box;}
 #create-new-photospot-form input{width:100px;}
 
 .tagzone .select2-container{width:240px;}
+
+.photoset-linkzone h3{display:inline-block;margin-right:10px;}
+.container img {max-width:inherit;}

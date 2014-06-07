@@ -3,13 +3,13 @@
 {% block head %}{{super()}}{% endblock head %}
 
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
-<h1>Tagged with {% for tag in phototags %}{{tag}} {% endfor %} ({{photocount}})</h1>
+<h1>Tagged with {% for phototag in phototags %}{{phototag.name}} {% endfor %} ({{photocount}})</h1>
 
 <div id="notification" class="notification-zone" style="display:inline-block;float:right;height:24px;">&nbsp;</div>
 
-<div class="addnamezone"><h3>Add</h3>{% for lnk,name in addnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-plus"></i></a>{% endfor %}</div>
-<div class="killnamezone"><h3>Remove</h3>{% for lnk,name in killnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-remove"></i></a>{% endfor %}</div>
-<div class="jumpnamezone"><h3>Jump</h3>{% for lnk,name in jumps %}<a class="btn tagkill" href="../{{lnk}}">{{name}}</a>{% endfor %}</div>
+<div class="addnamezone photoset-linkzone"><h3>Add</h3>{% for lnk,name in addnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-plus"></i></a>{% endfor %}</div>
+<div class="killnamezone photoset-linkzone"><h3>Remove</h3>{% for lnk,name in killnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-remove"></i></a>{% endfor %}</div>
+<div class="jumpnamezone photoset-linkzone"><h3>Jump</h3>{% for lnk,name in jumps %}<a class="btn tagkill" href="../{{lnk}}">{{name}}</a>{% endfor %}</div>
 
 {% for photo in photos %}
     <div class="photolink">
