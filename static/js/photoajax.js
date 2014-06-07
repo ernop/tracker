@@ -109,8 +109,9 @@ function load(donefunc, only_one){
                             im.height=ymax
                             im.width=nextphoto.resolutionx/scale
                         }else{
-                            im.height=nextphoto.resolutiony
-                            im.width=nextphoto.resolutionx
+                            if (nextphoto.resolutionx != null)
+                            {im.height=nextphoto.resolutiony
+                            im.width=nextphoto.resolutionx}
                         }
                         //im.height=800
                         im.src=nextphoto.fp;
