@@ -142,7 +142,7 @@ class Photo(DayModel):
         if not text:
             text='ajax link'
         '''link to /photo/photoajax/#!id'''
-        res='<a class="btn%s" href="/photo/photoajax/#!id=%d">%s</a>'%(wrap, self.id, text)
+        res='<a class="%s" href="/photo/photoajax/#!id=%d">%s</a>'%(wrap, self.id, text)
         return res
     
     def exhref(self):
@@ -151,7 +151,7 @@ class Photo(DayModel):
     def __unicode__(self):
         return self.name or self.fp or 'no name'
     
-    def inhtml(self,clink=True,vlink=False,size='scaled',ajaxlink=False):
+    def inhtml(self,clink=False,vlink=False,size='scaled',ajaxlink=False):
         if not vlink and not clink and not ajaxlink:
             clink=True
         thumb=False

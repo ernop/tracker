@@ -87,6 +87,7 @@ def photoset(request,tagset):
     rawphotos=Photo.objects.filter(deleted=False)
     addnames=[]
     killnames=[]
+    jumps=[]
     photos=rawphotos
     for name in names:
         photos=photos.filter(tags__tag__name=name)
@@ -101,6 +102,7 @@ def photoset(request,tagset):
         else:
             killtext=name
         killnames.append((','.join(nt),killtext))
+        jumps.append((name,name))
     photoids=[p.id for p in photos]
     #PhotoHasTag.objects.filter(photo__id__in=photoids)
     #import ipdb;ipdb.set_trace()
@@ -115,6 +117,7 @@ def photoset(request,tagset):
         nt.sort()
         addlinkname='%s (%d)'%(rt.name,rt.ct)
         addnames.append((','.join(nt),addlinkname))
+        jumps.append((rt.name,rt.name))
     vals['photocount']=photos.count()
     photos=photos[:30]
     #addnames=[]
@@ -122,6 +125,7 @@ def photoset(request,tagset):
     vals['phototags']=[PhotoTag.objects.get(name=name) for name in names]
     vals['killnames']=killnames
     vals['addnames']=addnames
+    vals['jumps']=sorted(list(set(jumps)))
     return r2r('jinja2/photo/photoset.html',request,vals)
 
 @user_passes_test(staff_test)

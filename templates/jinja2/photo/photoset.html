@@ -3,17 +3,18 @@
 {% block head %}{{super()}}{% endblock head %}
 
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
-<div class="row">
-    <div class="span8">
-        <h1>Tagged with {% for tag in phototags %}{{tag}} {% endfor %} ({{photocount}})</h1>
-    </div>
-</div>
-    <div id="notification" class="notification-zone" style="display:inline-block;float:right;">&nbsp;</div>
+<h1>Tagged with {% for tag in phototags %}{{tag}} {% endfor %} ({{photocount}})</h1>
+
+<div id="notification" class="notification-zone" style="display:inline-block;float:right;height:24px;">&nbsp;</div>
+
 <div class="addnamezone"><h3>Add</h3>{% for lnk,name in addnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-plus"></i></a>{% endfor %}</div>
-<div class="killnameone"><h3>Remove</h3>{% for lnk,name in killnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-remove"></i></a>{% endfor %}</div>
+<div class="killnamezone"><h3>Remove</h3>{% for lnk,name in killnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-remove"></i></a>{% endfor %}</div>
+<div class="jumpnamezone"><h3>Jump</h3>{% for lnk,name in jumps %}<a class="btn tagkill" href="../{{lnk}}">{{name}}</a>{% endfor %}</div>
 
 {% for photo in photos %}
-    <div class="photolink">{{photo.inhtml(size='thumb')|safe}}</div>
+    <div class="photolink">
+        {{photo.inhtml(size='thumb',ajaxlink=True)|safe}}
+    </div>
 {% endfor %}
 
 <div class="linkzone">

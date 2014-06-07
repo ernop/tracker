@@ -7,7 +7,7 @@ div {box-sizing:border-box;}
 .big{font-size:2em;}
 .photofooter{position:fixed; bottom:120px;left:10px;height:90px;width:100px;}
 
-.infozone{width:300px;float:right;display:inline-block;}
+.infozone{width:280px;float:right;display:inline-block;}
 .tagzone{clear:both;float:right;margin-top:40px;}
 .photozone{text-align:center;}
 
@@ -16,3 +16,8 @@ div {box-sizing:border-box;}
     width:1250px;
     border:3px solid lightgrey;
 }
+
+#create-new-tag-form input{width:100px;}
+#create-new-photospot-form input{width:100px;}
+
+.tagzone .select2-container{width:240px;}

@@ -223,6 +223,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         data=(('vlink',obj.vlink()),
               ('use count',obj.use_count),
               ('person clink',obj.person and '%s'%(obj.person.clink()) or ''),
+              ('photoset','<a href="/photo/photoset/%s/">%s</a>'%(obj.name,obj.name)),
               )
         return mktable(data)
         
