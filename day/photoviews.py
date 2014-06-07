@@ -89,10 +89,12 @@ def photoset(request,tagset):
     killnames=[]
     jumps=[]
     photos=rawphotos
+    phototags=[]
     for name in names:
         #clean it cause this is a bit messy
         lookupname=name.replace("(organization)",'').strip()
         photos=photos.filter(tags__tag__name=lookupname)
+        phototags.append(PhotoTag.objects.get(name=lookupname))
         nt=names[:]
         nt.remove(name)
         nt.sort()
@@ -126,7 +128,7 @@ def photoset(request,tagset):
     photos=photos[:30]
     #addnames=[]
     vals['photos']=photos
-    vals['phototags']=[PhotoTag.objects.get(name=name) for name in names]
+    #vals['phototags']=[PhotoTag.objects.get(name=name) for name in names]
     vals['killnames']=killnames
     vals['addnames']=addnames
     vals['jumps']=sorted(list(set(jumps)))
