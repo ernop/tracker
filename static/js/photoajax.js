@@ -334,13 +334,16 @@ function update_tag_info(tagids){
   //ajax but this is faster
   var ctarget=$('.ctagzone')
   var vtarget=$('.vtagzone')
+  var settarget=$('.photosetzone')
   ctarget.find('a').remove()
   vtarget.find('a').remove()
+  settarget.find('a').remove()
   $.each(tagids, function(index,tagid){
     var tag=get_phototag(tagid);
     if (!tag){return}
     ctarget.append('<a class="btn" href="/admin/day/phototag/?id='+tag.id+'">'+tag.name+'</a> ')
     vtarget.append('<a class="btn" href="/photo/phototag/'+tag.name.replace(/ /g,'_')+'">'+tag.name+'</a> ')
+    settarget.append('<a class="btn" href="/photo/photoset/'+tag.name+'">'+tag.name+'</a> ')
   })
 }
 

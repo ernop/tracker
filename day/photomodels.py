@@ -507,7 +507,8 @@ class Photo(DayModel):
     
     def exif_table(self):
         from trackerutils import div
-        ctags=div(klass='ctagzone',contents=', '.join([tag.tag.clink() for tag in self.tags.all()]))
+        ctags=div(klass='ctagzone',contents=''.join([tag.tag.clink() for tag in self.tags.all()]))
+        photoset=div(klass='photosetzone',contents=''.join([tag.tag.photosetlink() for tag in self.tags.all()]))
         cspot=''
         if self.photospot:
             cspot=self.photospot.clink()
@@ -522,6 +523,7 @@ class Photo(DayModel):
              ('size',size),
              ('filesize',humanize_size(self.filesize)),
              ('tags clink',ctags),
+             ('photoset',photoset),
              ('photospot clink',cspot),
              )
         res=mktable(dat,skip_false=True)
@@ -625,6 +627,12 @@ class PhotoTag(DayModel):
 
         #
 
+    
+    def photosetlink(self,text=None):
+        if not text:
+            text=self.name
+        return '<a class="btn" href="/photo/photoset/%s/">%s</a>'%(self.name,text)
+    
     def history_sparkline(self):
         #photos=Photo.objects.filter(tags__tag=obj)
         photos=Photo.objects.raw('select p.id,date(p.photo_created) as date,\
