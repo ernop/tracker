@@ -94,4 +94,5 @@ font-size}
 }
 .table.thintable{margin-bottom:0;}
 
-.select2-search-choice a{font-size:2.3em;}
+/*.select2-search-choice a{font-size:2.3em;}*/
+.select2-search-choice div{font-size:2.3em;line-height:1em;}
