@@ -387,7 +387,7 @@ class Photo(DayModel):
     def autoorient(self):
         '''mogrify, while preserving a,mtime.  ffs.'''
         if not os.path.exists(self.fp):
-            log.error('tried to auto-orient an fp which then no longer existed. photoid:%d fp:%s',self.id,self.fp)
+            log.error('tried to auto-orient an fp which then no longer existed. photoid:fp:%s',self.fp)
             return False
         stat=os.stat(self.fp)
         atime,mtime=stat.st_atime,stat.st_mtime
