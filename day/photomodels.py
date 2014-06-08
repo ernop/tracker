@@ -184,14 +184,14 @@ class Photo(DayModel):
             
     def _create_thumb(self):
         '''really create it'''
-        newthumbfp=self.get_thumbfp()
-        self.thumbfp=newthumbfp
         if self.thumbfp:
             if os.path.exists(self.thumbfp):
                 os.remove(self.thumbfp)
-        else:
-            self.thumbfp=self.get_thumbfp()
-            self.save()
+        #else:
+            #self.thumbfp=self.get_thumbfp()
+            #self.save()
+        newthumbfp=self.get_thumbfp()
+        self.thumbfp=newthumbfp
         cmd='convert -define "jpeg:size=500x%d" "%s" \
         -auto-orient -thumbnail 250x%d \
         -unsharp 0x.5 "%s"'%(settings.THUMB_HEIGHT*3, 
@@ -209,9 +209,8 @@ class Photo(DayModel):
             self.thumb_ok=False
             self.save()
             return False
-        if not self.thumb_ok:
-            self.thumb_ok=True
-            self.save()
+        self.thumb_ok=True
+        self.save()
         return True
             
             
