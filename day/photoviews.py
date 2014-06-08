@@ -238,7 +238,7 @@ def ajax_photo_data(request):
                               }
                 vals['nextphoto']=nextphoto_js
                 vals['success']=True
-                vals['message']='preloaded fp %s'%nextphoto_js['fp']
+                vals['message']='preloaded %s'%nextphoto.name
         elif kind=='new phototag':
             if 'tagname' in todo and todo['tagname']:
                 name=make_safe_tag_name(todo['tagname'])
@@ -318,7 +318,8 @@ def ajax_photo_data(request):
             if photo.tags.filter(tag__name__in=settings.ADVANCING_TAGS).exclude(tag__id__in=kept_tagids):
                 #actually was assigned this tag
                 photo.done()
-            vals['message']='saved %d tags.'%photo.tags.count()
+            #vals['message']='saved %d tags.'%photo.tags.count()
+            vals['message']=''
         
         elif kind=='remove photo from photospot':        
             #disassociate a photo from a photospot.

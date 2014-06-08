@@ -6,6 +6,7 @@ keynav_active=true;
 ii=0
 initial_load_done=false
 force_id=null;
+last_saved_tags=null;
 
 function get_hash_id(){
     //check if there's something like #!id=<id> and if so, load that one first.
@@ -172,7 +173,7 @@ function show_next(going_backwards){
         put_infozone(next)
         put_photozone(next)
         put_photospot(next)
-        notify(next.fp,true);
+        //notify(next.fp,true);
         showing=true;
         reset_photo_tags();
         reset_photospot_select2();
@@ -245,8 +246,6 @@ function reset_photo_tags(){
     //console.log('reset photo tags end')
 }
 
-
-
 function get_tags_for_current_photo(){
     //console.log('get current tags start')
     //grab the tags from the full tag js object.
@@ -312,7 +311,8 @@ function create_tag(tagname, success_func){
         type:'POST',
         data:data,
         success:function(dat){
-            notify(dat['message'],dat['success']);
+            if (dat['message'] && dat['message'].length)
+            {notify(dat['message'],dat['success']);}
             if (dat['success']){
                 var ptag={id:dat.phototag_id,text:dat.name,name:dat.name};
                 full_phototags.push(ptag);
@@ -336,7 +336,8 @@ function create_photospot(spotname, success_func){
         type:'POST',
         data:data,
         success:function(dat){
-            notify(dat['message'],dat['success']);
+            if (dat['message'] && dat['message'].length)
+            {notify(dat['message'],dat['success']);}
             if (dat['success']){
                 var pspot={id:dat.photospot_id,text:dat.name,name:dat.name};
                 full_photospots.push(pspot);
@@ -402,10 +403,23 @@ function get_photospot(photospot_id){
 function data_changed(target, kind, override){
     var data={'kind':kind};
     if (kind=='phototag'){
-        if (override){data['phototag_ids']=override}else{
-        data['phototag_ids']=target.attr('value');
-        update_tag_info(target.attr('value').split(','));}
-    }else if (kind=='photospot'){
+        if (override){
+            data['phototag_ids']=override
+        }
+        else{
+            data['phototag_ids']=target.attr('value');
+            last_saved_tags=target.attr('value')
+            last_saved_tags_list=last_saved_tags.split(',')
+            last_saved_tags_text=[]
+            $.each(last_saved_tags_list, function(index,guy){
+                var tag=get_phototag(guy);
+                last_saved_tags_text.push(tag.name)
+            })
+            last_saved_tags_text=last_saved_tags_text.join(' ')
+            update_tag_info(last_saved_tags_list);
+        }
+    }
+    else if (kind=='photospot'){
         data['photospot_id']=target.attr('value');
         update_spot_info(target.attr('value'))
     }
@@ -419,7 +433,8 @@ function send_data(data){
         type:'POST',
         data:data,
         success:function(dat){
-            notify(dat['message'],dat['success']);
+            if (dat['message'] && dat['message'].length)
+            {notify(dat['message'],dat['success']);}
         },
         error:function(dat){
             notify('error',false);
@@ -496,35 +511,57 @@ function make_photozone(photo){
 }
 
 function setup_keynav(){
-  $(document.documentElement).keydown(function (event) {
-    //notify(event.keyCode,1);
-    if (!keynav_active){return}
-    if (event.keyCode==84){ //t
-        pop_tag()
-        keynav_active=false;
-    }
-    else if (event.keyCode==80){ //p
-        pop_photospot()
-        keynav_active=false;
-    }
-    else if (event.keyCode==68){ //d for delete
-        if (keynav_active){
-            data_changed(null,'phototag',(delete_phototag_id+''))
-            show_next();
+    //manually clicking tag zone disables it.
+    $('.tagzone').bind('click',function(e){
+        if (keynav_active && !(e.isTrigger)){
+            //wow, pushing enter triggers click.  so just dont cancel in this case.
+            keynav_active=false;
+            notify('keynav inactive',0)
         }
-    }
-    else if (event.keyCode==78){ //done, go to next.
-        if (keynav_active){
-            data_changed(null,'phototag',(done_phototag_id+''))
-            show_next();
+    })
+    $(document.documentElement).keydown(function (event) {
+        notify(event.keyCode,1);
+        if (!keynav_active){return}
+        if (event.keyCode==84){ //t
+            pop_tag()
+            keynav_active=false;
         }
-    }
-    else if (event.keyCode==83){ //done, go to next.
-        if (keynav_active){
-            data_changed(null,'phototag',(screenshot_phototag_id+''))
-            show_next();
+        else if (event.keyCode==80){ //p
+            pop_photospot()
+            keynav_active=false;
         }
-    }
-    
-});
+        else if (event.keyCode==68){ //d for delete
+            if (keynav_active){
+                data_changed(null,'phototag',(delete_phototag_id+''))
+                show_next();
+                notify('deleted',1)
+            }
+        }
+        else if (event.keyCode==78){ //done, go to next.
+            if (keynav_active){
+                data_changed(null,'phototag',(done_phototag_id+''))
+                show_next();
+                notify('skipped',1)
+            }
+        }
+        else if (event.keyCode==83){ //done, go to next.
+            if (keynav_active){
+                data_changed(null,'phototag',(screenshot_phototag_id+''))
+                show_next();
+                notify('screenshot',1)
+            }
+        }
+        else if (event.keyCode==82){ //done, go to next.
+            if (keynav_active){
+                if (last_saved_tags){
+                    data_changed(null,'phototag',last_saved_tags)
+                    show_next();
+                    notify('repeat tags '+last_saved_tags_text,1)
+                }else{
+                    notify('no saved tags.',0)
+                }
+                
+            }
+        }
+    });
 }
