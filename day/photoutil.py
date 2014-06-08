@@ -40,7 +40,7 @@ def check_incoming():
         if ii%50==0:
             log.info('have mogrified %d / %d photos this time.',ii,len(new))
         ph=Photo(fp=fp,incoming=True)
-        res=ph.auto_orient()
+        res=ph.autoorient()
 
 def photo2obj(photo):
     res={'fp':photo.get_external_fp(),

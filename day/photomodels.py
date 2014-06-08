@@ -59,31 +59,6 @@ class Photo(DayModel):
     class Meta:
         db_table='photo'
 
-    def auto_orient(self):
-        '''mogrify, while preserving a,mtime.  ffs.'''
-        stat=os.stat(self.fp)
-        atime,mtime=stat.st_atime,stat.st_mtime
-        if self.fp.endswith('webp'):
-            #mogrify doesn't work on webp anyway.
-            res=0
-        else:
-            cmd='mogrify -auto-orient "%s"'%self.fp
-            res=os.system(cmd)
-            try:
-                os.utime(self.fp, (atime, mtime))
-            except OSError,e:
-                log.error('error doing utime %s',e)
-        self.rehash()
-        if res:
-            log.error("fail cmd %s for fp %s"%(cmd,self.fp))
-            self.save()
-            return False
-        try:
-            self.save()
-        except Exception, e:
-            log.error("error saving self. %s %s",self,e)
-            return False
-        return True
 
     def file_exists(self):
         if not self.fp:
@@ -408,16 +383,33 @@ class Photo(DayModel):
         self.save()
         return True
     
+    
     def autoorient(self):
+        '''mogrify, while preserving a,mtime.  ffs.'''
+        if not os.path.exists(self.fp):
+            log.error('tried to auto-orient an fp which then no longer existed. photoid:%d fp:%s',self.id,self.fp)
+            return False
         stat=os.stat(self.fp)
         atime,mtime=stat.st_atime,stat.st_mtime
-        cmd='mogrify -auto-orient "%s"'%(self.fp)
-        res=os.system(cmd)
-        os.utime(self.fp, (atime, mtime))
+        if self.fp.endswith('webp'):
+            #mogrify doesn't work on webp anyway.
+            res=0
+        else:
+            cmd='mogrify -auto-orient "%s"'%self.fp
+            res=os.system(cmd)
+            try:
+                os.utime(self.fp, (atime, mtime))
+            except OSError,e:
+                log.error('error doing utime %s',e)
         self.rehash()
-        self.save()
         if res:
-            log.error('error in cmd %s',cmd)
+            log.error("fail cmd %s for fp %s"%(cmd,self.fp))
+            self.save()
+            return False
+        try:
+            self.save()
+        except Exception, e:
+            log.error("error saving self. %s %s",self,e)
             return False
         return True
     

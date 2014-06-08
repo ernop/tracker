@@ -31,7 +31,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     date_hierarchy='taken'
     
     actions=['undoable_delete','not_myphoto','delete_file',
-             'undelete','reinitialize','re_autoorient','force_recreate_thumbs',
+             'undelete','reinitialize','force_recreate_thumbs',
              'autoorient','redo_classification','kill_entry',
              'unlink_from_day','rename_name']
     actions.extend(['remove_photospot','rehash','merge_photos_lowest_id',])
@@ -87,10 +87,9 @@ class PhotoAdmin(OverriddenModelAdmin):
             photo.myphoto=False
             photo.save()
             
-    def re_autoorient(self,request,queryset):
+    def autoorient(self,request,queryset):
         for photo in queryset:
-            photo.auto_orient()
-    
+            photo.autoorient()
     
     def kill_entry(self,request,queryset):
         for photo in queryset:
@@ -102,10 +101,6 @@ class PhotoAdmin(OverriddenModelAdmin):
     def delete_file(self,request,queryset):    
         for photo in queryset:
             photo.delete_file()
-            
-    def autoorient(self,request,queryset):    
-        for photo in queryset:
-            photo.autoorient()
     
     def undoable_delete(self,request,queryset):
         for photo in queryset:
