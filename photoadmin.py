@@ -34,7 +34,7 @@ class PhotoAdmin(OverriddenModelAdmin):
              'undelete','reinitialize','force_recreate_thumbs',
              'autoorient','redo_classification','kill_entry',
              'unlink_from_day','rename_name']
-    actions.extend(['remove_photospot','rehash','merge_photos_lowest_id',])
+    actions.extend(['remove_photospot','rehash','merge_photos_lowest_id','check_thumbs',])
     actions.sort()
     
     def rename_name(self, request, queryset):
@@ -109,7 +109,11 @@ class PhotoAdmin(OverriddenModelAdmin):
     def force_recreate_thumbs(self,request,queryset):
         for photo in queryset:
             photo.create_thumb(force=True)
-        
+    
+    def check_thumbs(self,request,queryset):
+        for photo in queryset:
+            photo.create_thumb()
+            
     def undelete(self,request,queryset):
         for photo in queryset:
             photo.undelete()
