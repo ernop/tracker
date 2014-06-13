@@ -281,10 +281,16 @@ class Photo(DayModel):
         self.setup=True
         if self.modified<self.created:
             self.created=self.modified
-        if self.taken and self.created and self.created<self.taken:
-            #weird, some editing software apparently updates exif without updating created date of the file.
-            #this messes up using exif taken to link to a day, so might as well at least link it to the file created day.
-            self.taken=self.created
+        #if self.taken and self.created and self.created<self.taken:
+            #self.taken=self.created
+            #self.day=None
+            #self.set_day()
+            #reset the day in the weird case where they somehow get an incorrectly-future set taken date
+            #even though photo created is later.
+        if self.taken and self.photo_created and self.photo_created<self.taken:
+            self.taken=self.photo_created
+            self.day=None
+            self.set_day()
         try:
             self.save()
         except Exception,e:
@@ -306,8 +312,11 @@ class Photo(DayModel):
     def rehash(self):
         '''hash the first few K of data'''
         import hashlib
+        if self.fp.endswith('.bmp'):
+            self.hash=''
+            return
         if os.path.exists(self.fp):
-            data=open(self.fp,'rb').read(100000)
+            data=open(self.fp,'rb').read(10000)
             hsh=hashlib.md5(data).hexdigest()
             self.hash=hsh
     
@@ -336,26 +345,33 @@ class Photo(DayModel):
             log.error('bad name. %d',self.id)
         self.name=make_safe_filename(self.name)[:100]
         if self.taken and not self.day:
-            #make the day
-            from day.models import Day
-            date=self.taken.date()
-            qq=date
-            try:
-                day=Day.objects.filter(date=date).get()
-            except Day.DoesNotExist:
-                day=Day(date=date)
-                day.save()
-            #first time through myphoto is null.
-            if self.id:
-                if self.myphoto==False:
-                    #do nothing, don't re-add the day
-                    pass
-                elif self.myphoto:
-                    self.day=day
-            else: #when you are first saved, treat as myphoto.
-                self.day=day
-                self.myphoto=True
+            self.set_day()
         super(Photo, self).save(*args, **kwargs)
+            
+    def set_day(self):
+        #make the day
+        from day.models import Day
+        if not self.taken:
+            log.error('tried to set day but no day set. %s'%(self.id and str(self.id) or 'no id'))
+            return
+        date=self.taken.date()
+        qq=date
+        try:
+            day=Day.objects.filter(date=date).get()
+        except Day.DoesNotExist:
+            day=Day(date=date)
+            day.save()
+        #first time through myphoto is null.
+        if self.id:
+            if self.myphoto==False:
+                #do nothing, don't re-add the day
+                pass
+            elif self.myphoto:
+                self.day=day
+        else: #when you are first saved, treat as myphoto.
+            self.day=day
+            self.myphoto=True
+        
     
     def filename(self):    
         fn=os.path.split(self.fp)[-1]

@@ -336,12 +336,14 @@ def make_safe_tag_name(ss):
 
 def make_safe_filename(fn):
     res = []
+    rawfn,ext=os.path.splitext(fn)
     OKS = ['-', '_', ]
-    fn=fn.replace('_','-').replace('\'','-')
-    for c in fn:
-        if c.isalnum() or c in OKS:
-            res.append(c)
-    return ''.join(res)
+    rawfn=rawfn.replace('_','-').replace('\'','-')
+    for c in rawfn:
+        if c.isalnum() or c in OKS:res.append(c)
+    newfn=''.join(res)
+    res=newfn+ext
+    return res
 
 from django.contrib import admin
 class OverriddenModelAdmin(admin.ModelAdmin):
