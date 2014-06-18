@@ -121,11 +121,12 @@ def get_next_incoming(exclude=None, force_id=None):
             exclude=[]
         elif type(exclude) is not list:
             exclude=[exclude]
-        imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('taken','fp','id',)
-        for img in imgexis:
-            if img.file_exists():
-                log.info('returning img %s', img)
-                return img
+        if 0:
+            imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('taken','fp','id',)
+            for img in imgexis:
+                if img.file_exists():
+                    log.info('returning img %s', img)
+                    return img
         #no IMG ones, so return
         exis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True)
         #exis=exis.order_by('-day__date','-id','taken','created','modified','id')
