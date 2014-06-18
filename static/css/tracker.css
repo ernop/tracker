@@ -5,7 +5,7 @@ font-size}
 .notification-zone{display:inline-block;height:120px;width:230px;}
 .ajax-notification-zone{display:inline-block;height:40px;width:230px;}
 
-.footer{position:fixed; bottom:100px;right:100px;}
+.footer{position:fixed; bottom:5px;right:5px;}
 
 .textarea{
     width:610px;

@@ -121,7 +121,7 @@ def get_next_incoming(exclude=None, force_id=None):
             exclude=[]
         elif type(exclude) is not list:
             exclude=[exclude]
-        if 0:
+        if 1:
             imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True).filter(fp__icontains='img').order_by('taken','fp','id',)
             for img in imgexis:
                 if img.file_exists():
