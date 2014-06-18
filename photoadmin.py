@@ -28,7 +28,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     #list_editable=['note',]
     search_fields= ['name']
     list_per_page=100
-    date_hierarchy='taken'
+    date_hierarchy='photo_created'
     
     actions=['undoable_delete','not_myphoto','delete_file',
              'undelete','reinitialize','force_recreate_thumbs',
