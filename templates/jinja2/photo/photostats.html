@@ -5,6 +5,12 @@
 
 {% block content %}
 <table class="table">
+    <tr><td>total photos<td>{{totalphotos}}
+    <tr><td>total incoming<td>{{totalincoming}}
+    <tr><td>total done<td>{{totaldone}}
+    <tr><td>total deleted<td>{{totaldeleted}}
+</table>
+<table class="table">
 <tr><td>
 {% for key in res.keys() %}
     <td>{{key}}
