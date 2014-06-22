@@ -32,6 +32,7 @@ urlpatterns = patterns('',
     url(r'^recent_connections/$','tracker.day.views.recent_connections',name='recent_connections'),
     url(r'^month_connections/$','tracker.day.views.month_connections',name='month_connections'),
     url(r'^initial_annual/$','tracker.day.views.initial_annual',name='initial_annual'),
+    url(r'^anon_annual/$','tracker.day.views.anon_annual',name='anon_annual'),
 
     #-------------------------------------------AJAX-------------------------------------------
 

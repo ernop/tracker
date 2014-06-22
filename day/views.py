@@ -302,11 +302,20 @@ def month_connections(request, exclude_disabled=False):
     now=datetime.datetime.today().date()
     return people_connections(request, since=now-datetime.timedelta(days=30), exclude_disabled=True)
 
+
+
 @login_required
 def initial_annual(request):
     now=datetime.datetime.today().date()
     yearago=datetime.date(month=now.month,day=now.day,year=now.year-1)
     return people_connections(request,detail_level='initials',since=yearago)
+
+@login_required
+def anon_annual(request):
+    now=datetime.datetime.today().date()
+    yearago=datetime.date(month=now.month,day=now.day,year=now.year-1)
+    return people_connections(request,detail_level='anon',since=yearago)
+
 
 @login_required
 def people_connections(request, exclude_disabled=False, since=None,detail_level=None):
