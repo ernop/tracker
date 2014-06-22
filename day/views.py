@@ -403,7 +403,7 @@ def person2obj(person, kind=None):
     if kind=='supporting':
         dat['name']=person.initial()
     elif kind=='anon':
-        dat['name']='?'
+        dat['name']=''
         dat['gender']=1
     elif kind=='initials':
         dat['name']=person.initial()
