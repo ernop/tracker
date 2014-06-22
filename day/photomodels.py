@@ -492,7 +492,7 @@ class Photo(DayModel):
         dat=[('id',self.clink(text=self.id)),
             ('name',self.name),
             ('hash',self.hash),
-            ('fp',self.fp),
+            ('fn',os.path.split(self.fp)[-1]),
              ]
         if include_image:
             dat.insert(2,('img',self.inhtml(size='thumb',clink=clink,vlink=vlink,ajaxlink=ajaxlink)),)
@@ -558,7 +558,6 @@ class Photo(DayModel):
             return ''
     
     def get_photo_external_link(self,thumb=False):
-        '''will be loaded from django.fuseki.net/static/photopassthrough/<FP>'''
         if thumb:
             exfp='/static/'+'/'.join(self.thumbfp.rsplit('/')[-2:])
         else:
