@@ -72,6 +72,8 @@ def phototag(request,name):
     vals['phototag']=phototag
     return r2r('jinja2/photo/phototag.html',request,vals)
 
+
+@user_passes_test(staff_test)
 def photoset(request,tagset):
     '''show a bunch of photo thumbnails.  clicking one results in a nice fast preloaded display (like photoajax)
     with/without edit options.  along the top are the currently defined tags & links to +1 tag / -1 tag
@@ -394,6 +396,7 @@ def photostats(request):
     vals['totalincoming']=Photo.objects.filter(incoming=True).count()
     return r2r('jinja2/photo/photostats.html',request,vals)
 
+@user_passes_test(staff_test)
 def photodups(request):
     photos=Photo.objects.raw('select id,name,count(*) as ct from photo group by 2 having ct>1 order by ct desc,name')
     done_names=set()
@@ -416,6 +419,7 @@ def photodups(request):
     vals['links']=links
     return r2r('jinja2/photo/photodups.html',request,vals)
 
+@user_passes_test(staff_test)
 def photohashdups(request):
     photos=Photo.objects.raw('select id,hash,count(*) as ct from photo group by 2 having ct>1 order by ct desc,fp')
     done_names=set()
