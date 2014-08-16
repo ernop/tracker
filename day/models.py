@@ -443,10 +443,14 @@ class Person(DayModel):
         return res
     
     def save(self,*args,**kwargs):
-        self.first_name=self.first_name.strip().title()
-        self.last_name=self.last_name.strip().title()
-        self.description=self.description.strip()
-        self.origin=self.origin.strip()
+        if self.first_name:
+            self.first_name=self.first_name.strip().title()
+        if self.last_name:
+            self.last_name=self.last_name.strip().title()
+        if self.description:
+            self.description=self.description.strip()
+        if self.origin:
+            self.origin=self.origin.strip()
         super(Person, self).save(*args, **kwargs)
         
         try:
