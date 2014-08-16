@@ -129,7 +129,7 @@ def photoset(request,tagset):
         addnames.append((','.join(nt),addlinkname))
         jumps.append((rt.name,rt.name))
     vals['photocount']=photos.count()
-    photos=photos[:100]
+    photos=photos[:5000]
     #addnames=[]
     vals['photos']=photos
     #vals['phototags']=[PhotoTag.objects.get(name=name) for name in names]
