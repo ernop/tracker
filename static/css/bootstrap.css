@@ -197,7 +197,8 @@ a:hover {
 .container,
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
-  width: calc(100% - 40px);
+  width: calc(100% - 100px);
+  margin-top:10px;
 }
 
 .span12 {

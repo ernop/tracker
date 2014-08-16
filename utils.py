@@ -423,6 +423,8 @@ def user_passes_test(test_func, login_url=None):
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
+            from django.shortcuts import HttpResponseRedirect
+            from django.conf import settings
             login_scheme, login_netloc = urlparse.urlparse(login_url or
                                                         settings.LOGIN_URL)[:2]
             current_scheme, current_netloc = urlparse.urlparse(path)[:2]

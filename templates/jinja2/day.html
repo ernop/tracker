@@ -20,39 +20,37 @@
 <div class="row">
     <div>
         <h2>{{day.date}} {{day.show_day()}}</h2>
-        <div class="historybox">
-        {% for photo in day.get_photos_for_history(user) %}
-            {% if loop.counter==0%}Today{%endif %}
-            <div class="photolink">{{photo.inhtml(size='thumb')|safe}}</div>
-        {% endfor %}
-        </div>
+        {% set dayphotos = day.get_photos_for_history(user) %}
+        {% if dayphotos %}
+            <div class="historybox">
+            {% for photo in dayphotos %}
+                {% if loop.counter==0%}Today{%endif %}
+                <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
         
         {% for historyday in histories %}
             <div class="historybox">
             <span class="float:left;">{{historyday.vlink(text=historyday.get_history_description(),max_length=True)|safe}}</span>
-            <br>
-            
             {% set show_photos=historyday.get_photos_for_history(user)%}
             {% if show_photos %}
                 {% for photo in show_photos %}
-                    <div class="photolink" style="float:left;">{{photo.inhtml(size='thumb')|safe}}</div>
+                    <div class="photolink" style="float:left;">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
                 {% endfor %}
-                <br>
             {% endif %}
             </div>
         {% endfor %}
     </div>
-    
 </div>
 
-<br>
-<div class="span2">
+<div class="span2" style="float:left;">
     <div class="btn add-note">
         <i class="icon-plus"></i>
     </div>
 </div>
-<hr>
-<div class="notezone">
+<hr style="float:left;clear:both;">
+<div class="notezone" style="float:left;clear:both;display:inline-block;">
 {% for note in notes %}
     {% include "jinja2/noteedit.html" %}
 {% endfor %}
@@ -91,9 +89,11 @@
     </div>
 </div></div>
 
-<div class="row"><div class="span8">
+<div class="row">
+    <h2>Measurement</h2>
+    <div class="span8">
     <table class="table thintable measurement-list">
-        <tr><td colspan=4><h2>Measurement</h2></tr>
+        
     </table>
     <div class="measurement-zone">
         <table class="table"><tr>
@@ -104,7 +104,7 @@
     </div>
 </div></div>
 
-<div class="row"><div>
+<div class="row" style='display:none;'><div>
 <h2>Workouts</h2>
     {% for workout in day.getworkouts() %}
     {{workout.mysets()|safe}}<br>{% endfor %}

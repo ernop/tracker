@@ -287,20 +287,22 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id myinfo myintroduced_to mywith mysources mydomains mypurchases'.split()
+    list_display='id myinfo first_name last_name description origin myintroduced_to mywith mysources mydomains mypurchases'.split()
     list_filter=[GenderFilter, AnyPurchaseFilter,KnownSinceLongAgo, 'met_through']
     date_hierarchy = 'created'
-    #list_editable=[]
+    list_editable=['description','origin','first_name','last_name',]
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
     actions = ['disable','male','female','organization', 'set_longago', 'set_today', 'update_rough_purchase_counts', ]
 
+    def mydescription(self,obj):
+        return '<blockquote>%s</>'%(obj.description or '')
+    
     def update_rough_purchase_counts(self, request, queryset):
         sixmonths = datetime.datetime.now() - datetime.timedelta(days=180)
         for person in Person.objects.all():
-            person.rough_purchase_count = person.purchases.filter(created__gt=sixmonths).count()
-            person.save()
-
+            person.update_purchase_count()
+            
     def set_longago(self, request, queryset):
         for person in queryset:
             person.created = settings.LONG_AGO
@@ -333,11 +335,17 @@ class PersonAdmin(OverriddenModelAdmin):
         else:
             known_since= humanize_date(obj.created)
         met_through=', '.join([p.clink() for p in obj.met_through.all()])
+        
         if obj.disabled:disabled='%sdisabled'%NO_ICON
         else:disabled=''
+        met_at=None
         if obj.purchases.exists():
             latest=obj.purchases.latest('created')
             latest_clink=latest.clink()
+            #if obj.
+            if obj.created>settings.LONG_AGO:
+                #(only if we met him since start of tracking)
+                met_at=obj.purchases.order_by('created')[0].source.clink()
         else:
             latest=''
             latest_clink=None
@@ -350,19 +358,25 @@ class PersonAdmin(OverriddenModelAdmin):
         else:
             latest_dvlink=''
         
-        data=[('name','%s %s'%(obj.first_name,obj.last_name)),
+        data=[('name',obj.name(),),
+              ('origin',obj.origin or ''),
               ('gender',obj.get_gender()),
-            ('known since',known_since),
+              ('known since',known_since),
               ('met through',met_through),
+              ('met at',met_at,),
               ('disabled',disabled),
-              ('birthday','<div class="nb">%s</div>'%obj.birthday),
+              ('birthday',obj.birthday and '<div class="nb">%s</div>'%obj.birthday or ''),
+              ('pcount',obj.rough_purchase_count,),
               ('last purch',latest_clink),
               ('cday',latest_dclink),
               ('vday',latest_dvlink),
               ('taglink', obj.as_tag.exists() and obj.as_tag.get().clink() or ''),
               ]
         if obj.as_tag.exists():
-            photos='<br>'+''.join([p.photo.inhtml(size='thumb') for p in obj.as_tag.get().photos.all()])
+            try:
+                photos='<br>'+''.join([p.photo.inhtml(size='thumb') for p in obj.as_tag.get().photos.all()])
+            except:
+                photos=''
         else:
             photos=''
         tbl=mktable(data,skip_false=True)
@@ -439,7 +453,7 @@ class PersonAdmin(OverriddenModelAdmin):
         data = [r[1] for r in data]
         return mktable(data)
 
-    adminify(myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith)
+    adminify(mydescription,myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith)
 
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name rmb_value symbol mytotal my3months'.split()

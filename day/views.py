@@ -262,6 +262,10 @@ def amonth(request, month):
     vals['saverate']=saverate
     vals['saved']=saved
     vals['projected_saving'] = monthtotal
+    vals['metpeople']=Person.objects.filter(created__lt=end,created__gt=start)
+    for pp in vals['metpeople']:
+        pp.update_purchase_count()
+    vals['metpeople']=vals['metpeople'].order_by('-rough_purchase_count')
     return r2r('jinja2/month.html', request, vals)
 
 def mkinfobox(title, content):

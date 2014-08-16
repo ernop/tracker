@@ -132,7 +132,6 @@ function load(donefunc, only_one){
     }
 }
 
-
 function maybe_show(){
     //console.log('maybe show start')
     if (!showing){
@@ -148,15 +147,16 @@ function show_prev(){
 }
 
 function show_next(going_backwards){
-    if (initial_load_done && loaded_photos.length<23){initial_load_done=false;load();
-    //console.log('restarted load process.')
+    if (initial_load_done && loaded_photos.length<23){
+        initial_load_done=false;
+        load();
+        //console.log('restarted load process.')
     }
     //console.log('show next start')
     next=loaded_photos.shift()
     if (next){
         //console.log('got next',next.id)
         if (current_photo){
-        
             if (going_backwards)
                 {loaded_photos.unshift(current_photo)}   
             else{
@@ -363,6 +363,7 @@ function update_tag_info(tagids){
   settarget.find('a').remove()
   combo=''
   clean_tags=[]
+  META_TAGS=['done','delete','repeat']
   $.each(tagids, function(index,tagid){
     var tag=get_phototag(tagid);
     if (!tag){return}
@@ -370,9 +371,10 @@ function update_tag_info(tagids){
     vtarget.append('<a class="btn" href="/photo/phototag/'+tag.name.replace(/ /g,'_')+'">'+tag.name+'</a> ')
     clean_name=tag.name.replace(' (person)','')
     settarget.append('<a class="btn" href="/photo/photoset/'+clean_name+'">'+tag.name+'</a> ')
-    clean_tags.push(clean_name)
+    if (META_TAGS.indexOf(clean_name)!=-1){
+        clean_tags.push(clean_name)}
   })
-  var alltags=clean_tags.join(',')
+    var alltags=clean_tags.join(',')
   settarget.append('<a class="btn" href="/photo/photoset/'+alltags+'">ALL</a> ')
 }
 

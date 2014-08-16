@@ -377,13 +377,21 @@ class Person(DayModel):
     disabled = models.BooleanField()  #if they're gone forever / probably never meet again, just remove them form most convenience functions.
     gender=models.IntegerField() #1 male 2 female 3 organization 0 undefined
     rough_purchase_count = models.IntegerField(default=0)
-
+    description=models.TextField(blank=True,null=True)
+    origin=models.CharField(max_length=100,blank=True,null=True)
+    
     class Meta:
         db_table='person'
         ordering=['first_name','last_name',]
+        
+    def update_purchase_count(self):
+        self.rough_purchase_count = self.purchases.count()
+        self.save()
 
     def __unicode__(self):
+        return self.name()
         return '%s%s'%(self.first_name, self.last_name and ' %s' % self.last_name)
+    
 
     def short_name(self):
         return self.first_name.title().replace('\'S', '\'s')
@@ -408,11 +416,31 @@ class Person(DayModel):
         res['costs'] = costs
         return res
 
+    
+    def gender_html_class(self):
+        return self.get_gender()
+    
+    #def gender_html_icon(self):
+        #if self.gender==1:return 'male'
+        #if self.gender==2:return 'female'
+        #if self.gender==3:return '<i class='
+        #return ''
+    
     def get_gender(self):
         if self.gender==1:return 'male'
         if self.gender==2:return 'female'
         if self.gender==3:return 'org'
         return 'undef'
+        
+    def name(self):
+        fn=self.first_name or ''
+        res=fn
+        ln=self.last_name or ''
+        if ln=='?':
+            ln=''
+        if ln:
+            res+=' '+ln
+        return res
     
     def save(self,*args,**kwargs):
         super(Person, self).save(*args, **kwargs)

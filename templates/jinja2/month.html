@@ -15,6 +15,17 @@
 <h2>Saved {{saved}}</h3>
 <h3>{{saverate}}% saving</h3>
 
+{% if metpeople %}
+<table class="table thintable">
+    {% for person in metpeople %}
+        {% if loop.index%5==0%}
+            <tr>
+        {% endif %}
+        <td><div class="{{person.gender_html_class()|safe}} person">{{person.clink()|safe}} ({{person.rough_purchase_count}})</div>
+    {% endfor %}
+</table>
+{% endif %}
+
 <table class="table thintable">
 <tr><td style="width:50px;">day<td>tags{% for spot in spots %}<td class="leftborder middle">{{spot.name}}{% endfor %}
 {% for day in days %}
