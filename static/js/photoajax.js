@@ -371,7 +371,7 @@ function update_tag_info(tagids){
     vtarget.append('<a class="btn" href="/photo/phototag/'+tag.name.replace(/ /g,'_')+'">'+tag.name+'</a> ')
     clean_name=tag.name.replace(' (person)','')
     settarget.append('<a class="btn" href="/photo/photoset/'+clean_name+'">'+tag.name+'</a> ')
-    if (META_TAGS.indexOf(clean_name)!=-1){
+    if (META_TAGS.indexOf(clean_name)==-1){
         clean_tags.push(clean_name)}
   })
     var alltags=clean_tags.join(',')
