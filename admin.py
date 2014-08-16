@@ -288,7 +288,7 @@ class DomainAdmin(OverriddenModelAdmin):
 
 class PersonAdmin(OverriddenModelAdmin):
     list_display='id myinfo first_name last_name description origin myintroduced_to mywith mysources mydomains mypurchases'.split()
-    list_filter=['origin',GenderFilter, AnyPurchaseFilter,KnownSinceLongAgo,]
+    list_filter=['origin',GenderFilter, AnyPurchaseFilter,KnownSinceLongAgo,HasPhotoFilter]
     date_hierarchy = 'created'
     list_editable=['description','origin','first_name','last_name',]
     list_per_page = 10

@@ -192,9 +192,23 @@ class NoteHasText(SimpleListFilter):
         elif self.value()=='no':
             return queryset.filter(text='')|queryset.filter(text=None)
 
+class HasPhotoFilter(SimpleListFilter):
+    title = 'Has Photos'
+    parameter_name = 'has_photo'
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'yes'),
+            ('no', 'no'),
+        )
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            return queryset.exclude(as_tag__photos=None)
+        elif self.value()=='no':
+            return queryset.filter(as_tag__photos=None)
+
 class AnyPurchaseFilter(SimpleListFilter):
-    title = 'Any Purchase?'
-    parameter_name = 'any_purchase'
+    title = 'Has Purchase'
+    parameter_name = 'has_purchase'
     def lookups(self, request, model_admin):
         return (
             ('yes', 'yes'),
