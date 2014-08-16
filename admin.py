@@ -391,7 +391,6 @@ class PersonAdmin(OverriddenModelAdmin):
     def myintroduced_to(self, obj):
         return mktable([(p.clink(), ) for p in obj.introduced_to.order_by('first_name', 'last_name')])
 
-    @debu
     def mywith(self, obj):
         counts = {}
         costs = {}
@@ -452,6 +451,18 @@ class PersonAdmin(OverriddenModelAdmin):
         data.sort(key=lambda x:-1*x[0])
         data = [r[1] for r in data]
         return mktable(data)
+
+    
+
+    def get_changelist_form(self, request,**kwargs):
+        class EditForm(forms.ModelForm):
+            class Meta:
+                model=Person
+                widgets={'description':forms.Textarea(attrs={'cols':25,'rows':15}),
+                         'origin':forms.TextInput(attrs={'cols':30}),
+                         'first_name':forms.TextInput(attrs={'cols':30}),
+                         'last_name':forms.TextInput(attrs={'cols':30})}
+        return EditForm
 
     adminify(mydescription,myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith)
 

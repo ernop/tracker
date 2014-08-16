@@ -579,6 +579,10 @@ class PhotoTag(DayModel):
     @classmethod
     def setup_my_person_tag(self,person):
         if PhotoTag.objects.filter(person=person).exists():
+            #edits propagate
+            exitag=PhotoTag.objects.get(person=person)
+            exitag.name=unicode(person)
+            exitag.save()
             return
         tg=PhotoTag(name=unicode(person), person=person)
         tg.save()
