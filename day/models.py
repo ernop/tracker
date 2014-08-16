@@ -443,7 +443,12 @@ class Person(DayModel):
         return res
     
     def save(self,*args,**kwargs):
+        self.first_name=self.first_name.strip()
+        self.last_name=self.last_name.strip()
+        self.description=self.description.strip()
+        self.origin=self.origin.strip()
         super(Person, self).save(*args, **kwargs)
+        
         try:
             from day.photomodels import PhotoTag
             PhotoTag.setup_my_person_tag(self)
