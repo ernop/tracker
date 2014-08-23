@@ -261,7 +261,6 @@ class DomainAdmin(OverriddenModelAdmin):
             #while trying<now:
                 #res2.append((res.get(trying.strftime(DATE), 0)))
                 #trying=datetime.timedelta(days=1)+trying
-            #import ipdb;ipdb.set_trace()
             #res2=[r[0] for r in res2]
             costs= nice_sparkline(results=res2, width=5, height=100)
             #tmp=savetmp(im)
