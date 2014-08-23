@@ -65,6 +65,7 @@ def ajax_get_popular(request):
 
 @user_passes_test(staff_test)
 def ajax_get_measurements(request):
+    #import ipdb;ipdb.set_trace()
     day=request.POST['today']
     day=datetime.datetime.strptime(day, DATE)
     dayobj=Day.objects.get(date=day.date())

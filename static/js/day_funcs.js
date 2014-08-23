@@ -15,8 +15,8 @@ function show_popular_from_product(){
 		type:'POST',
 		url:'/ajax/get_popular/',
 		data:data,
-		dataType:"json",
-		contentType: "application/json; charset=utf-8",
+		//dataType:"json",
+		//contentType: "application/json; charset=utf-8",
 		success:function(data){
 			display_popular(data);
 		},
@@ -37,8 +37,8 @@ function show_popular_from_source(){
 		type:'POST',
 		url:'/ajax/get_popular/',
 		data:data,
-		dataType:"json",
-		contentType: "application/json; charset=utf-8",
+		//dataType:"json",
+		//contentType: "application/json; charset=utf-8",
 		success:function(data){
 			display_popular(data);
 		},
@@ -198,8 +198,8 @@ function submit_purchase(){
 			type:'POST',
 			url:'/ajax/make_purchase/',
 			data:data,
-			dataType:"json",
-			contentType: "application/json; charset=utf-8",
+			//dataType:"json",
+			//contentType: "application/json; charset=utf-8",
 			success:function(data){
 				$('.loading').slideUp();
 				display_purch();
@@ -224,8 +224,8 @@ function submit_measurement(){
 		type:'POST',
 		url:'/ajax/make_measurement/',
 		data:data,
-		dataType:"json",
-		contentType: "application/json; charset=utf-8",
+		//dataType:"json",
+		//contentType: "application/json; charset=utf-8",
 		success:function(data){
 			$('.measurement-loading-zone').find($('.loading')).slideUp();
 			//$('.make-measurement').parent().
@@ -242,8 +242,8 @@ function display_purch(){
 		type:'POST',
 		url:'/ajax/get_purchases/',
 		data:{'today':today},
-		dataType:"json",
-		contentType: "application/json; charset=utf-8",
+		//dataType:"json",
+		//contentType: "application/json; charset=utf-8",
 		success:function(data){
 			var pz=$(".purchase-list");
 			pz.find('.purchase').remove();
@@ -263,8 +263,8 @@ function display_measurement(){
 		type:'POST',
 		url:'/ajax/get_measurements/',
 		data:{'today':today},
-		dataType:"json",
-		contentType: "application/json; charset=utf-8",
+		//dataType:"json",
+		//contentType: "application/json; charset=utf-8",
 		success:function(data){
 			var pz=$(".measurement-list");
 			pz.find('.measurement').remove();
