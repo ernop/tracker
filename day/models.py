@@ -126,6 +126,7 @@ class Day(DayModel):
         '''classified ones on this day exactly'''
         res=[]
         photos=self.photos.exclude(incoming=True).exclude(deleted=True).exclude(tags=None)
+        photos=photos.order_by('photo_created')
         for ph in photos:
             if user:
                 if ph.can_be_seen_by(user):
@@ -138,6 +139,7 @@ class Day(DayModel):
     def get_day_created_photos(self,user=None):
         res=[]
         photos=Photo.objects.filter(day=None,incoming=False,photo_created__day=self.date.day,photo_created__month=self.date.month,photo_created__year=self.date.year)
+        photos=photos.order_by('photo_created')
         for ph in photos:
             if user:
                 if ph.can_be_seen_by(user):
