@@ -1,4 +1,6 @@
 import urllib, urlparse, re, os, ConfigParser, logging, uuid, logging.config, types, datetime, json, calendar,random
+from django.conf import settings
+log=logging.getLogger(__name__)
 
 from django.template import RequestContext
 
@@ -344,48 +346,6 @@ def make_safe_filename(fn):
     newfn=''.join(res)
     res=newfn+ext
     return res
-
-from django.contrib import admin
-class OverriddenModelAdmin(admin.ModelAdmin):
-    """normal, except overrides some widgets."""
-    formfield_overrides = {
-        #models.DateTimeField: {'widget': admin.widgets.AdminDateWidget,},
-        #models.DateField: { 'widget': admin.widgets.AdminDateWidget,},
-        #models.DateTimeField: {'widget': BetterDateWidget,},
-        #models.DateField: { 'widget': BetterDateWidget,},
-    }
-
-    def _media(self):
-        from django.forms import Media
-        js = ("/static/admin/js/core.js","/static/admin/js/admin/RelatedObjectLookups.js",
-              '/static/admin/js/jquery.js',"/static/admin/js/jquery.init.js",
-              "/static/admin/js/actions.js",
-              '/static/admin/js/calendar.js',
-              '/static/admin/js/admin/DateTimeShortcuts.js',
-              '/static/js/jquery-1.7.2.min.js',
-              '/static/js/DjangoAjax.js',
-              '/static/js/jquery.sparkline.min.js',
-              '/static/js/admin_init.js',
-              )
-        #css=('/static/css/select2.css',)
-        med=Media(js=js)
-        return med
-
-    media=property(_media)
-
-    def changelist_view(self, request, extra_context=None):
-        #the way searches work in django is fucking stupid.
-        #when you view by ID and then apply a filter/search it doesn't cancel the previous ID.  so you get no results
-        #and confuse yourself.
-        if request.GET.has_key('id'):
-            #delete id parameter if there are other filters! yes!
-            real_keys = [k for k in request.GET.keys() if k not in getattr(self, 'not_count_filters', [])]
-            if len(real_keys) != 1:
-                q = request.GET.copy()
-                del q['id']
-                request.GET = q
-                request.META['QUERY_STRING'] = request.GET.urlencode()
-        return super(OverriddenModelAdmin,self).changelist_view(request, extra_context=extra_context)
 
 def staff_test(user):
     return user and user.is_authenticated() and (user.is_superuser or user.is_staff)

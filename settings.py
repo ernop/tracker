@@ -30,16 +30,16 @@ TEMPLATE_CONTEXT_PROCESSORS=(
     )
 
 MIDDLEWARE_CLASSES = (
-    'tracker.general_middleware.PatchDebugMiddleware',
+    'general_middleware.PatchDebugMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'tracker.urls'
+ROOT_URLCONF = 'urls'
 
-WSGI_APPLICATION = 'tracker.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -50,8 +50,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'tracker',
-    'tracker.day',
+    'day',
     'django_extensions',
 )
 
@@ -126,7 +125,8 @@ JINJA2_FILTERS=('filters.ipdbfilter','filters.jsonify')
 
 LOGIN_URL = '/admin/'
 
-#the date you start using this.  everyone/thing from before this date doesn't have accurate time tracking.  and as you fill in old info, just set them to longago so that
+#the date you start using this.  everyone/thing from before this date doesn't have accurate time tracking.  
+#and as you fill in old info, just set them to longago so that
 #time sequence stuff doesn't get messed up if you added it out of order.
 import datetime
 LONG_AGO = datetime.date(year=2012, month=5, day=1)
@@ -138,6 +138,7 @@ assert os.path.exists(DONE_PHOTO_DIR),DONE_PHOTO_DIR
 assert os.path.exists(DELETED_PHOTO_DIR),DELETED_PHOTO_DIR
 assert os.path.exists(DONE_PHOTO_DIR),DONE_PHOTO_DIR
 assert os.path.exists(THUMB_PHOTO_DIR),THUMB_PHOTO_DIR
+
 PHOTO_SCALED=750
 THUMB_HEIGHT=120
 

@@ -6,16 +6,10 @@ from django.conf import settings
 from django.db.models import Sum
 from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 
-#import djangoplus.widgets
-#from spark import *
-LG=[700, 427]
-MED=[340,200]
-SM=[200,100]
 from choices import *
 from trackerutils import *
 from utils import *
 from day.models import *
-#from tracker.utils import adminify, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
 from admin_helpers import *
 
 class PhotoAdmin(OverriddenModelAdmin):

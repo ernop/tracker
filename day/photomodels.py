@@ -199,6 +199,8 @@ class Photo(DayModel):
                              settings.THUMB_HEIGHT,
                              newthumbfp)
         log.info("create thumb doing cmd %s",cmd)
+        if not os.path.exists(self.fp):
+            return False
         try:
             res=os.system(cmd)
         except:

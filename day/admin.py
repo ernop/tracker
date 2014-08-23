@@ -6,8 +6,9 @@ from django.conf import settings
 from django.db.models import Sum
 from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 
-#import djangoplus.widgets
-#from spark import *
+from django.contrib import admin
+admin.autodiscover()
+
 LG=[700, 427]
 MED=[340,200]
 SM=[200,100]
@@ -15,7 +16,6 @@ from choices import *
 from trackerutils import *
 from utils import *
 from day.models import *
-#from tracker.utils import adminify, mk_default_field, nowdate, rstripz, mk_default_fkfield, rstripzb
 from admin_helpers import *
 
 def test_defaults():
@@ -29,6 +29,8 @@ def test_defaults():
 test_defaults()
 
 RMBSYMBOL=Currency.objects.get(id=1).symbol
+linesample = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]
+
 class PurchaseForm(forms.ModelForm):
     who_with=forms.ModelMultipleChoiceField(queryset=Person.objects.all(), widget=FilteredSelectMultiple("name", is_stacked=False), required=False)
     class Meta:
@@ -712,7 +714,7 @@ class WorkoutAdmin(OverriddenModelAdmin):
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
     adminify(mycreated, mysets)
 
-linesample = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]
+
 class MeasuringSpotAdmin(OverriddenModelAdmin):
     list_display='id myname myhistory'.split()
     list_filter=['domain',]
@@ -843,26 +845,8 @@ class NoteKindAdmin(OverriddenModelAdmin):
 
     adminify(mynotes, myvlink)
 
-admin.site.register(Product, ProductAdmin)
-admin.site.register(Domain, DomainAdmin)
-admin.site.register(Purchase, PurchaseAdmin)
-admin.site.register(Source, SourceAdmin)
-admin.site.register(Region, RegionAdmin)
-admin.site.register(Currency, CurrencyAdmin)
-admin.site.register(Person, PersonAdmin)
-admin.site.register(Exercise, ExerciseAdmin)
-admin.site.register(Set, SetAdmin)
-admin.site.register(ExWeight, ExWeightAdmin)
-admin.site.register(Muscle, MuscleAdmin)
-admin.site.register(Workout, WorkoutAdmin)
-admin.site.register(Measurement, MeasurementAdmin)
-admin.site.register(MeasuringSpot, MeasuringSpotAdmin)
 
-admin.site.register(Tag, TagAdmin)
-admin.site.register(Day, DayAdmin)
-admin.site.register(Note, NoteAdmin)
-admin.site.register(NoteKind, NoteKindAdmin)
-#admin.site.register(TagDay, TagDayAdmin)
+
 
 class MSetFormSet(BaseInlineFormSet):
     def get_queryset(self):
@@ -902,7 +886,28 @@ class MeasurementSetAdmin(OverriddenModelAdmin):
     adminify(mydo, mycontains)
 
 
-admin.site.register(MeasurementSet, MeasurementSetAdmin)
 
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Domain, DomainAdmin)
+admin.site.register(Purchase, PurchaseAdmin)
+admin.site.register(Source, SourceAdmin)
+admin.site.register(Region, RegionAdmin)
+admin.site.register(Currency, CurrencyAdmin)
+admin.site.register(Person, PersonAdmin)
+admin.site.register(Exercise, ExerciseAdmin)
+admin.site.register(Set, SetAdmin)
+admin.site.register(ExWeight, ExWeightAdmin)
+admin.site.register(Muscle, MuscleAdmin)
+admin.site.register(Workout, WorkoutAdmin)
+admin.site.register(Measurement, MeasurementAdmin)
+admin.site.register(MeasuringSpot, MeasuringSpotAdmin)
+
+admin.site.register(Tag, TagAdmin)
+admin.site.register(Day, DayAdmin)
+admin.site.register(Note, NoteAdmin)
+admin.site.register(NoteKind, NoteKindAdmin)
+#admin.site.register(TagDay, TagDayAdmin)
+
+admin.site.register(MeasurementSet, MeasurementSetAdmin)
 
 from photoadmin import *
