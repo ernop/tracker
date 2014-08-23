@@ -343,7 +343,7 @@ def people_connections(request, exclude_disabled=False, since=None,detail_level=
 
     for person in people:
         if person.id==ID:
-            import ipdb;ipdb.set_trace()
+            from util import ipdb;ipdb()
         #include them if they've got purch in the last year, or they introduced me to sb in the last year.
         if since and person.created>since :
             #at some point should also include them if they're in a new phototag.
@@ -359,11 +359,11 @@ def people_connections(request, exclude_disabled=False, since=None,detail_level=
         if person.id in newly_created or person.id in purch_existed:
             for from_person in person.met_through.all():
                 if from_person.id==ID:
-                    import ipdb;ipdb.set_trace()
+                    from util import ipdb;ipdb()
                 supporting_linked_ids.add(from_person.id)
     for person in people:
         if person.id==ID:
-            import ipdb;ipdb.set_trace()
+            from util import ipdb;ipdb()
         #ordering matters.  default is supporting, then is purch existed
         #then is newly created in green.
         if person.id in supporting_linked_ids:
@@ -417,7 +417,7 @@ def person2obj(person, kind=None):
         #the default.
         pass
     else:
-        import ipdb;ipdb.set_trace()
+        from util import ipdb;ipdb()
     return dat
 
 @login_required

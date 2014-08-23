@@ -80,7 +80,6 @@ def photoset(request,tagset):
     
     v1 just thumbnails.'''
     vals={}
-    #import ipdb;ipdb.set_trace()
     from urllib import unquote
     names=unquote(unquote(tagset))
     names=names.split(',')
@@ -115,7 +114,6 @@ def photoset(request,tagset):
     photos=photos.distinct()
     photoids=[p.id for p in photos]
     #PhotoHasTag.objects.filter(photo__id__in=photoids)
-    #import ipdb;ipdb.set_trace()
     rel_tags=PhotoTag.objects.filter(photos__photo__id__in=photoids)
     from django.db.models import Count
     rel_tags=rel_tags.annotate(ct=Count('name')).order_by('-ct')
@@ -192,7 +190,7 @@ def photo_passthrough(request, id, thumb=False):
         response=HttpResponse(data, mimetype="Image/webp")
     else:
         log.error('wronge filetype. %s',ext)
-        import ipdb;ipdb.set_trace()
+        from util import ipdb;ipdb()
     response['Cache-Control'] = 'max-age=86400	'
     return response
 
@@ -218,7 +216,7 @@ def ajax_photo_data(request):
                 else:
                     exclude_ids=None
             except Exception,e:
-                import ipdb;ipdb.set_trace()
+                from utils import ipdb;ipdb()
             if 'force id' in todo and todo['force id']:
                 nextphoto=get_next_incoming(force_id=todo['force id'], exclude=exclude_ids)
             else:
@@ -354,7 +352,7 @@ def ajax_photo_data(request):
         
         else:
             log.error('bad k %s',k)
-            import ipdb;ipdb.set_trace()
+            from utils import ipdb;ipdb()
         return r2j(vals)
     except Exception,e:
         vals['success']=False

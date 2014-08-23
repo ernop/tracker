@@ -269,11 +269,11 @@ def ipdb():
         desc = '%s line:%s' % (par[1], [par[2]])
     except:
         log.error('failed to inspect stack.')
-        import ipdb;ipdb.set_trace()
+        from util import ipdb;ipdb()
         desc='failed to inspect stack.'
     if settings.LOCAL:
         log.error('missed ipdb call. %s', desc)
-        import ipdb;ipdb.set_trace()
+        from util import ipdb;ipdb()
     else:
         log.error('missed ipdb call. %s', desc)
 

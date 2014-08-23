@@ -106,7 +106,7 @@ def get_nonexisting_fp(basedir,basefn):
         ii+=1
         if ii>20:
             log.error('timeout.')
-            import ipdb;ipdb.set_trace()
+            from util import ipdb;ipdb()
     return testfp
 
 def get_next_incoming(exclude=None, force_id=None):

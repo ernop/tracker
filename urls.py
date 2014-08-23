@@ -1,5 +1,4 @@
 from django.contrib import admin
-#import ipdb;ipdb.set_trace()
 admin.autodiscover()
 
 import logging
