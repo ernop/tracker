@@ -10,7 +10,7 @@ from django.http import HttpResponseRedirect
 from day.models import *
 
 urlpatterns = patterns('',
-    url(r'^adminx/', include(admin.site.urls),),
+    url(r'^admin/', include(admin.site.urls),),
     url(r'^do_measurementset/$', 'day.views.do_measurementset', name='do_set'),
     url(r'^do_measurementset/(?P<measurementset_id>[0-9]+)/$', 'day.views.do_measurementset', name='do_set_id'),
     url(r'^make_workout','day.views.make_workout',name='make_workout'),
