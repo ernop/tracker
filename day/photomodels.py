@@ -18,8 +18,6 @@ from day.photoutil import *
 
 from choices import *
 
-
-
 class Photo(DayModel):
     ''''''
     created=models.DateTimeField(auto_now_add=True) #photo db object created
@@ -346,16 +344,18 @@ class Photo(DayModel):
         except:
             log.error('bad name. %d',self.id)
         self.name=make_safe_filename(self.name)[:100]
-        if self.taken and not self.day:
-            self.set_day()
+        #no longer set day every single time you save; it is ok to have exif day taken but not a day
+        #day should only be for photos which i took myself
+        #if self.taken and not self.day:
+            #self.set_day()
         super(Photo, self).save(*args, **kwargs)
             
     def set_day(self):
         #make the day
         from day.models import Day
         if not self.taken:
-            log.error('tried to set day but no day set. %s'%(self.id and str(self.id) or 'no id'))
-            return
+            log.error('tried to set day but no taken date set. %s'%(self.id and str(self.id) or 'no id'))
+            return False
         date=self.taken.date()
         qq=date
         try:
@@ -365,14 +365,17 @@ class Photo(DayModel):
             day.save()
         #first time through myphoto is null.
         if self.id:
-            if self.myphoto==False:
+            #if self.myphoto==False:
                 #do nothing, don't re-add the day
-                pass
-            elif self.myphoto:
+                #pass
+            
+            #elif self.myphoto:
                 self.day=day
+                return True
         else: #when you are first saved, treat as myphoto.
             self.day=day
             self.myphoto=True
+            return True
         
     
     def filename(self):    
@@ -470,8 +473,11 @@ class Photo(DayModel):
             dd=''
         if self.day:
             daylink=self.day.vlink()
+            kill_daylink='<div class="btn kill_day_btn">X</div>'
+            daylink+=' '+kill_daylink
         else:
             daylink=None
+        
         dat=(('deleted',dd),
              
              ('day',daylink),

@@ -26,7 +26,15 @@ $(document).ready(function(){
     load_show()
     setup_buttons();
     setup_keynav();
+    
 })
+
+function setup_kill_day(){
+    $('.kill_day_btn').unbind('click')
+    $('.kill_day_btn').click(function(){
+	kill_day();
+    })
+}
 
 function load_show(id){
     //console.log('in load show, calling load')
@@ -39,6 +47,18 @@ function load_show(id){
 function load_one(){
     //console.log('calling load one.')
     load(null, true)}
+
+
+
+function kill_day(restore){
+	//kill the related day for a photo
+	var photo_id=$(".photozone").attr('photo_id')
+	var data={'photo_id':photo_id,kind:'kill day'}
+	if (restore){
+	    data['kind']='restore day'	
+	}
+	send_data(data)
+}
 
 function load(donefunc, only_one){
     if (loaded_photos.length>25){initial_load_done=true;return}
@@ -178,6 +198,7 @@ function show_next(going_backwards){
         reset_photo_tags();
         reset_photospot_select2();
         keynav_active=true
+	setup_kill_day();
     }else{
         notify('no photo was ready',false)
     }

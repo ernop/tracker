@@ -212,6 +212,7 @@ def aday(request, day):
             day=exi[0]
             if day.has_any_history():
                 histories.append(day)
+    #vals['anniversary_photos']=day.get_photos_of_day(user=request.user)
     return r2r('jinja2/day.html', request, vals)
 
 @login_required

@@ -39,6 +39,7 @@ class Currency(DayModel):
         return self.name
     def adm(self):
         return lnk('currency',self.id, self)
+    
 class Day(DayModel):
     date=models.DateField()
     created=models.DateTimeField(auto_now_add=True)
@@ -113,14 +114,16 @@ class Day(DayModel):
             return []
         
     def has_any_history(self):
-        return self.get_photos_for_history() or self.notes.exists()
+        return self.get_day_taken_photos() or self.notes.exists()
 
     def get_history_description(self):
         '''text used on historylink on day.'''
         res=self.__unicode__()+' '+self.show_notekinds()
         return res
     
-    def get_photos_for_history(self,user=None):
+    #def get_photos_for_history(self,user=None):
+    def get_day_taken_photos(self,user=None):
+        '''classified ones on this day exactly'''
         res=[]
         photos=self.photos.exclude(incoming=True).exclude(deleted=True).exclude(tags=None)
         for ph in photos:
@@ -131,6 +134,44 @@ class Day(DayModel):
                 if ph.can_be_seen_by(user=None):
                     res.append(ph)
         return res
+    
+    def get_day_created_photos(self,user=None):
+        res=[]
+        photos=Photo.objects.filter(day=None,incoming=False,photo_created__day=self.date.day,photo_created__month=self.date.month,photo_created__year=self.date.year)
+        for ph in photos:
+            if user:
+                if ph.can_be_seen_by(user):
+                    res.append(ph)
+            else:
+                if ph.can_be_seen_by(user=None):
+                    res.append(ph)
+        return res
+        
+    #def get_photos_of_day(self,user=None):
+        #'''leftover ones without a day assignment'''
+        #'''actually, i should make all the day assigned ones be only for my photo
+        #and all the randomly exif tagged ones from that time should '''
+        #res=[]
+        #photos=Photo.objects.filter(day=None,incoming=False,photo_created__day=self.date.day,photo_created__month=self.date.month)
+        #for ph in photos:
+            #if user:
+                #if ph.can_be_seen_by(user):
+                    #res.append(ph)
+            #else:
+                #if ph.can_be_seen_by(user=None):
+                    #res.append(ph)
+        #return res
+    
+    def get_tags_of_day(self,user=None):
+        photos=self.get_day_created_photos(self,user=user)
+        tags={}
+        for pho in photos:
+            for tag in photo.tags.all():
+                if tag.name not in tags:
+                    tags[tag.name]=0
+                tags[tag.name]+=1
+        return tags
+    
     
     
 class Domain(DayModel):

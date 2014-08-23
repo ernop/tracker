@@ -239,6 +239,22 @@ def ajax_photo_data(request):
                 vals['nextphoto']=nextphoto_js
                 vals['success']=True
                 vals['message']='preloaded %s'%nextphoto.name
+        elif kind=='kill day' or kind=='restore day':
+            '''restore/kill the associated "day" object on a given photo.'''
+            ph=Photo.objects.get(id=todo['photo_id'])
+            vals['success']=True
+            if kind=='kill day':
+                ph.day=None
+                vals['message']='day killed'
+            elif kind=='restore day':
+                daysetres=ph.set_day()
+                if daysetres:
+                    vals['message']='set day.'
+                else:
+                    vals['message']='no day set.'
+                    vals['success']=False
+            ph.save()
+            
         elif kind=='new phototag':
             if 'tagname' in todo and todo['tagname']:
                 name=make_safe_tag_name(todo['tagname'])

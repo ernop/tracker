@@ -3,6 +3,8 @@ function setup_change_describer(){
 	$("#purchase-source").change(show_popular_from_source)
 }
 
+
+
 function show_popular_from_product(){
 	//for the current selection of the product, show the popular prices, sources, hour etc. for quick selection!
 	var thing=$("#purchase-product").select2('data');

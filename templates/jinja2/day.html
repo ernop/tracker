@@ -20,7 +20,7 @@
 <div class="row">
     <div>
         <h2>{{day.date}} {{day.show_day()}}</h2>
-        {% set dayphotos = day.get_photos_for_history(user) %}
+        {% set dayphotos = day.get_day_taken_photos(user) %}
         {% if dayphotos %}
             <div class="historybox">
             {% for photo in dayphotos %}
@@ -33,14 +33,22 @@
         {% for historyday in histories %}
             <div class="historybox">
             <span class="float:left;">{{historyday.vlink(text=historyday.get_history_description(),max_length=True)|safe}}</span>
-            {% set show_photos=historyday.get_photos_for_history(user)%}
-            {% if show_photos %}
-                {% for photo in show_photos %}
-                    <div class="photolink" style="float:left;">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
+            {% set taken_photos=historyday.get_day_taken_photos(user)%}
+            {% if taken_photos%}
+                {% for photo in taken_photos %}
+                    <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
                 {% endfor %}
             {% endif %}
+            {% set created_photos=historyday.get_day_created_photos(user)%}
+            {% if created_photos%}
+                {% for photo in created_photos %}
+                    <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
+                {% endfor %}
+            {% endif %}
+            
             </div>
         {% endfor %}
+
     </div>
 </div>
 
