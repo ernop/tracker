@@ -245,9 +245,11 @@ def ajax_photo_data(request):
             vals['success']=True
             if kind=='kill day':
                 ph.day=None
+                ph.myphoto=False
                 vals['message']='day killed'
             elif kind=='restore day':
                 daysetres=ph.set_day()
+                ph.myphoto=True
                 if daysetres:
                     vals['message']='set day.'
                 else:
