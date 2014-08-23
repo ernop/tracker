@@ -148,8 +148,18 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     search_fields= ['name']
     list_filter=['control_tag', TagHasPersonFilter]
     list_display='id myname myphotos mytags'.split()
-    actions=['reinitialize_tags','create_people_tags','redo_classification']
+    actions=['reinitialize_tags','create_people_tags','redo_classification','kill_all_days',]
     
+    def kill_all_days(self,request,queryset):
+        for ptag in queryset:
+            photos=ptag.photos.all()
+            for ph in photos:
+                if ph.photo.day:
+                    dd=ph.photo
+                    dd.day=None
+                    dd.save()
+            messages.info(request,'killed all days for related %d photos for %s'%(ptag.photos.count(),ptag))
+        
     def redo_classification(self,request,queryset):
         for phototag in queryset:
             for photo in Photo.objects.filter(tags__tag=phototag):
