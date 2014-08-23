@@ -28,7 +28,7 @@ class PhotoAdmin(OverriddenModelAdmin):
              'undelete','reinitialize','force_recreate_thumbs',
              'autoorient','redo_classification','kill_entry',
              'unlink_from_day','rename_name']
-    actions.extend(['remove_photospot','rehash','merge_photos_lowest_id','check_thumbs',])
+    actions.extend(['remove_photospot','remove_day','rehash','merge_photos_lowest_id','check_thumbs',])
     actions.sort()
     
     def rename_name(self, request, queryset):
@@ -84,6 +84,12 @@ class PhotoAdmin(OverriddenModelAdmin):
     def autoorient(self,request,queryset):
         for photo in queryset:
             photo.autoorient()
+    
+    
+    def remove_day(self,request,queryset):
+        for ph in queryset:
+            ph.day=None
+            ph.save()
     
     def kill_entry(self,request,queryset):
         for photo in queryset:
@@ -223,10 +229,12 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         return mktable(res2,nb=True)
         
     def myname(self,obj):
+        have_day_count=(obj.photos.exclude(photo__day=None).count())
         data=(('vlink',obj.vlink()),
               ('use count',obj.use_count),
               ('person clink',obj.person and '%s'%(obj.person.clink()) or ''),
               ('photoset','<a href="/photo/photoset/%s/">%s</a>'%(obj.name,obj.name)),
+              ('have day','<a href="../photo/?has_taken_day=yes&tagged_with=%d">have day (%d)</a>'%(obj.id,have_day_count)),
               )
         return mktable(data)
         
