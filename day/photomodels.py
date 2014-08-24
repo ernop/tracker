@@ -57,7 +57,6 @@ class Photo(DayModel):
     class Meta:
         db_table='photo'
 
-
     def file_exists(self):
         if not self.fp:
             log.error('image missing fp, hard deleting obj. %s',fp)
@@ -66,11 +65,14 @@ class Photo(DayModel):
             return False
         res=os.path.exists(self.fp)
         if not res:
-            log.error('fp not exist. hard deleting. %d %s',self.id,self.fp)
+            if settings.LOCAL:
+                print 'del',self
+            else:
+                log.error('fp not exist. hard deleting. %s %s',self.id and str(self.id) or 'already deleted',self.fp)
             self.kill_thumb()
             self.delete()
             return False            
-        return res
+        return True
     
     def kill_this(self):
         log.info('killing this. %s',self)
