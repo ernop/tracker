@@ -51,13 +51,13 @@ function load_one(){
 
 
 function kill_day(restore){
-	//kill the related day for a photo
-	var photo_id=$(".photozone").attr('photo_id')
-	var data={'photo_id':photo_id,kind:'kill day'}
-	if (restore){
-	    data['kind']='restore day'	
-	}
-	send_data(data)
+    //kill the related day for a photo
+    var photo_id=$(".photozone").attr('photo_id')
+    var data={'photo_id':photo_id,kind:'kill day'}
+    if (restore){
+	data['kind']='restore day'	
+    }
+    send_data(data)
 }
 
 function load(donefunc, only_one){
@@ -79,7 +79,8 @@ function load(donefunc, only_one){
         $.each(loaded_photos, function(index,guy){exclude_ids.push(guy.id)})
         $.each(past_photos, function(index,guy){exclude_ids.push(guy.id)})
         if (current_photo){
-            exclude_ids.push(current_photo.id)
+	    if (exclude_ids.indexOf(current_photo.id)==-1)
+                {exclude_ids.push(current_photo.id)}
         }
         if (!exclude_ids){exclude_ids=null}
         var dat={'kind':'ajax photo preload','smithee':'blather'}
