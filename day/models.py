@@ -114,7 +114,7 @@ class Day(DayModel):
             return []
         
     def has_any_history(self):
-        return self.get_day_taken_photos() or self.notes.exists()
+        return self.get_day_taken_photos() or self.notes.exists() or self.get_day_created_photos()
 
     def get_history_description(self):
         '''text used on historylink on day.'''
