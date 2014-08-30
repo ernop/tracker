@@ -525,12 +525,10 @@ def two_sig(n):
 
         
 def get_span_created_photos(start, end, user=None):
-    
     res=[]
     from day.photomodels import Photo
     photos=Photo.objects.filter(deleted=False, incoming=False, photo_created__gte=start, photo_created__lt=end)
-    photos=Photo.objects.all()[:300]
-    #photos=photos.order_by('photo_created')
+    photos=photos.order_by('photo_created')
     for ph in photos:
         if user:
             if ph.can_be_seen_by(user):
