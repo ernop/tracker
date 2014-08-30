@@ -160,7 +160,8 @@ class ProductAdmin(OverriddenModelAdmin):
 
 class PurchaseAdmin(OverriddenModelAdmin):
     list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
-    list_filter=' product__domain currency source who_with'.split()
+    list_filter='product__domain currency source who_with'.split()
+    list_filter.insert(0,LastWeekPurchaseFilter)
     date_hierarchy='created'
     list_editable=['note',]
     search_fields= ['product__name']

@@ -1,8 +1,11 @@
 .historybox{border:2px solid steelblue;
 border-radius:4px;margin:2px;display:inline-block;padding:2px;
 float:left;clear:both;
-width:100%;
 }
+.saved-day-box{
+clear:both;
+}
+
 .purchase-zone .table td {padding:3px;}
 
 .purchase-zone table td:first-child{

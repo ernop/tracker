@@ -165,6 +165,7 @@ class OverriddenModelAdmin(admin.ModelAdmin):
             if request.GET and 'q' in request.GET:
                 desc = ('Searching for', "\"%s\"" % request.GET['q'], make_untoggle_link(request, 'q'))
                 filter_descriptions.append(desc)
+            #import ipdb;ipdb.set_trace()
             request.filter_descriptions = filter_descriptions
         sup=super(OverriddenModelAdmin,self)
         return sup.changelist_view(request, extra_context=extra_context)
@@ -426,6 +427,20 @@ class KnownSinceLongAgo(SimpleListFilter):
             return queryset.filter(created=settings.LONG_AGO)
         elif self.value()=='no':
             return queryset.exclude(created=settings.LONG_AGO)
+
+class LastWeekPurchaseFilter(SimpleListFilter):
+    title = 'Last Week'
+    parameter_name = 'lastweek'
+    def lookups(self, request, model_admin):
+        return (
+            ('no', 'no'),
+            ('yes', 'yes'),
+        )
+    def queryset(self, request, queryset):
+        if self.value()=='yes':
+            weekago=(datetime.datetime.now()-datetime.timedelta(days=7)).date()
+            weekago=datetime.datetime(year=weekago.year,month=weekago.month,day=weekago.day,hour=0,minute=0)
+            return queryset.filter(created__gt=weekago)
 
 class GenderFilter(SimpleListFilter):
     title = 'gender'

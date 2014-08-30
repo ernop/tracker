@@ -40,12 +40,14 @@
                 {% endfor %}
             {% endif %}
             </div>
-            {% set created_photos=historyday.get_day_created_photos(user)%}
-            {% if created_photos%}
-                {% for photo in created_photos %}
-                    <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
-                {% endfor %}
-            {% endif %}
+            <div class="saved-day-box">
+                {% set created_photos=historyday.get_day_created_photos(user)%}
+                {% if created_photos%}
+                    {% for photo in created_photos %}
+                        <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
         {% endfor %}
 
     </div>
