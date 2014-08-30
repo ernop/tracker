@@ -267,6 +267,7 @@ def amonth(request, month):
     for pp in vals['metpeople']:
         pp.update_purchase_count()
     vals['metpeople']=vals['metpeople'].order_by('-rough_purchase_count')
+    vals['span_tags']=get_span_tags(start,end,user=request.user)
     return r2r('jinja2/month.html', request, vals)
 
 def mkinfobox(title, content):

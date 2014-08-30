@@ -523,3 +523,36 @@ def two_sig(n):
         ct+=1
     return round(orign,-1*(ct-2))
 
+        
+def get_span_created_photos(start, end, user=None):
+    
+    res=[]
+    from day.photomodels import Photo
+    photos=Photo.objects.filter(deleted=False, incoming=False, photo_created__gte=start, photo_created__lt=end)
+    photos=Photo.objects.all()[:300]
+    #photos=photos.order_by('photo_created')
+    for ph in photos:
+        if user:
+            if ph.can_be_seen_by(user):
+                res.append(ph)
+        else:
+            if ph.can_be_seen_by(user=None):
+                res.append(ph)
+    return res
+    
+def get_span_tags(start, end, user=None):
+    photos=get_span_created_photos(start, end,user=user)
+    tag_counts={}
+    for photo in photos:
+        tags=photo.tags.all()
+        for tag in tags:
+            if tag.tag.name in settings.EXCLUDE_FROM_PHOTOSET_TAGS:
+                continue
+            name=tag.tag.name
+            if tag.tag not in tag_counts:
+                tag_counts[tag.tag]=0
+            tag_counts[tag.tag]+=1
+            #tag_counts[tag]=tag_counts.get(tag,0)+1
+    res=sorted(tag_counts.items(),key=lambda x:(-1*x[1]))
+    res=[s for s in res if s[1]>2]
+    return res

@@ -437,9 +437,10 @@ class LastWeekPurchaseFilter(SimpleListFilter):
         )
     def queryset(self, request, queryset):
         if self.value()=='yes':
-            weekago=(datetime.datetime.now()-datetime.timedelta(days=7)).date()
+            now=datetime.datetime.now()
+            weekago=(now-datetime.timedelta(days=7)).date()
             weekago=datetime.datetime(year=weekago.year,month=weekago.month,day=weekago.day,hour=0,minute=0)
-            return queryset.filter(created__gt=weekago).order_by('-created')
+            return queryset.filter(created__gt=weekago).filter(created__lt=now).order_by('-created')
 
 class GenderFilter(SimpleListFilter):
     title = 'gender'

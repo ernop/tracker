@@ -148,6 +148,7 @@ class Day(DayModel):
                 if ph.can_be_seen_by(user=None):
                     res.append(ph)
         return res
+     
         
     #def get_photos_of_day(self,user=None):
         #'''leftover ones without a day assignment'''
