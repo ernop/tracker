@@ -138,7 +138,7 @@ class Day(DayModel):
     
     def get_day_created_photos(self,user=None):
         res=[]
-        photos=Photo.objects.filter(day=None,incoming=False,photo_created__day=self.date.day,photo_created__month=self.date.month,photo_created__year=self.date.year)
+        photos=Photo.objects.filter(day=None,deleted=False,incoming=False,photo_created__day=self.date.day,photo_created__month=self.date.month,photo_created__year=self.date.year)
         photos=photos.order_by('photo_created')
         for ph in photos:
             if user:
