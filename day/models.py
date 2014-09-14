@@ -95,6 +95,18 @@ class Day(DayModel):
                 nks[nk.name] = nks.get(nk.name, 0) + 1
         return sorted(nks.items(), key=lambda x:x[0])
 
+    def get_purchases(self):
+        plusone=datetime.timedelta(days=1)+self.date
+        purchases=Purchase.objects.filter(created__gte=self.date,created__lt=plusone)
+        return purchases
+    
+    def total_spend(self):
+        purchs=self.get_purchases()
+        total=0
+        for purch in purchs:
+            total+=purch.get_cost()
+        return total
+
     def getmeasurements(self):
         try:
             from day.models import Measurement
