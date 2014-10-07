@@ -23,7 +23,7 @@ class DayModel(models.Model):
         if skip_btn:
             klass=''
         else:
-            klass='btn'
+            klass='btn btn-default'
         if wrap:
             wrap=' nb'
         else:

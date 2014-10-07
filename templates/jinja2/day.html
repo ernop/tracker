@@ -2,6 +2,8 @@
 {% block title %}{{day}}{% endblock %}
 {% block head %}
     {{super()}}
+    <script src='/static/js/day_funcs.js'></script>
+    <script src='/static/js/day.js'></script>
     <script>
         var today={{today|jsonify|safe}};
         var notekinds={{notekinds|jsonify|safe}};
@@ -63,7 +65,7 @@
 </div>
 
 <div class="span2" style="float:left;">
-    <div class="btn add-note">
+    <div class="btn btn-default add-note">
         <span class="glyphicon glyphicon-plus"></span>
     </div>
 </div>
@@ -97,7 +99,7 @@
         <tr><td>note<td><input type=text id=purchase-note style="width:180px;"></input>
         <tr><td>currency<td><input type=text id=purchase-currency style="width:190px;"></input>
         <tr><td>size<td><input type=text id=purchase-size  style="width:180px;"></input>
-        <tr><td><div class="btn make-purchase">Save</div>
+        <tr><td><div class="btn btn-default make-purchase">Save</div>
         <td>
         
         
@@ -113,7 +115,7 @@
     <div class="measurement-zone">
         <table class="table"><tr>
         <tr><td><input  id="measurement-spot" style="width:190px;"></input><td><input type=text id="measurement-amount" style="width:190px;"></input>
-        <tr><td><div class="btn make-measurement">Save</div><td><div class="measurement-loading-zone">&nbsp;</div>
+        <tr><td><div class="btn btn-default make-measurement">Save</div><td><div class="measurement-loading-zone">&nbsp;</div>
         <tr><td><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/measurement/add"><span class="glyphicon glyphicon-plus"></span>new</a>
         </table>
     </div>

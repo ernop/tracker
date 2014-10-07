@@ -478,7 +478,7 @@ class Photo(DayModel):
             dd=''
         if self.day:
             daylink=self.day.vlink()
-            kill_daylink='<div class="btn kill_day_btn">X</div>'
+            kill_daylink='<div class="btn btn-default kill_day_btn">X</div>'
             daylink+=' '+kill_daylink
         else:
             daylink=None

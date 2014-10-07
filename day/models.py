@@ -105,7 +105,7 @@ class Day(DayModel):
             extra_style='width:inherit;'
         else:
             extra_style=''
-        return '<a style="%s" class="stdbtn btn nb" href="/aday/%s/">%s</a>'%(extra_style,str(self.date), text)
+        return '<a style="%s" class="stdbtn btn btn-default nb" href="/aday/%s/">%s</a>'%(extra_style,str(self.date), text)
 
     def show_day(self):
         return datetime.datetime.strftime(self.date, '%A')

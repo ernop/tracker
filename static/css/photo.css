@@ -4,7 +4,7 @@ div {box-sizing:border-box;}
 .photospot-photolink {border:3px solid steelblue;border-radius:3px;padding:1px;display:inline-block;margin-bottom;1px;}
 .photospot-active-photo{border:3px dashed red;}
 .photo-info{float:right;}
-.big{font-size:2em;}
+/*.big{font-size:2em;}*/
 .photofooter{position:fixed; bottom:120px;left:10px;height:90px;width:100px;}
 
 .infozone{width:280px;float:right;display:inline-block;overflow:hidden;clear:both;}

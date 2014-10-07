@@ -71,7 +71,7 @@ hr {margin:3px;}
 	float:left;
 }
 
-.big{font-size:1.3em;}
+.big{font-size:1.2em;}
 .thintable .right{text-align:right;}
 .thintable .middle{text-align:center;vertical-align:middle;}
 
@@ -79,7 +79,8 @@ hr {margin:3px;}
 .thintable .leftborder{border-left:2px dotted grey;}
 .thintable td {padding:3px;}
 
-.stdbtn{width:100px;}
+.stdbtn{width:100px;
+text-align:left;}
 
 
 
