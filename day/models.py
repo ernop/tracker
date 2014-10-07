@@ -73,7 +73,26 @@ class Day(DayModel):
             newmonth = newmonth % 12
         return str(datetime.date(newyear, day=tt.day, month=newmonth))
 
+    def hoverblock(self):
+        '''for each note, make a hover button for quick viewing when the day is referenced (as part of history, or month)'''
+        '''<span class="float:left;">{{historyday.vlink(text=historyday.get_history_description(),max_length=True)|safe}}</span>'''
+        basic_link=self.vlink()
+        notes=self.notes.all()
+        text_notes=[]
+        import urllib2
+        for note in notes:
+            kinds=','.join([k.name for k in note.kinds.all()])
+            content=urllib2.quote(note.text)
+            val='<div class="hoverable hover-note" data-title="%s" data-content="%s">%s</div>'%(kinds,content,kinds)
+            text_notes.append(val)
+        notes_combined=' | '.join(text_notes)
+        return basic_link+notes_combined
+
+    def hover_note_vlink(self,text=None):
+        '''vlink but with a popover showing text.'''
+
     def vlink(self, text=None,max_length=False):
+        '''<span class="float:left;">{{historyday.vlink(text=historyday.get_history_description(),max_length=True)|safe}}</span>'''
         if not text:
             text=str(self.date)+' '+datetime.datetime.strftime(self.date, '%a')
         if max_length:

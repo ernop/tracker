@@ -1,0 +1,3 @@
+fix login redirection
+hover-read for older text bits
+fix graph representations - make some automatically week-wide bar graphs?

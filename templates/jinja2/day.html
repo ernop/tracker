@@ -32,7 +32,7 @@
         
         {% for historyday in histories %}
             <div class="historybox">
-            <span class="float:left;">{{historyday.vlink(text=historyday.get_history_description(),max_length=True)|safe}}</span>
+            <span class="float:left;">{{historyday.hoverblock()|safe}}</span>
             {% set taken_photos=historyday.get_day_taken_photos(user)%}
             {% if taken_photos%}
                 {% for photo in taken_photos %}
