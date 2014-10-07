@@ -427,10 +427,8 @@ class Note(DayModel):
     def nkids(self):
         return ','.join([str(n.id) for n in self.kinds.all()])
 
-    def getheight(self):
-        return (self.text and len(self.text)/4+80) or '250'
-
-
+    def get_height(self):
+        return (self.text and len(self.text)/6+80) or '250'
 
 class NoteKind(DayModel):
     name=models.CharField(max_length=100)
@@ -460,6 +458,18 @@ class Person(DayModel):
     rough_purchase_count = models.IntegerField(default=0)
     description=models.TextField(blank=True,null=True)
     origin=models.CharField(max_length=100,blank=True,null=True)
+    
+    
+    def colored_clink(self,newperson=False):
+        genderklass=self.gender_html_class()
+        klass=genderklass
+        text=self
+        #raw_link=super(self,Person).clink(*args,**kwa
+        #kind of annoying we can't really modify the returned html text as an element very well.
+        if newperson:
+            klass+=' new-person'
+        link='<a class="%s btn btn-default" href="%s/day/person/?id=%d">%s</a>'%(klass, settings.ADMIN_EXTERNAL_BASE, self.id, text)
+        return link
     
     class Meta:
         db_table='person'

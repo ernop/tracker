@@ -479,7 +479,7 @@ def insert_defaults():
                 otherperson=Person.objects.get(id=name2id[personname])
                 pp.met_through.add(otherperson)
     for name,dname in settings.DEFAULT_PRODUCTS:
-        print name,dname
+        #print name,dname
         pp=Product(name=name, domain=Domain.objects.get(name=dname))
         pp.save()
     for name in settings.DEFAULT_PHOTOTAGS:

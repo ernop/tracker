@@ -1,5 +1,5 @@
 <div class="note-row" note_id="{{note.id}}">
-    <textarea class="textarea" id="note" style="float:left;height:{{note.getheight()}}px;">{{note.text or ''|safe}}</textarea>
+    <textarea class="textarea" id="note" style="float:left;height:{{note.get_height()}}px;">{{note.text or ''|safe}}</textarea>
     <span class="notekindzone{% for kind in note.kinds.all() %} notekind-{{kind.id}}{% endfor %}">   
         <div class="notekind-available"></div>
         <button class="notekindselect new" value="{{note.nkids()}}"></button>

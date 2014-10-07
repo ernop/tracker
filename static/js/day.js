@@ -177,10 +177,11 @@ function send_data(data, target){
 }
 
 function add_note(){
-    var newrow=$('#notemodel').clone().removeAttr('id');
-    $(".notezone").prepend(newrow);
-    newrow.show();
-    newrow.find('.notekindselect').addClass('new');
+    var newouter=$('#notemodel').clone().removeAttr('id');
+    var innerrow=newouter.find('.note-row')
+    $(".notezone").prepend(newouter);
+    newouter.show();
+    newouter.find('.notekindselect').addClass('new');
     setup_nkselect();
     setup_textarea();
     setup_savebutton();

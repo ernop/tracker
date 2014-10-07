@@ -19,11 +19,13 @@ class DayModel(models.Model):
     
     #should add default modified & created here.
 
-    def clink(self, text=None,wrap=True,skip_btn=False):
+    def clink(self, text=None,wrap=True,skip_btn=False,klasses=None):
         if skip_btn:
             klass=''
         else:
             klass='btn btn-default'
+        if klasses:
+            klass+=' '.join(klasses)
         if wrap:
             wrap=' nb'
         else:

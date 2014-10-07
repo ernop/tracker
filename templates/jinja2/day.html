@@ -22,7 +22,7 @@
     <style>.container{width:90%;}
     .popover{max-width:500px;}
     .popover-content{18px;}
-    .note-outline{display:inline-block;width:90%;padding:10px;}
+    .note-outline{display:inline-block;width:90%;padding-bottom:18px;}
     .notekindzone{margin-left:15px;display:inline-block;}
     </style>
 {% endblock %}
@@ -65,12 +65,12 @@
 </div>
 
 <div class="span2" style="float:left;">
-    <div class="btn btn-default add-note">
+    <div class="add-note">
         <span class="glyphicon glyphicon-plus"></span>
     </div>
 </div>
-<br>
-<div>
+<br><br>
+<div class="notezone">
 {% for note in notes %}<br>
     <div class="note-outline">{% include "jinja2/noteedit.html" %}</div>
 {% endfor %}
@@ -128,15 +128,14 @@
     <a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/day/add"><span class="glyphicon glyphicon-plus"></span> new</a><br>
 </div></div>
 
-<div id="notemodel" class="note-row" note_id="new" style="display:none;">
-        <span class="note note-2">
-            <textarea class="textarea" id="note" note_id="new"></textarea>
-        </span>
-        <div class="notekindzone">
-            <span class="notekind-available"></span>
+<div id="notemodel" class="note-outline" style="display:none;">
+    <div class="note-row" note_id="new" >
+            <textarea class="textarea" id="note" note_id="new" style="float:left;height:100px;"></textarea>
+            <div class="notekindzone">
+                <div class="notekind-available"></div>
                 <button class="notekindselect" value=""></button>
-            </span>
-        </div>
+            </div>
+    </div>
 </div>
 
 <div class="notification fixed-notification">

@@ -264,10 +264,19 @@ def amonth(request, month):
     vals['saverate']=saverate
     vals['saved']=saved
     vals['projected_saving'] = monthtotal
+    #import ipdb;ipdb.set_trace()
     vals['metpeople']=Person.objects.filter(created__lt=end,created__gt=start)
-    for pp in vals['metpeople']:
+    vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gt=start)
+    vals['monthpeople']=vals['monthpeople']|vals['metpeople']
+    vals['monthpeople']=vals['monthpeople'].distinct().order_by('-rough_purchase_count')
+    for pp in vals['monthpeople']:
         pp.update_purchase_count()
-    vals['metpeople']=vals['metpeople'].order_by('-rough_purchase_count')
+    for pp in vals['monthpeople']:
+        if pp in vals['metpeople']:
+            pp.newperson=True
+        else:
+            pp.newperson=False
+    #import ipdb;ipdb.set_trace()
     vals['span_tags']=get_span_tags(start,end,user=request.user)
     return r2r('jinja2/month.html', request, vals)
 

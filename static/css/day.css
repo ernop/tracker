@@ -14,8 +14,13 @@ clear:both;
     font-weight:700;
     vertical-align:middle;
     padding-right:6px;
+    width:120px;
 }
 
 .purchase-zone td input {margin-bottom:0;}
 
 .hover-zone{display:inline-block;}
+
+.new-person{border:3px solid rgb(51, 170, 51);}
+.male{background:rgb(173, 216, 230);}
+.female{background:rgb(255, 192, 203);}
