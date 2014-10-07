@@ -22,7 +22,7 @@
 {% if metpeople %}
 <table class="table thintable">
     {% for person in monthpeople %}
-        <td>{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.rough_purchase_count}})
+        <td>{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}})
         {% if loop.index%4==0 %}
             <tr>
         {% endif %}

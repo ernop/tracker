@@ -470,7 +470,7 @@ class Person(DayModel):
         #kind of annoying we can't really modify the returned html text as an element very well.
         if newperson:
             klass+=' new-person'
-        link='<a class="%s btn btn-default" href="%s/day/person/?id=%d">%s</a>'%(klass, settings.ADMIN_EXTERNAL_BASE, self.id, text)
+        link=u'<a class="%s btn btn-default" href="%s/day/person/?id=%d">%s</a>'%(klass, settings.ADMIN_EXTERNAL_BASE, self.id, unicode(text))
         return link
     
     class Meta:

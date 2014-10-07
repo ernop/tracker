@@ -5614,6 +5614,8 @@ button.close {
 .popover-content {
   padding: 9px 14px;
   white-space:pre-wrap;
+  line-height:18px;
+  font-size:16px;
 }
 .popover > .arrow,
 .popover > .arrow:after {
