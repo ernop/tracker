@@ -55,7 +55,7 @@
     <table class="table admintable" style="width:inherit;">
       <tr><td style="border:0;"><h3>Current Filters:</h3>
       {% for desc,val,untoggle in request.filter_descriptions%}
-        <td style="border:0;"><div style="margin-left:5px;padding:4px;display:inline-block;border-radius:6px;border:1px solid lightgrey;">{{desc}} = {{val|safe}}<div class="btn" style="margin-left:12px;">{{untoggle|safe}}</div></div></td>
+        <td style="border:0;"><div style="margin-left:5px;padding:4px;display:inline-block;border-radius:6px;border:1px solid lightgrey;">{{desc}} = {{val|safe}}<div class="btn btn-default" style="margin-left:12px;">{{untoggle|safe}}</div></div></td>
       {% endfor %}
       </tr>
     </table>

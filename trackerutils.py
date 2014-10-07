@@ -39,7 +39,7 @@ class DayModel(models.Model):
             wrap=''
         if not text:
             text=self
-        return u'<a class="btn" href="%s/day/%s/%d/">%s</a>'%(wrap,settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+        return u'<a class="btn btn-default" href="%s/day/%s/%d/">%s</a>'%(wrap,settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
 
     class Meta:
         app_label='day'

@@ -17,3 +17,5 @@ clear:both;
 }
 
 .purchase-zone td input {margin-bottom:0;}
+
+.hover-zone{display:inline-block;}

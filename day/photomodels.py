@@ -645,7 +645,7 @@ class PhotoTag(DayModel):
                 text=self.name
             else:
                 text='no name phototag'
-        return '<a class="btn" href="/photo/phototag/%s/">%s</a>'%(self.name, text)
+        return '<a class="btn btn-default" href="/photo/phototag/%s/">%s</a>'%(self.name, text)
 
 
         #
@@ -654,7 +654,7 @@ class PhotoTag(DayModel):
     def photosetlink(self,text=None):
         if not text:
             text=self.name
-        return '<a class="btn" href="/photo/photoset/%s/">%s</a>'%(self.name,text)
+        return '<a class="btn btn-default" href="/photo/photoset/%s/">%s</a>'%(self.name,text)
     
     def history_sparkline(self):
         #photos=Photo.objects.filter(tags__tag=obj)
@@ -711,7 +711,7 @@ class PhotoSpot(DayModel):
                 text=self.name
             else:
                 text='no name photospot'
-        return '<a class="btn" href="/photo/photospot/%s/">%s</a>'%(self.name.replace(' ','_'), text)
+        return '<a class="btn btn-default" href="/photo/photospot/%s/">%s</a>'%(self.name.replace(' ','_'), text)
 
 class PhotoHasTag(DayModel):
     '''through object for photo&phototag'''

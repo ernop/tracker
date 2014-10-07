@@ -13,7 +13,16 @@
         var hours={{hours|jsonify|safe}};
         var hour={{hour|jsonify|safe}};
         var measurement_spots={{measurement_spots|jsonify|safe}};
+        $(document).ready(function(){
+            $(".hoverable").popover({trigger:'hover',placement:'bottom'})
+        })
     </script>
+    <style>.container{width:90%;}
+    .popover{max-width:500px;}
+    .popover-content{18px;}
+    .note-outline{display:inline-block;width:90%;padding:10px;}
+    .notekindzone{margin-left:15px;display:inline-block;}
+    </style>
 {% endblock %}
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
 <div id="day_id" day_id="{{day.id}}"></div>
@@ -55,38 +64,36 @@
 
 <div class="span2" style="float:left;">
     <div class="btn add-note">
-        <i class="icon-plus"></i>
+        <span class="glyphicon glyphicon-plus"></span>
     </div>
 </div>
-<hr style="float:left;clear:both;">
-<div class="notezone" style="float:left;clear:both;display:inline-block;">
-{% for note in notes %}
-    {% include "jinja2/noteedit.html" %}
+<br>
+<div>
+{% for note in notes %}<br>
+    <div class="note-outline">{% include "jinja2/noteedit.html" %}</div>
 {% endfor %}
 </div>
 
-<br>
-
-<div class="row"><div>
+<div>
     <div id="notification" class="notification-zone">&nbsp;</div>
-</div></div>
+</div>
+<hr>
 
-<div class="row"><div>
-    <a href="/admin/day/notekind/add" class="btn">add notekind</a>
-</div></div>
+    <a href="/admin/day/notekind/add" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>add notekind</a>
 
-<div class="row"><div>
+
+<div>
     <h2>Purchases</h2>
     <table class="purchase-list table"></table>
     <div class="purchase-zone span12">
         <table class="table"><tr>
         <td><input id="purchase-product" style="width:190px;"></input>
         <td style="vertical-align:middle;"><input type=text style="width:30px;" id="purchase-cost"></input> money for
-        <input type=text id=purchase-quantity style="width:28px;" value=1></input> guys<a class="btn" style="margin-left:38px;" href="{{ADMIN_EXTERNAL_BASE}}/day/product/add"><i class="icon-plus"></i></a><td><div class="price-chooser"></div>
+        <input type=text id=purchase-quantity style="width:28px;" value=1></input> guys<a class="btn btn-default" style="margin-left:38px;" href="{{ADMIN_EXTERNAL_BASE}}/day/product/add"><span class="glyphicon glyphicon-plus"></span></a><td><div class="price-chooser"></div>
         <div style="clear:both;float:left;" class="product-chooser"></div>
-        <tr><td>source <td><input id="purchase-source" style="width:190px;"></input><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/source/add"><i class="icon-plus"></i></a><td><div class="source-chooser">
+        <tr><td>source <td><input id="purchase-source" style="width:190px;"></input><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/source/add"><span class="glyphicon glyphicon-plus"></span></a><td><div class="source-chooser">
         <tr><td>hour<td><input type=text id="purchase-hour" style="width:190px;" value="{{hour}}"></input><td><div class="hour-chooser">
-        <tr><td>who<td><input id=purchase-who_with style="width:190px;"></input><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/person/add"><i class="icon-plus"></i></a><td><div class="who_with-chooser">
+        <tr><td>who<td><input id=purchase-who_with style="width:190px;"></input><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/person/add"><span class="glyphicon glyphicon-plus"></span></a><td><div class="who_with-chooser">
         <tr><td>note<td><input type=text id=purchase-note style="width:180px;"></input>
         <tr><td>currency<td><input type=text id=purchase-currency style="width:190px;"></input>
         <tr><td>size<td><input type=text id=purchase-size  style="width:180px;"></input>
@@ -96,18 +103,18 @@
         
         </table>
     </div>
-</div></div>
+</div>
 
 <div class="row">
     <h2>Measurement</h2>
-    <div class="span8">
+    <div>
     <table class="table thintable measurement-list">
     </table>
     <div class="measurement-zone">
         <table class="table"><tr>
         <tr><td><input  id="measurement-spot" style="width:190px;"></input><td><input type=text id="measurement-amount" style="width:190px;"></input>
         <tr><td><div class="btn make-measurement">Save</div><td><div class="measurement-loading-zone">&nbsp;</div>
-        <tr><td><a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/measurement/add"><i class="icon-plus"></i>new</a>
+        <tr><td><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/measurement/add"><span class="glyphicon glyphicon-plus"></span>new</a>
         </table>
     </div>
 </div></div>
@@ -116,20 +123,18 @@
 <h2>Workouts</h2>
     {% for workout in day.getworkouts() %}
     {{workout.mysets()|safe}}<br>{% endfor %}
-    <a class="btn" href="{{ADMIN_EXTERNAL_BASE}}/day/day/add"><i class="icon-plus"></i> new</a><br>
+    <a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/day/add"><span class="glyphicon glyphicon-plus"></span> new</a><br>
 </div></div>
 
 <div id="notemodel" class="note-row" note_id="new" style="display:none;">
-    <div class="row">
-        <span class="span8 note note-2">
+        <span class="note note-2">
             <textarea class="textarea" id="note" note_id="new"></textarea>
         </span>
-        <span class="span2"><div class="notekindzone">
+        <div class="notekindzone">
             <span class="notekind-available"></span>
                 <button class="notekindselect" value=""></button>
             </span>
-        </span>
-    </div>
+        </div>
 </div>
 
 <div class="notification fixed-notification">

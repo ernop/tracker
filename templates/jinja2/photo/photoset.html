@@ -7,8 +7,8 @@
 
 <div id="notification" class="notification-zone" style="display:inline-block;float:right;height:24px;">&nbsp;</div>
 
-<div class="addnamezone photoset-linkzone"><h3>Add</h3>{% for lnk,name in addnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-plus"></i></a>{% endfor %}</div>
-<div class="killnamezone photoset-linkzone"><h3>Remove</h3>{% for lnk,name in killnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <i class="icon-remove"></i></a>{% endfor %}</div>
+<div class="addnamezone photoset-linkzone"><h3>Add</h3>{% for lnk,name in addnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <span class="glyphicon glyphicon-plus"></span></a>{% endfor %}</div>
+<div class="killnamezone photoset-linkzone"><h3>Remove</h3>{% for lnk,name in killnames %}<a class="btn tagkill" href="../{{lnk}}">{{name}} <span class="glyphicon glyphicon-remove"></span></a>{% endfor %}</div>
 <div class="jumpnamezone photoset-linkzone"><h3>Jump</h3>{% for lnk,name in jumps %}<a class="btn tagkill" href="../{{lnk}}">{{name}}</a>{% endfor %}</div>
 
 {% for photo in photos %}

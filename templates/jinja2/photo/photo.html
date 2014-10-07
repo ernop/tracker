@@ -45,7 +45,7 @@ $(document).ready(function(){
         <div class="tagzone" >
             <h2>Tags</h2>
             <button id="phototagselect2" value="{{photo.tagids()}}"></button>
-            <div class="new-tag-button btn"><a href="/admin/day/phototag/add/"><i class="icon-plus"></i>Add</a></div>
+            <div class="new-tag-button btn"><a href="/admin/day/phototag/add/"><span class="glyphicon glyphicon-plus"></span>Add</a></div>
         </div><hr>
         {% if photo.day %}
             <div class="daylink">{{photo.day.vlink()|safe}}</div>

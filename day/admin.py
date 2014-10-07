@@ -67,7 +67,7 @@ class ProductAdmin(OverriddenModelAdmin):
         #return obj.summary()
         data= [(p.clink(),p.day.vlink()) for p in Purchase.objects.filter(product=obj)]
         
-        alllink = '<a class="btn" href="../purchase/?product_id=%d">all</a>' % obj.id
+        alllink = '<a class="btn btn-default" href="../purchase/?product_id=%d">all</a>' % obj.id
         data.append(alllink)
         domainlink=obj.domain.clink()
         data.insert(0, domainlink)

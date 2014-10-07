@@ -389,15 +389,15 @@ function update_tag_info(tagids){
   $.each(tagids, function(index,tagid){
     var tag=get_phototag(tagid);
     if (!tag){return}
-    ctarget.append('<a class="btn" href="/admin/day/phototag/?id='+tag.id+'">'+tag.name+'</a> ')
-    vtarget.append('<a class="btn" href="/photo/phototag/'+tag.name.replace(/ /g,'_')+'">'+tag.name+'</a> ')
+    ctarget.append('<a class="btn btn-default" href="/admin/day/phototag/?id='+tag.id+'">'+tag.name+'</a> ')
+    vtarget.append('<a class="btn btn-default" href="/photo/phototag/'+tag.name.replace(/ /g,'_')+'">'+tag.name+'</a> ')
     clean_name=tag.name.replace(' (person)','')
-    settarget.append('<a class="btn" href="/photo/photoset/'+clean_name+'">'+tag.name+'</a> ')
+    settarget.append('<a class="btn btn-default" href="/photo/photoset/'+clean_name+'">'+tag.name+'</a> ')
     if (META_TAGS.indexOf(clean_name)==-1){
         clean_tags.push(clean_name)}
   })
     var alltags=clean_tags.join(',')
-  settarget.append('<a class="btn" href="/photo/photoset/'+alltags+'">ALL</a> ')
+  settarget.append('<a class="btn btn-default" href="/photo/photoset/'+alltags+'">ALL</a> ')
 }
 
 function update_spot_info(spotid){
@@ -407,8 +407,8 @@ function update_spot_info(spotid){
   vtarget.find('a').remove()
   var spot=get_photospot(spotid);
   if (spot){
-    ctarget.append('<a class="btn" href="/admin/day/photospot/?id='+spot.id+'">'+spot.name+'</a> ')
-    vtarget.append('<a class="btn" href="/photo/photospot/'+spot.name.replace(/ /g,'_')+'">'+spot.name+'</a> ')
+    ctarget.append('<a class="btn btn-default" href="/admin/day/photospot/?id='+spot.id+'">'+spot.name+'</a> ')
+    vtarget.append('<a class="btn btn-default" href="/photo/photospot/'+spot.name.replace(/ /g,'_')+'">'+spot.name+'</a> ')
   }
 }
 

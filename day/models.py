@@ -80,10 +80,16 @@ class Day(DayModel):
         notes=self.notes.all()
         text_notes=[]
         import urllib2
+        def clean_text(txt):
+            #return txt
+            #txt=txt.replace('\n','<br>')
+            txt=txt.replace("'","&apos;")
+            txt=txt.replace('"','&quot;')
+            return txt
         for note in notes:
             kinds=','.join([k.name for k in note.kinds.all()])
-            content=urllib2.quote(note.text)
-            val='<div class="hoverable hover-note" data-title="%s" data-content="%s">%s</div>'%(kinds,content,kinds)
+            content=clean_text(note.text)
+            val='<div class="hoverable hover-note btn" data-title="%s" data-content="%s">%s</div>'%(kinds,content,kinds)
             text_notes.append(val)
         notes_combined=' | '.join(text_notes)
         return basic_link+notes_combined
@@ -441,7 +447,7 @@ class NoteKind(DayModel):
     def vlink(self, text=None):
         if not text:
             text='%s (%d)'%(self.name, self.notes.count())
-        return '<a class="btn"  href="/notekind/%s/">%s </a>'%(self.id, text)
+        return '<a class="btn btn-default"  href="/notekind/%s/">%s </a>'%(self.id, text)
     
 class Person(DayModel):
     first_name=models.CharField(max_length=100)
