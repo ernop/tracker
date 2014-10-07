@@ -428,7 +428,7 @@ class Note(DayModel):
         return ','.join([str(n.id) for n in self.kinds.all()])
 
     def get_height(self):
-        return (self.text and len(self.text)/6+80) or '250'
+        return (self.text and len(self.text)/4+80) or '250'
 
 class NoteKind(DayModel):
     name=models.CharField(max_length=100)
