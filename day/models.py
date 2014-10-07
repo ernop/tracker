@@ -88,6 +88,8 @@ class Day(DayModel):
             return txt
         for note in notes:
             kinds=','.join([k.name for k in note.kinds.all()])
+            if not kinds:
+                kinds='none'
             content=clean_text(note.text)
             val='<div class="hoverable hover-note btn" data-title="%s" data-content="%s">%s</div>'%(kinds,content,kinds)
             text_notes.append(val)
