@@ -19,7 +19,7 @@
 <h2>Saved {{saved}}</h3>
 <h3>{{saverate}}% saving</h3>
 
-{% if metpeople %}
+{% if monthpeople %}
 <table class="table thintable">
     {% for person in monthpeople %}
         <td>{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}})
