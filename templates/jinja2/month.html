@@ -20,18 +20,14 @@
 <h3>{{saverate}}% saving</h3>
 
 {% if monthpeople %}
-<table class="table thintable">
+
     {% for person in monthpeople %}
-        <td>{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}})
-        {% if loop.index%4==0 %}
-            <tr>
-        {% endif %}
+        <span style="float:left;height:30px;width:220px;">{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}})</span>
     {% endfor %}
-</table>
 {% endif %}
 
 <table class="table thintable">
-    <tr><td style="width:50px;">day<td>spent<td>tags{% for spot in spots %}<td class="leftborder middle">{{spot.clink(text=spot.name,wrap=False)|safe}}{% endfor %}
+    <tr><td style="width:50px;">day<td>spent<td>tags{% for spot in spots %}<td class="leftborder middle">{{spot.clink(skip_btn=True, wrap=True,text=spot.name)|safe}}{% endfor %}
     {% for day in days %}
     <tr><td>{{day.vlink()|safe}}
         <td><a href="../../admin/day/purchase/?created__month={{day.date.month}}&created__year={{day.date.year}}&created__day={{day.date.day}}">{{day.total_spend()|safe}}</a>

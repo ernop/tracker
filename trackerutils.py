@@ -27,9 +27,9 @@ class DayModel(models.Model):
         if klasses:
             klass+=' '.join(klasses)
         if wrap:
-            wrap=' nb'
-        else:
             wrap=''
+        else:
+            wrap=' nb'
         if not text:
             text=self
         return u'<a class="%s%s" href="%s/day/%s/?id=%d">%s</a>'%(klass, wrap, settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
