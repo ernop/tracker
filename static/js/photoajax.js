@@ -390,7 +390,7 @@ function update_tag_info(tagids){
     var tag=get_phototag(tagid);
     if (!tag){return}
     ctarget.append('<a class="btn btn-default" href="/admin/day/phototag/?id='+tag.id+'">'+tag.name+'</a> ')
-    vtarget.append('<a class="btn btn-default" href="/photo/phototag/'+tag.name.replace(/ /g,'_')+'">'+tag.name+'</a> ')
+    vtarget.append('<a class="btn btn-default" href="/photo/phototag_id/'+tag.id+'">'+tag.name+'</a> ')
     clean_name=tag.name.replace(' (person)','')
     settarget.append('<a class="btn btn-default" href="/photo/photoset/'+clean_name+'">'+tag.name+'</a> ')
     if (META_TAGS.indexOf(clean_name)==-1){

@@ -9,10 +9,21 @@ function fix_links(){
 
 
 function fix_phototags(){
+    //make them links to the admin.
     var divs=$(".select2-search-choice").find('div');
+    var s2=$(".select2-search-choice").closest('.select2-container')
+    var choices=$(".select2-search-choice").closest('.select2-container').select2('data')
     $.each(divs, function(index, div){
+	var txt=$(div).text()
+	choice_id=null;
+	$.each(choices, function(index, choice){
+		if (choice.text==txt){
+			choice_id=choice.id
+			return false
+		}
+	})
         if ($(div).find('a').length){}else{
-            div.innerHTML='<a href="/photo/phototag/'+div.innerHTML+'/">'+div.innerHTML+'</a>';
+            div.innerHTML='<a href="/photo/phototag_id/'+choice_id+'/">'+div.innerHTML+'</a>';
         }
     });
 }

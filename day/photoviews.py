@@ -62,8 +62,14 @@ def photo(request,id):
     vals['next_photopaths']=get_next_photopaths(count=1,excludes=[photo.id])
     return r2r('jinja2/photo/photo.html',request,vals)
 
+
 @user_passes_test(staff_test)
-def phototag(request,name):
+def phototag_id(request,id):
+    pt=PhotoTag.objects.get(id=id)
+    return phototag(request,name=pt.name)
+
+@user_passes_test(staff_test)
+def phototag(request,name=None):
     name=name.replace('%20',' ')
     phototag=PhotoTag.objects.get(name=name)
     if not can_access_private(request.user) and phototag.name in settings.EXCLUDED_TAGS:

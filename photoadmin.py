@@ -252,7 +252,7 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
     #list_filter=' product__domain currency source who_with'.split()
     #date_hierarchy='created'
-    list_editable=['name','tour_order', 'description',]
+    list_editable=['name',]
     search_fields= ['name']
     list_display='id myinfo name tour_order description  myphotos'.split()
     list_filter=['tour','tour_order',]
@@ -271,12 +271,12 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
         actions.append(make_assign(tourname))
   
     def myinfo(self,obj):
-        data=[('tour',obj.tour or ''),
-              ('description',obj.description),
+        data=[('tour',obj.tour or 'no tour'),
+              ('description',obj.description or ''),
               ('photo count',obj.photos.count()),
-              ('vlink',obj.vlink(text='vlink')),
+              (obj.vlink(text='spotpage')),
               ]
-        return mktable(data)
+        return mktable(data,skip_false=True)
     
     def myphotos(self,obj):
         photos=[]
