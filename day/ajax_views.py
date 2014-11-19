@@ -34,7 +34,6 @@ FileField
 
 @user_passes_test(staff_test)
 def ajax_receive_mp3(request, note_id):
-    import ipdb;ipdb.set_trace()
     fn=str(uuid.uuid4())+'.mp3'
     fp=os.path.join(settings.MP3_DIR,fn)
     while os.path.exists(fp):
