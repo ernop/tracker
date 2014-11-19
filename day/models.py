@@ -408,7 +408,8 @@ class Note(DayModel):
     text=models.TextField()
     created=models.DateTimeField(auto_now_add=True)
     kinds=models.ManyToManyField('NoteKind', related_name='notes', blank=True, null=True)
-
+    mp3path=models.CharField(max_length=500,blank=True,null=True) #based on 
+ 
     class Meta:
         db_table='note'
 

@@ -1,6 +1,6 @@
 # Create your views here.
 
-import datetime
+import datetime,uuid
 
 # Create your views here.
 
@@ -20,6 +20,41 @@ from forms import DayForm
 #@user_passes_test(staff_test)
 #def select2_people(request):
 
+@user_passes_test(staff_test)
+def ajax_serve_mp3(request,mp3_filename):
+    fn=make_safe_filename(mp3_filename)
+    fp=os.path.join(settings.MP3_DIR,fn)
+    assert os.path.exists(fp)
+    data=open(fp,'rb')
+    resp=HttpResponse(content=data.read(), mimetype="audio/mpeg")
+    return resp
+
+from django.forms import *
+FileField
+
+@user_passes_test(staff_test)
+def ajax_receive_mp3(request, note_id):
+    import ipdb;ipdb.set_trace()
+    fn=str(uuid.uuid4())+'.mp3'
+    fp=os.path.join(settings.MP3_DIR,fn)
+    while os.path.exists(fp):
+        fn=str(uuid.uuid4())
+        fp=os.path.join(settings.MP3_DIR,fn)
+    note=Note.objects.get(id=note_id)
+    note.mp3path=fn
+    note.save()
+    out=open(fp,'wb')
+    import base64
+    
+    data = request.POST['data']
+    data2 = base64.decodestring(data[22:])
+    out.write(data2)
+    out.close()
+    log.info('outfp for saved mp3 is %s',fp)
+    return r2j({'success':True,'message':'okay'})
+    
+        
+    
 
 @user_passes_test(staff_test)
 def ajax_get_purchases(request):

@@ -242,10 +242,6 @@ class PhotoTagAdmin(OverriddenModelAdmin):
               ('have day','<a href="../photo/?has_taken_day=yes&tagged_with=%d">have day (%d)</a>'%(obj.id,have_day_count)),
               )
         return mktable(data)
-        
-    
-    
-    
     adminify(myname, myphotos, mytags)
 
 class PhotoSpotAdmin(OverriddenModelAdmin):

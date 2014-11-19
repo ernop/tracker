@@ -3,7 +3,11 @@
 {% block head %}
     {{super()}}
     <script src='/static/js/day_funcs.js'></script>
+    <script src='/static/js/recordmp3.js'></script>
+    <script src='/static/js/recording_helpers.js'></script>
     <script src='/static/js/day.js'></script>
+    
+    
     <script>
         var today={{today|jsonify|safe}};
         var notekinds={{notekinds|jsonify|safe}};
@@ -25,6 +29,7 @@
     .note-outline{display:inline-block;width:90%;padding-bottom:18px;}
     .notekindzone{margin-left:15px;display:inline-block;}
     .note-row{font-size:18px;line-height:18px;}
+    .redborder{border:3px solid red;border-radius:4px;}
     </style>
 {% endblock %}
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
@@ -46,6 +51,7 @@
             <div class="historybox">
             <span class="float:left;">{{historyday.hoverblock()|safe}}</span>
             {% set taken_photos=historyday.get_day_taken_photos(user)%}
+            
             {% if taken_photos%}
                 {% for photo in taken_photos %}
                     <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>

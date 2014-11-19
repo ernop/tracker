@@ -8,6 +8,7 @@ $(document).ready(function(){
     setup_change_describer();
     $(".add-note").click(add_note);
     $(".add-note").click();
+    setup_mp3_recording();
 });
 
 

@@ -5,3 +5,13 @@
         <button class="notekindselect new" value="{{note.nkids()}}"></button>
     </span>
 </div>
+{% if note.mp3path %}
+    <audio controls>
+        <source src="/ajax/serve_mp3/{{note.mp3path}}" type="audio/mpeg">
+    </audio>
+{% else %}
+    <div class="mp3-creator" note_id={{note.id}}>create mp3 here.
+    <div class="btn recorder-start" note_id={{note.id}}>start</div>
+    <div class="btn recorder-stop" note_id={{note.id}}>stop</div>
+    </div>
+{% endif %}
