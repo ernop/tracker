@@ -239,6 +239,7 @@ class Photo(DayModel):
         if not self.file_exists():
             return False
         import datetime, os
+        from utils import ipdb;ipdb()
         from PIL import Image
         try:
             im=Image.open(self.fp)

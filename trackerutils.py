@@ -139,7 +139,7 @@ def source2obj(source):
 def currency2obj(cur):
     return {'id':cur.id,'name':cur.name,'text':'%s %s'%(cur.symbol, cur.name),'symbol':cur.symbol,}
 
-def mktable(dat, rights=None, bigs=None, skip_false=False, nb=False):
+def mktable(dat, rights=None, bigs=None, skip_false=False, nb=False,non_max_width=False):
     rows = []
     for row in dat:
         if not row:
@@ -162,7 +162,11 @@ def mktable(dat, rights=None, bigs=None, skip_false=False, nb=False):
             else:
                 res += '<td>%s</td>' % (thing)
         rows.append(res+'</tr>')
-    return '<table class="table thintable" style="background-color:white;">%s</table>' % ''.join(rows)
+    tblklass='table thintable'
+    tblstyle=''
+    if non_max_width:
+        tblstyle='width:inherit;'
+    return '<table class="%s" style="background-color:white;%s">%s</table>' % (tblklass,tblstyle,''.join(rows))
 
 
 def div(klass=None,contents=None):

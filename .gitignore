@@ -28,3 +28,7 @@ dbpw
 photo_thumbs
 static/bkincomingphoto
 static/tracker_mp3
+apache
+*.wsgi
+logs
+local_settings_tracker.py
