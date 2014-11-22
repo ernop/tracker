@@ -79,8 +79,12 @@ class PhotoAdmin(OverriddenModelAdmin):
     
     def remove_photospot(self,request,queryset):
         for pho in queryset:
+            spot=pho.photospot
             pho.photospot=None
             pho.save()
+            if spot and spot.founding_photo=pho:
+                spot.founding_photo=None
+                spot.save()
     
     def redo_classification(self,request,queryset):
         for photo in queryset:
