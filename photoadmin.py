@@ -268,7 +268,7 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
     #date_hierarchy='created'
     list_editable=['name',]
     search_fields= ['name']
-    list_display='id myinfo name tour_order description  myphotos'.split()
+    list_display='id myinfo name description  myphotos'.split()
     list_filter=['tour',make_null_filter(field='founding_photo',include_empty_string=False),'tour_order',]
     actions=[]
     
@@ -286,6 +286,7 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
   
     def myinfo(self,obj):
         data=[('tour',obj.tour or 'no tour'),
+              ('order',obj.tour_order),
               ('description',obj.description or ''),
               ('photo count',obj.photos.count()),
               (obj.vlink(text='spotpage')),
@@ -293,14 +294,17 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
         return mktable(data,skip_false=True)
     
     def myphotos(self,obj):
-        photos=[]
-        for ph in obj.photos.order_by('taken')[:10]:
+        dat=[]
+        for ph in obj.photos.order_by('-founded','taken'):
+            using_time=ph.taken or ph.day and ph.day.date or ph.photo_created or None
+            if using_time:
+                phtime=using_time.strftime(DATE_DASH_REV_DAY)
+            else:phtime=''
             if ph==obj.founding_photo:
-                photos.append(div(contents=ph.inhtml(size='thumb', clink=True),klass='founding-photo photospot-photolist-admin'))
+                dat.append((phtime,'<h2>First Photo</h2>'+div(contents=ph.inhtml(size='thumb', clink=True),klass='founding-photo photospot-photolist-admin')))
             else:
-                photos.append(ph.inhtml(size='thumb', clink=True))
-        return ''.join(photos)
-    
+                dat.append((phtime,ph.inhtml(size='thumb', clink=True)))
+        return mktable(dat)
     
     adminify(myinfo,myphotos)
 
