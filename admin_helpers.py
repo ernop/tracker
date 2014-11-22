@@ -12,14 +12,19 @@ from django.contrib.admin.views.main import SuspiciousOperation, ImproperlyConfi
 from django.contrib.admin.util import lookup_needs_distinct
 from django.db.models import Q, Count
 
-def make_null_filter(field, title=None, param_name=None):
+def make_null_filter(field, title=None, param_name=None, include_empty_string=True):
     if not title:
         title = 'null filter for %s' % field
     if not param_name:
         param_name = 'has_'+''.join([c for c in field if c.isalpha()])
     '''rather than making a whole class for these, just make them on the fly...'''
     bb = title
-    class InnerFilter(BaseNullEmptyFilter):
+    if include_empty_string:
+        use_klass = BaseNullEmptyFilter
+    else:
+        use_klass = BaseNullFilter
+
+    class InnerFilter(use_klass):
         title= bb
         parameter_name= param_name
         args={field:None}

@@ -265,7 +265,7 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
     list_editable=['name',]
     search_fields= ['name']
     list_display='id myinfo name tour_order description  myphotos'.split()
-    list_filter=['tour','tour_order',]
+    list_filter=['tour',make_null_filter(field='founding_photo',include_empty_string=False),'tour_order',]
     actions=[]
     
     def make_assign(tn):
