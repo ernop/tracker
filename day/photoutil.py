@@ -72,7 +72,7 @@ def photospot2obj(photospot):
     name=photospot.name
     if photospot.founding_photo:
         founding_fp=photospot.founding_photo.get_external_fp(thumb=True)
-        text='%s<img height=200 src="%s">'%(name,founding_fp)
+        text='%s<br><img src="%s">'%(name,founding_fp)
         html=text
     else:
         founding_fp=''
