@@ -39,7 +39,7 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'urls'
 
-WSGI_APPLICATION = 'django2.wsgi'
+
 
 INSTALLED_APPS = (
     'django.contrib.admin',
