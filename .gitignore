@@ -1,3 +1,4 @@
+wsgi
 *.pyc
 local
 trackenv
