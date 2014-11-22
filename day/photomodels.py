@@ -292,7 +292,7 @@ class Photo(DayModel):
             #self.set_day()
             #reset the day in the weird case where they somehow get an incorrectly-future set taken date
             #even though photo created is later.
-        if self.taken and self.photo_created and self.photo_created<self.taken:
+        if self.taken and self.photo_created and self.photo_created<=self.taken:
             self.taken=self.photo_created
             self.day=None
             self.set_day()

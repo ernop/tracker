@@ -28,10 +28,16 @@ class PhotoAdmin(OverriddenModelAdmin):
     actions=['undoable_delete','not_myphoto','delete_file',
              'undelete','reinitialize','force_recreate_thumbs',
              'autoorient','redo_classification','kill_entry',
-             'unlink_from_day','rename_name','remove_photospot',]
+             'unlink_from_day','rename_name','remove_photospot','set_day',]
     actions.extend(['remove_photospot','remove_day','rehash','merge_photos_lowest_id','check_thumbs',])
     actions.append('set_founding')
     actions.sort()
+    
+    def set_day(self,request,queryset):
+        for ph in queryset:
+            from utils import ipdb;ipdb()
+            ph.set_day()
+            ph.save()
     
     def set_founding(self,request,queryset):
         for ph in queryset:
@@ -178,6 +184,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     list_filter=['control_tag', TagHasPersonFilter]
     list_display='id myname myphotos mytags'.split()
     actions=['reinitialize_tags','create_people_tags','redo_classification','kill_all_days',]
+    list_per_page=5
     
     def kill_all_days(self,request,queryset):
         for ptag in queryset:
@@ -268,9 +275,10 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
     #date_hierarchy='created'
     list_editable=['name',]
     search_fields= ['name']
-    list_display='id myinfo name description  myphotos'.split()
+    list_display='id myinfo name myphotos'.split()
     list_filter=['tour',make_null_filter(field='founding_photo',include_empty_string=False),'tour_order',]
     actions=[]
+    list_per_page=20
     
     def make_assign(tn):
         def assign_guy(self,request,queryset):
@@ -301,10 +309,10 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
                 phtime=using_time.strftime(DATE_DASH_REV_DAY)
             else:phtime=''
             if ph==obj.founding_photo:
-                dat.append((phtime,'<h2>First Photo</h2>'+div(contents=ph.inhtml(size='thumb', clink=True),klass='founding-photo photospot-photolist-admin')))
+                dat.append((phtime,'<h2>Founding Photo</h2>'+div(contents=ph.inhtml(size='thumb', clink=True),klass='founding-photo photospot-photolist-admin')))
             else:
                 dat.append((phtime,ph.inhtml(size='thumb', clink=True)))
-        return mktable(dat)
+        return mktable(dat,non_max_width=True)
     
     adminify(myinfo,myphotos)
 

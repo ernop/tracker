@@ -223,10 +223,11 @@ class MyCameraFilter(SimpleListFilter):
         NEXUS='Nexus S'
         CANON='Canon EOS 500D'
         OLDCAM='KODAK DC280 ZOOM DIGITAL CAMERA'
+        GALAXYNOTE='SM-N900'
         if self.value()=='yes':
-            return queryset.filter(camera=NEXUS)|queryset.filter(camera=CANON)|queryset.filter(camera=OLDCAM)
+            return queryset.filter(camera=NEXUS)|queryset.filter(camera=CANON)|queryset.filter(camera=OLDCAM)|queryset.filter(camera=GALAXYNOTE)
         elif self.value()=='no':
-            return queryset.exclude(camera=NEXUS).exclude(camera=CANON).exclude(camera=OLDCAM).exclude(camera=None).exclude(camera='')
+            return queryset.exclude(camera=NEXUS).exclude(camera=CANON).exclude(camera=OLDCAM).exclude(camera=GALAXYNOTE).exclude(camera=None).exclude(camera='')
 
 class PhotoExtensionFilter(SimpleListFilter):
     title='extension'
