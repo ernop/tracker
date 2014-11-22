@@ -111,11 +111,11 @@ LOGGING = {
             'propagate': True,
             'level':'INFO',
         },
-        'django.request': {
-            'handlers': ['mail_admins','file_log'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
+        #'django.request': {
+            #'handlers': ['mail_admins','file_log'],
+            #'level': 'ERROR',
+            #'propagate': False,
+        #},
     }
 }
 
