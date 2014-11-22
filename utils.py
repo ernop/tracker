@@ -126,15 +126,15 @@ def format_exception(maxTBlevel=10):
 def is_valid_password(pw):
     OK_PASSWORD_CHARS='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-_=+[{]}|;:,<.>/?`~'
     if not pw:
-        return False,_('no password provided')
+        return False,'no password provided'
     if len(pw)<4:
-        return False, _('password too short')
+        return False, 'password too short'
     forbidden=set()
     for c in pw:
         if c not in OK_PASSWORD_CHARS:
             forbidden.add(c)
     if forbidden:
-        return False,_('password contains forbidden characters')+ '%s'%''.join(forbidden)+'. '+_('Passwords may only contain the following characters: ')+'%s'%OK_PASSWORD_CHARS
+        return False,'password contains forbidden characters'+ '%s'%''.join(forbidden)+'. '+'Passwords may only contain the following characters: '%OK_PASSWORD_CHARS
     return True,''
 
 def group_required(*group_names):
