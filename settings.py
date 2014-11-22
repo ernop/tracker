@@ -49,7 +49,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admin',
     'day',
     'django_extensions',
 )
@@ -111,11 +110,11 @@ LOGGING = {
             'propagate': True,
             'level':'INFO',
         },
-        #'django.request': {
-            #'handlers': ['mail_admins','file_log'],
-            #'level': 'ERROR',
-            #'propagate': False,
-        #},
+        'django.request': {
+            'handlers': ['mail_admins','file_log'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
     }
 }
 
