@@ -40,7 +40,7 @@ urlpatterns = patterns('',
     url(r'^ajax/receive_mp3/(?P<note_id>.*)/$','day.ajax_views.ajax_receive_mp3',name='ajax_receive_mp3'),
     url(r'^ajax/get_measurements/$','day.ajax_views.ajax_get_measurements',name='ajax_get_measurements'),
     url(r'^ajax/make_measurement/$','day.ajax_views.ajax_make_measurement',name='ajax_make_measurement'),
-    url(r'^ajax/get_founding_for_spot/$','day.ajax_views.ajax_get_founding_for_spot',name='ajax_get_founding_for_spot'),
+    #url(r'^ajax/get_founding_for_spot/$','day.ajax_views.ajax_get_founding_for_spot',name='ajax_get_founding_for_spot'),
         url(r'^/?$', 'day.views.redir', name='redir'),
 
     #--------------------------D3 jumping.-----------------------------------
