@@ -292,7 +292,7 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
         photos=[]
         for ph in obj.photos.order_by('taken')[:10]:
             if ph==obj.founding_photo:
-                photos.append(div(contents=ph.inhtml(size='thumb', clink=True),klass='founding-photo'))
+                photos.append(div(contents=ph.inhtml(size='thumb', clink=True),klass='founding-photo photospot-photolist-admin'))
             else:
                 photos.append(ph.inhtml(size='thumb', clink=True))
         return ''.join(photos)
