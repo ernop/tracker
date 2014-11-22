@@ -229,7 +229,6 @@ function pop_photospot(){
     }, 0); 
 }
 
-
 function reset_photospot_select2(){
     var sel=$('#photospotselect2');
     if (current_photo.photospot){
@@ -243,7 +242,13 @@ function reset_photospot_select2(){
         //initSelection: function(element,callback){
             //callback(get_photospot_for_current_photo())
         //}
+	formatResult:function(guy){return guy['text']},
     })
+    
+    
+    
+    
+    
     sel.unbind('change').on('change', change_photospot)
 }
 
@@ -315,7 +320,7 @@ function change_phototag(e){
 }
 
 function change_photospot(e){
-    //console.log('change photospot start')
+    console.log('change photospot start')
     if (e){var target=$(e.target)}else{
     var target=$('#photospotselect2')}
     current_photo.photoid=target.attr('value');
@@ -401,6 +406,8 @@ function update_tag_info(tagids){
 }
 
 function update_spot_info(spotid){
+    //draw in the photospot link etc.
+    //would be better if this came through ajax rather than hacked ...
   var ctarget=$('.cspotzone')
   var vtarget=$('.vspotzone')
   ctarget.find('a').remove()
@@ -452,6 +459,7 @@ function data_changed(target, kind, override){
     else if (kind=='photospot'){
         data['photospot_id']=target.attr('value');
         update_spot_info(target.attr('value'))
+	//also show the thumb for the rel spot.
     }
     data['photo_id']=$(".photozone").attr('photo_id')
     send_data(data);

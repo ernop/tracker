@@ -53,6 +53,8 @@ class Photo(DayModel):
     setup=models.BooleanField(default=False)
     myphoto=models.BooleanField(default=False)
     thumb_ok=models.BooleanField(default=False)
+    
+    
         
     class Meta:
         db_table='photo'
@@ -208,6 +210,7 @@ class Photo(DayModel):
             return False
         if res:
             log.error('failure of convert command %s',cmd)
+            from utils import ipdb;ipdb()
             self.thumb_ok=False
             self.save()
             return False
@@ -482,13 +485,17 @@ class Photo(DayModel):
             daylink+=' '+kill_daylink
         else:
             daylink=None
-        
+        founded=self.founded.exists() and self.founded.get() or False
+        fspot=''
+        if founded:
+            fspot=founded.clink(text='founded photospot %s'%founded)
         dat=(('deleted',dd),
              
              ('day',daylink),
              ('incoming',icon(self.incoming)),
              ('setup',icon(self.setup)),
              ('myphoto',icon(self.myphoto)),
+             
              ('thumb ok',icon(self.thumb_ok)),
              ('done',icon(self.done)),
              ('crop',(self.xcrop or self.ycrop) and ('x=%d y=%d'%(self.xcrop,self.ycrop)) or ''),
@@ -497,6 +504,7 @@ class Photo(DayModel):
              ('photo modified',self.photo_modified.strftime(DATE_DASH_REV_DAY)),
              ('obj created',self.created.strftime(DATE_DASH_REV)),
              ('obj modified',self.modified.strftime(DATE_DASH_REV)),
+             ('fspot',fspot),
              )
         res=mktable(dat,skip_false=True,nb=True)
         return res
@@ -692,6 +700,8 @@ class PhotoSpot(DayModel):
     slug=models.CharField(max_length=100,blank=True,null=True)
     latitude=models.CharField(max_length=30,blank=True,null=True)
     longitude=models.CharField(max_length=30,blank=True,null=True)
+    
+    founding_photo=models.ForeignKey('Photo',blank=True,null=True,related_name='founded')
     
     class Meta:
         db_table='photospot'

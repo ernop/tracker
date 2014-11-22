@@ -16,7 +16,8 @@ class PhotoAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
     list_display='id myname myinfo myexif'.split()
     #list_filter=' product__domain currency source who_with'.split()
-    list_filter=['incoming','deleted',PhotoHasDayFilter,PhotoDoneFilter,PhotoExtensionFilter, NullHashFilter,PhotoTaggedWithFilter, PhotoHasSpotFilter, MyCameraFilter,'iso','camera','thumb_ok','setup','myphoto']
+    list_filter=['incoming','deleted',PhotoHasDayFilter,PhotoDoneFilter,PhotoExtensionFilter, NullHashFilter,PhotoTaggedWithFilter, 
+                 PhotoHasSpotFilter, MyCameraFilter,'iso','camera','thumb_ok','setup','myphoto']
     
     #date_hierarchy='created'
     #list_editable=['note',]
@@ -29,8 +30,19 @@ class PhotoAdmin(OverriddenModelAdmin):
              'autoorient','redo_classification','kill_entry',
              'unlink_from_day','rename_name','remove_photospot',]
     actions.extend(['remove_photospot','remove_day','rehash','merge_photos_lowest_id','check_thumbs',])
+    actions.append('set_founding')
     actions.sort()
     
+    def set_founding(self,request,queryset):
+        for ph in queryset:
+            if ph.photospot:
+                spot=ph.photospot
+                spot.founding_photo=ph
+                spot.save()
+                messages.info(request,'set as founding photo')
+            else:
+                messages.error(request,'this photo has no spot')
+                
     def rename_name(self, request, queryset):
         for ph in queryset:
             for n in range(5):
@@ -137,7 +149,9 @@ class PhotoAdmin(OverriddenModelAdmin):
     myname.admin_order_field='hash'
     
     def myexif(self,obj):
-        return obj.exif_table()+obj.links_table()
+        et=obj.exif_table()
+        lt=obj.links_table()
+        return '%s %s'%(et,lt)
     
     def queryset(self, request):
         queryset = super(PhotoAdmin, self).queryset(request)

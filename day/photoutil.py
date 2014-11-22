@@ -70,9 +70,19 @@ def phototag2obj(phototag):
 
 def photospot2obj(photospot):
     name=photospot.name
+    if photospot.founding_photo:
+        founding_fp=photospot.founding_photo.get_external_fp(thumb=True)
+        text='%s<img height=100 src="%s">'%(name,founding_fp)
+        html=text
+    else:
+        founding_fp=''
+        text=name
+        html=name
     return {'id':photospot.id,
-            'name':name,
-            'text':name,}
+        'name':name,
+        'text':text,
+        'html':html,
+        'founding_fp':founding_fp}
 
 def get_exif(im):
     ret = {}

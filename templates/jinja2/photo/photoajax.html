@@ -18,11 +18,12 @@
         {% if LOCAL %}(Local){% endif %}
 </div>
     <div id="notification" style="clear:right;float:right;" class="notification-zone ajax-notification-zone">Notification zone</div>
-    <div class="tagzone" >
+    <div class="tagzone" ><div class="spot-subzone">
         <form id="create-new-photospot-form" onsubmit="return false;">
             <input id="create-new-photospot-input" /><span class="glyphicon glyphicon-plus"></span>Add Photospot</a>
         </form>        
         <button id="photospotselect2" value=""></button>        
+        </div><div class="tag-subzone">
             <h2>Tags</h2>    
             <button id="phototagselect2" value=""></button>        
             <br><br>
@@ -30,11 +31,10 @@
                 <input id="create-new-tag-input" /> <span class="glyphicon glyphicon-plus"></span>Add Tag</a>
             </form>
         </div>
+        </div>
         <div class="infozone">
         </div>
-        
-    
-    
+
     <p><div class="btn btn-default prev-btn">prev</div>
     
     <div class="btn btn-default next-btn">next</div></p>

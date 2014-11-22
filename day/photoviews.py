@@ -153,8 +153,8 @@ def photospot(request,name):
     pspot=PhotoSpot.objects.get(name=name)
     vals={}
     vals['photospot']=pspot
-    vals['photos']=pspot.photos.exclude(deleted=True).order_by('day__date')
-    vals['photo_objs']=[photo2obj(pho) for pho in pspot.photos.exclude(deleted=True).order_by('day__date')]
+    vals['photos']=pspot.photos.exclude(deleted=True).order_by('-founded','day__date')
+    vals['photo_objs']=[photo2obj(pho) for pho in pspot.photos.exclude(deleted=True).order_by('-founded','day__date')]
     vals['phototags']=[phototag2obj(pt) for pt in sorted(PhotoTag.objects.all(),key=phototagsort)]
     return r2r('jinja2/photo/photospot.html',request,vals)
 
@@ -287,9 +287,10 @@ def ajax_photo_data(request):
                     vals['message']='photospot of this name already existed'
                     vals['success']=False
                 except PhotoSpot.DoesNotExist:
-                    ps=PhotoSpot(name=name)
+                    photo=Photo.objects.get(id=todo['photo_id'])
+                    ps=PhotoSpot(name=name,founding_photo=photo)
                     ps.save()
-                    vals['message']='created photospot %s'%ps
+                    vals['message']='created photospot %s with this as the founding.'%ps
                     vals['photospot_id']=ps.id
                     vals['name']=name
             else:
@@ -302,7 +303,11 @@ def ajax_photo_data(request):
             photo.photospot=spot
             photo.save()
             vals['message']='assigned photospot.'
-        
+            #return the thumb
+            if spot.founding_photo:
+                vals['founding_thumb_fp']=spot.founding_photo.get_external_fp(thumb=True)
+            else:
+                vals['founding_thumb_fp']=''
         elif kind=='phototag':
             #setting/removing phototags on a given Photo
             photo=Photo.objects.get(id=todo['photo_id'])

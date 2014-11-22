@@ -29,9 +29,6 @@ def ajax_serve_mp3(request,mp3_filename):
     resp=HttpResponse(content=data.read(), mimetype="audio/mpeg")
     return resp
 
-from django.forms import *
-FileField
-
 @user_passes_test(staff_test)
 def ajax_receive_mp3(request, note_id):
     fn=str(uuid.uuid4())+'.mp3'
@@ -161,3 +158,21 @@ def ajax_make_measurement(request):
         return r2j(res)
     except Exception, e:
         return r2j({'success':False,'message':'%s'%e})
+    
+#@user_passes_test(staff_test)
+#def ajax_get_founding_for_spot(request):
+    #'''return info to load the founding photo thumb for a spot if exists'''
+    #try:
+        #dat=request.POST
+        #spot=PhotoSpot.objects.get(id=dat['photospot_id'])
+        #from utils import ipdb;ipdb()
+        #if spot.founding_photo:
+            #founding=spot.founding_photo
+            #exfp=founding.get_external_fp(thumb=True)
+            #res={'success':True,'fp':exfp}
+            #return r2j(res)
+        #else:
+            #res={'success':False,'message':'spot has no founding photo'}
+            #return r2j(res)
+    #except Exception, e:
+        #return r2j({'success':False,'message':'%s'%e})

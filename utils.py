@@ -273,7 +273,7 @@ def ipdb():
         desc='failed to inspect stack.'
     if settings.LOCAL:
         log.error('missed ipdb call. %s', desc)
-        from util import ipdb;ipdb()
+        import ipdb;ipdb.set_trace()
     else:
         log.error('missed ipdb call. %s', desc)
 
