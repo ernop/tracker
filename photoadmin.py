@@ -82,7 +82,7 @@ class PhotoAdmin(OverriddenModelAdmin):
             spot=pho.photospot
             pho.photospot=None
             pho.save()
-            if spot and spot.founding_photo=pho:
+            if spot and spot.founding_photo==pho:
                 spot.founding_photo=None
                 spot.save()
     
