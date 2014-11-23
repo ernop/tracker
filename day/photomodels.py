@@ -206,7 +206,11 @@ class Photo(DayModel):
                              self.fp, 
                              settings.THUMB_HEIGHT,
                              newthumbfp)
+        
         log.info("create thumb doing cmd %s",cmd)
+        import locale
+        aa=locale.CODESET
+        bb=locale.nl_langinfo(locale.CODESET)
         if not os.path.exists(self.fp):
             return False
         try:
