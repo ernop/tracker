@@ -30,7 +30,7 @@ TEMPLATE_CONTEXT_PROCESSORS=(
     )
 
 MIDDLEWARE_CLASSES = (
-    'general_middleware.PatchDebugMiddleware',
+    'tracker.general_middleware.PatchDebugMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -49,7 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'day',
+    'tracker.day',
     'django_extensions',
 )
 

@@ -24,7 +24,7 @@ from forms import DayForm
 def ajax_serve_mp3(request,mp3_filename):
     fn=make_safe_filename(mp3_filename)
     fp=os.path.join(settings.MP3_DIR,fn)
-    assert os.path.exists(fp)
+    assert os.path.exists(fp),fp
     data=open(fp,'rb')
     resp=HttpResponse(content=data.read(), mimetype="audio/mpeg")
     return resp
