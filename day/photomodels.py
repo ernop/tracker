@@ -288,7 +288,7 @@ class Photo(DayModel):
         
         #get resolution
         #get exif data etc.
-        stat=os.stat(self.fp)
+        stat=os.stat(self.fp.encode('utf8'))
         self.photo_modified=datetime.datetime.fromtimestamp(stat.st_mtime)
         self.photo_created=min(self.photo_modified,datetime.datetime.fromtimestamp(stat.st_ctime))
         
@@ -426,7 +426,7 @@ class Photo(DayModel):
         if not os.path.exists(self.fp):
             log.error('tried to auto-orient an fp which then no longer existed. photoid:fp:%s',self.fp)
             return False
-        stat=os.stat(self.fp)
+        stat=os.stat(self.fp.encode('utf8'))
         atime,mtime=stat.st_atime,stat.st_mtime
         if self.fp.endswith('webp'):
             #mogrify doesn't work on webp anyway.
