@@ -212,7 +212,7 @@ class Photo(DayModel):
         aa=locale.CODESET
         bb=locale.nl_langinfo(locale.CODESET)
         cc=os.path.supports_unicode_filenames
-        if not os.path.exists(self.fp):
+        if not os.path.exists(self.fp.encode('utf8')):
             return False
         try:
             res=os.system(cmd)
