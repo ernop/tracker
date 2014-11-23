@@ -399,6 +399,7 @@ class Photo(DayModel):
             fn=self.filename()
             delfp=get_nonexisting_fp(settings.DELETED_PHOTO_DIR,fn)
             self.tags.filter(tag__name='undelete').delete()
+            log.info("deleting; moving from %s 5o %s",self.fp,delfp)
             shutil.move(self.fp,delfp)
             self.fp=delfp
         else:
@@ -422,6 +423,7 @@ class Photo(DayModel):
             res=0
         else:
             cmd='mogrify -auto-orient "%s"'%self.fp
+            log.info("mogrify cmd %s",cmd)
             res=0
             if not settings.LOCAL:
                 res=os.system(cmd)
@@ -429,7 +431,6 @@ class Photo(DayModel):
                     os.utime(self.fp, (atime, mtime))
                 except OSError,e:
                     log.error('error doing utime %s',e)
-            
         self.rehash()
         if res:
             log.error("fail cmd %s for fp %s"%(cmd,self.fp))
@@ -447,6 +448,7 @@ class Photo(DayModel):
             fn=self.filename()
             donefp=get_nonexisting_fp(settings.DONE_PHOTO_DIR,fn)
             self.tags.filter(tag__name='incoming').delete()
+            log.info("moving from %s 5o %s",self.fp,donefp)
             shutil.move(self.fp,donefp)
             self.fp=donefp
             self.incoming=False
@@ -461,6 +463,7 @@ class Photo(DayModel):
             if self.deleted:
                 self.tags.filter(tag__name='delete').delete()
                 infp=get_nonexisting_fp(settings.INCOMING_PHOTO_DIR, self.filename())
+                log.info("undeleting: moving from %s 5o %s",self.fp,infp)
                 shutil.move(self.fp,infp)
                 self.fp=infp
                 self.deleted=False

@@ -22,6 +22,7 @@ def get_fps_from_incoming():
         if fpclean.endswith('.jpeg'):
             fpclean=fpclean.rsplit('.jpeg',1)[-2]+'.jpg'
         if fpclean!=fp:
+            log.info("moving from %s 5o %s",fp,fpclean)
             shutil.move(fp, fpclean)
         fps.append(fpclean)
     return fps
