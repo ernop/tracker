@@ -289,8 +289,8 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id myinfo first_name last_name description origin myintroduced_to mywith mysources mydomains mypurchases'.split()
-    list_filter=['origin',GenderFilter, AnyPurchaseFilter,KnownSinceLongAgo,HasPhotoFilter]
+    list_display='id myinfo description origin myintroduced_to mywith mysources mydomains mypurchases'.split()
+    list_filter=['origin', GenderFilter, AnyPurchaseFilter, KnownSinceLongAgo, HasPhotoFilter]
     date_hierarchy = 'created'
     list_editable=['description','origin',]
     list_per_page = 10
@@ -330,7 +330,6 @@ class PersonAdmin(OverriddenModelAdmin):
             pp.gender=2
             pp.save()
 
-    @debu
     def myinfo(self,obj):
         if obj.created == settings.LONG_AGO:
             known_since= 'long ago'

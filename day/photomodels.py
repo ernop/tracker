@@ -448,7 +448,12 @@ class Photo(DayModel):
             fn=self.filename()
             donefp=get_nonexisting_fp(settings.DONE_PHOTO_DIR,fn)
             self.tags.filter(tag__name='incoming').delete()
-            log.info("moving from %s 5o %s",self.fp,donefp)
+            if not self.tags.filter(tag__name='done').exists():
+                from photomodels import PhotoTag,PhotoTag
+                tt=PhotoHasTag(photo=self,tag=PhotoTag.objects.get(name='done'))
+                log.info('added done tag. %s', self)
+                tt.save()
+            log.info("moving from %s 5o %s", self.fp, donefp)
             shutil.move(self.fp,donefp)
             self.fp=donefp
             self.incoming=False

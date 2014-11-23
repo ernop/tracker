@@ -30,12 +30,15 @@ class PhotoAdmin(OverriddenModelAdmin):
              'autoorient','redo_classification','kill_entry',
              'unlink_from_day','rename_name','remove_photospot','set_day',]
     actions.extend(['remove_photospot','remove_day','rehash','merge_photos_lowest_id','check_thumbs',])
-    actions.append('set_founding')
+    actions.extend(['set_founding','set_done',])
     actions.sort()
+    
+    def set_done(self,request,queryset):
+        for ph in queryset:
+            ph.done()
     
     def set_day(self,request,queryset):
         for ph in queryset:
-            from utils import ipdb;ipdb()
             ph.set_day()
             ph.save()
     
