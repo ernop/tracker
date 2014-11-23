@@ -342,7 +342,7 @@ def make_safe_filename(fn):
     OKS = ['-', '_', ]
     rawfn=rawfn.replace('_','-').replace('\'','-')
     for c in rawfn:
-        if c.isalnum() or c in OKS:res.append(c)
+        if (c.isalnum() and ord(c)<256) or c in OKS:res.append(c)
     newfn=''.join(res)
     res=newfn+ext
     return res

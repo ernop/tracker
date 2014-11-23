@@ -173,8 +173,14 @@ class Photo(DayModel):
         
     def is_thumb_ok(self):
         if self.thumbfp:
-            if os.path.exists(self.thumbfp):
-                return True
+            try:
+                if os.path.exists(self.thumbfp):
+                    return True
+            except UnicodeEncodeError:
+                log.error('error dealing with thumbfp for %s',self)
+                self.thumbfp=''
+                self.save()
+                return False
         return False
         
     def create_thumb(self,force=False):
