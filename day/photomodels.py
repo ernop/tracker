@@ -208,10 +208,10 @@ class Photo(DayModel):
                              newthumbfp)
         
         log.info("create thumb doing cmd %s",cmd)
-        import locale
-        aa=locale.CODESET
-        bb=locale.nl_langinfo(locale.CODESET)
-        cc=os.path.supports_unicode_filenames
+        #import locale
+        #aa=locale.CODESET
+        #bb=locale.nl_langinfo(locale.CODESET)
+        #cc=os.path.supports_unicode_filenames
         if not os.path.exists(self.fp.encode('utf8')):
             return False
         try:
