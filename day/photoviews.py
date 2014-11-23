@@ -286,6 +286,7 @@ def ajax_photo_data(request):
                     exi=PhotoSpot.objects.get(name=name)
                     vals['message']='photospot of this name already existed'
                     vals['success']=False
+                    log.info('same name existed: %s',name)
                 except PhotoSpot.DoesNotExist:
                     photo=Photo.objects.get(id=todo['photo_id'])
                     ps=PhotoSpot(name=name,founding_photo=photo)
@@ -293,6 +294,7 @@ def ajax_photo_data(request):
                     vals['message']='created photospot %s with this as the founding.'%ps
                     vals['photospot_id']=ps.id
                     vals['name']=name
+                    log.error('new photospot name created: %s', name)
             else:
                 vals['message']='bad text %s'%todo['tagname']
                 vals['success']=False
@@ -378,12 +380,12 @@ def ajax_photo_data(request):
             #the photo won't actually be modified on disk, but pages which support cropped views
             #(mostly photospot view page) will show it with cropping info.
             vals['message']='saved %d crops'%len(todo['crops'])
-        
         else:
             log.error('bad k %s',k)
             from utils import ipdb;ipdb()
         return r2j(vals)
     except Exception,e:
+        from utils import ipdb;ipdb()
         vals['success']=False
         vals['message']='%s %s %s'%(todo,kind,e)
         return r2j(vals)

@@ -357,7 +357,7 @@ function create_tag(tagname, success_func){
 
 function create_photospot(spotname, success_func){
     //check we dont have it already
-    data={kind:'new photospot',spotname:spotname}
+    data={kind:'new photospot',spotname:spotname,'photo_id':$(".photozone").attr('photo_id')}
     $.ajax({
         url:'/ajax/photo_data/',
         type:'POST',
@@ -504,7 +504,8 @@ function setup_buttons(){
     
     $('#create-new-photospot-form').submit(function(e){
         var photospotname=$('#create-new-photospot-input').val();
-        notify('creating photospot based on form submit '+photospotname,true);
+        notify('creating photospot based on form submit '+photospotname, true);
+
         create_photospot(photospotname, function(pspot){
             //function to be called if creation is ok.
                 if (pspot){

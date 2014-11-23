@@ -97,7 +97,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     
     def redo_classification(self,request,queryset):
         for photo in queryset:
-            photo.tags.delete()
+            photo.tags.all().delete()
             photo.incoming=True
             photo.save()
             
@@ -296,12 +296,14 @@ class PhotoSpotAdmin(OverriddenModelAdmin):
         actions.append(make_assign(tourname))
   
     def myinfo(self,obj):
-        data=[('tour',obj.tour or 'no tour'),
+        data=(('tour',obj.tour or 'no tour'),
               ('order',obj.tour_order),
               ('description',obj.description or ''),
               ('photo count',obj.photos.count()),
+              
               (obj.vlink(text='spotpage')),
-              ]
+              ('created',obj.created.strftime(DATE_DASH_REV_DAY)),
+              )
         return mktable(data,skip_false=True)
     
     def myphotos(self,obj):
