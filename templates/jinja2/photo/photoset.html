@@ -1,18 +1,40 @@
 {% extends 'jinja2/photo_base.html' %}
 {% block title %}Photoset for {% for tag in phototags %}{{tag}} {% endfor %}{% endblock title %}
-{% block head %}{{super()}}{% endblock head %}
+{% block head %}{{super()}}
+
+<style>
+.hovered{border:4px solid lightblue;border-radius:4px;}
+.photolink.hovered{padding:0;}
+</style>
+<script src="/static/js/hovertag.js"></script>{% endblock head %}
+
 
 {% block content %}{% if LOCAL %}LOCAL{% endif %}
 <h1>Tagged with {% for phototag in phototags %}{{phototag.name}} {% endfor %} ({{photocount}})</h1>
 
 <div id="notification" class="notification-zone" style="display:inline-block;float:right;height:24px;">&nbsp;</div>
 
-<div class="addnamezone photoset-linkzone"><h3>Add</h3>{% for lnk,name in addnames %}<a class="btn btn-default tagkill" href="../{{lnk}}">{{name}} <span class="glyphicon glyphicon-plus"></span></a>{% endfor %}</div>
-<div class="killnamezone photoset-linkzone"><h3>Remove</h3>{% for lnk,name in killnames %}<a class="btn btn-default tagkill" href="../{{lnk}}">{{name}} <span class="glyphicon glyphicon-remove"></span></a>{% endfor %}</div>
-<div class="jumpnamezone photoset-linkzone"><h3>Jump</h3>{% for lnk,name in jumps %}<a class="btn btn-default tagkill" href="../{{lnk}}">{{name}}</a>{% endfor %}</div>
+<div class="addnamezone photoset-linkzone"><h3>Add</h3>
+    {% for lnk,name,count in addnames %}
+        <a class="btn btn-default hovertagable" iss="{{name}}" href="../{{lnk}}">{{name}} ({{count}})
+        <span class="glyphicon glyphicon-plus"></span></a>
+    {% endfor %}
+</div>
+
+{% if killnames %}<div class="killnamezone photoset-linkzone"><h3>Remove</h3>
+    {% for lnk,name,count in killnames %}
+        <a class="btn btn-default tagkill hovertagable" iss="{{name}}" href="../{{lnk}}">{{name}} {% if count %}({{count}}){% endif %}
+        <span class="glyphicon glyphicon-remove"></span></a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="jumpnamezone photoset-linkzone"><h3>Jump</h3>
+    {% for lnk,name,count in jumps %}<a class="btn btn-default hovertagable" iss="{{name}}" href="../{{lnk}}">{{name}} {% if count %}({{count}}){% endif %}</a>{% endfor %} 
+</div>
 
 {% for photo in photos %}
-    <div class="photolink">
+    <div class="photolink hovertagable" hass="{% for tag in photo.tags.all() %}{{tag.tag.name}}{% if loop.last %}{% else %},{% endif %}{% endfor %}">
         {{photo.inhtml(size='thumb',ajaxlink=True)|safe}}
     </div>
 {% endfor %}

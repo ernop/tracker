@@ -263,13 +263,18 @@ class PhotoTagAdmin(OverriddenModelAdmin):
         
     def myname(self,obj):
         have_day_count=(obj.photos.exclude(photo__day=None).count())
-        data=(('vlink',obj.vlink()),
+        if have_day_count:
+            have_day='<a href="../photo/?has_taken_day=yes&tagged_with=%d">have day (%d)</a>'%(obj.id,have_day_count)
+        else:
+            have_day=''
+        data=(
+            #('vlink',obj.vlink()),
               ('use count',obj.use_count),
               ('person clink',obj.person and '%s'%(obj.person.clink()) or ''),
               ('photoset','<a href="/photo/photoset/%s/">%s</a>'%(obj.name,obj.name)),
-              ('have day','<a href="../photo/?has_taken_day=yes&tagged_with=%d">have day (%d)</a>'%(obj.id,have_day_count)),
+              ('have day',have_day),
               )
-        return mktable(data)
+        return mktable(data,skip_false=True)
     adminify(myname, myphotos, mytags)
 
 class PhotoSpotAdmin(OverriddenModelAdmin):

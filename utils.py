@@ -334,7 +334,9 @@ def make_safe_tag_name(ss):
     for c in ss:
         if c.isalnum() or c in OKS:
             res.append(c)
-    return ''.join(res)
+    combo=''.join(res)
+    combo=combo.lower()
+    return combo
 
 def make_safe_filename(fn):
     res = []

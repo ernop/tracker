@@ -107,16 +107,20 @@ def photoset(request,tagset):
         nt=names[:]
         nt.remove(name)
         nt.sort()
-        if len(nt)>1:
+        
+        if len(nt)>0:
             subphotos=rawphotos
             for subnt in nt:
                 lookupsub=subnt.replace("(organization)",'').strip()
-                subphotos.filter(tags__tag__name=lookupsub)
-            killtext='%s (%d)'%(name, subphotos.count())
+                subphotos=subphotos.filter(tags__tag__name=lookupsub)
+            killtext=name
+            killcount=subphotos.count()
         else:
             killtext=name
-        killnames.append((','.join(nt),killtext))
-        jumps.append((name,name))
+            killcount=0
+        killnames.append((','.join(nt),killtext, killcount))
+        if len(names)!=1:
+            jumps.append((name, name, 100))
     photos=photos.distinct().order_by('taken','photo_created')
     photoids=[p.id for p in photos]
     #PhotoHasTag.objects.filter(photo__id__in=photoids)
@@ -129,16 +133,20 @@ def photoset(request,tagset):
         nt=names[:]
         nt.append(rt.name)
         nt.sort()
-        addlinkname='%s (%d)'%(rt.name,rt.ct)
-        addnames.append((','.join(nt),addlinkname))
-        jumps.append((rt.name,rt.name))
+        addlinkname=rt.name
+        addnames.append((','.join(nt),addlinkname,rt.ct))
+        jumps.append((rt.name,rt.name,100))
     vals['photocount']=photos.count()
     photos=photos[:5000]
     #addnames=[]
     vals['photos']=photos
     #vals['phototags']=[PhotoTag.objects.get(name=name) for name in names]
     vals['phototags']=phototags
-    vals['killnames']=killnames
+    if len(killnames)==1:
+        #cant kill the last one...
+        vals['killnames']=[]
+    else:vals['killnames']=killnames
+    
     vals['addnames']=addnames
     vals['jumps']=sorted(list(set(jumps)))
     return r2r('jinja2/photo/photoset.html',request,vals)
