@@ -457,7 +457,7 @@ class Photo(DayModel):
             #storing local variables
             ufp=''
         try:
-            stat=os.stat(self.fp):
+            stat=os.stat(self.fp)
         except:
             stat = os.stat(self.fp.encode('utf8'))
         atime, mtime = stat.st_atime,stat.st_mtime
