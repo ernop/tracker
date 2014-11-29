@@ -65,7 +65,10 @@ class Photo(DayModel):
             self.kill_thumb()
             self.delete()
             return False
-        res=os.path.exists(self.fp)
+        try:
+            res=os.path.exists(self.fp)
+        except:
+            res=os.path.exists(self.fp.encode('utf8'))
         if not res:
             if settings.LOCAL:
                 print 'del',self
