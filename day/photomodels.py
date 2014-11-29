@@ -567,7 +567,7 @@ class Photo(DayModel):
             vspot=self.photospot.vlink()
         
         vspot=div(klass='vspotzone',contents=vspot or '&nbsp;')
-        #data=(('tags vlink',vtags),
+        data=(#('tags vlink',vtags),
         ('photospot vlink',vspot),)
         res=mktable(data,skip_false=False)
         return res
