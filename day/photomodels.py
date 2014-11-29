@@ -244,7 +244,6 @@ class Photo(DayModel):
             return False
         if res:
             log.error('failure of convert command %s',cmd)
-            from utils import ipdb;ipdb()
             self.thumb_ok=False
             self.save()
             return False
@@ -449,6 +448,12 @@ class Photo(DayModel):
         if not os.path.exists(self.fp):
             log.error('tried to auto-orient an fp which then no longer existed. photoid:fp:%s',self.fp)
             return False
+        try:
+            ufp=self.fp.encode('utf8')
+        except Exception,e:
+            id=self.id
+            #storing local variables
+            ufp=''
         stat=os.stat(self.fp.encode('utf8'))
         atime,mtime=stat.st_atime,stat.st_mtime
         if self.fp.endswith('webp'):
