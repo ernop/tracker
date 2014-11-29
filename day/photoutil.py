@@ -206,3 +206,18 @@ def photospotsort(x):
 def phototagsort(x):
     key=(x.person is not None, x.person and -1*x.person.rough_purchase_count or 0,x.use_count*-1,x.name)
     return key
+
+def get_day_link(date):
+    if type(date)==datetime.datetime:
+        date=date.date()
+    
+    if not date:return ''
+    
+    from day.models import Day
+    exi=Day.objects.filter(date=date)
+    if exi.exists():
+        day=exi[0]
+    else:
+        day=Day(date=date)
+        day.save()
+    return day.vlink()

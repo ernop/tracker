@@ -289,7 +289,7 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id myinfo myphotos myintroduced_to mywith mysources mydomains mypurchases'.split()
+    list_display='id myinfo myphotos mywith mysources mydomains mypurchases'.split()
     list_filter=['origin', GenderFilter, AnyPurchaseFilter, KnownSinceLongAgo, HasPhotoFilter]
     date_hierarchy = 'created'
     #list_editable=['description','origin',]
@@ -410,20 +410,22 @@ class PersonAdmin(OverriddenModelAdmin):
             pp.save()
             messages.info(request, 'disabled %s'%pp)
 
-    def myintroduced_to(self, obj):
-        return mktable([(p.clink(), ) for p in obj.introduced_to.order_by('first_name', 'last_name')])
 
+        
     def mywith(self, obj):
         counts = {}
         costs = {}
+        bits=[]
+        bits.extend([('Introduced to',p.clink(), get_day_link(p.created)) for p in obj.introduced_to.order_by('created','first_name', 'last_name')])
+        
         ps = obj.purchases.all()
         for p in ps:
             togethercount = p.who_with.count()
             for person in p.who_with.exclude(id=obj.id):
                 counts[person.id] = counts.get(person.id, 0) + 1
                 costs[person.id] = costs.get(person.id, 0) + (p.get_cost() / togethercount)
-        bits = [(Person.objects.get(id=p).clink(), counts[p], '%0.1f' % costs[p]) for p in counts.keys()]
-        tbl = mktable(sorted(bits, key=lambda x:-1*x[1]))
+        bits.extend([(Person.objects.get(id=p).clink(), counts[p], '%0.1f' % costs[p]) for p,v in sorted(counts.items(), key=lambda x:-1*costs[x[0]])])
+        tbl = mktable(bits)
         return tbl
 
     def mysources(self, obj):
@@ -486,7 +488,7 @@ class PersonAdmin(OverriddenModelAdmin):
                          'last_name':forms.TextInput(attrs={'cols':30})}
         return EditForm
 
-    adminify(mydescription,myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith,myphotos)
+    adminify(mydescription, mysources, mypurchases, myinfo, mydomains, mywith,myphotos)
 
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name rmb_value symbol mytotal my3months'.split()

@@ -249,7 +249,6 @@ def amonth(request, month):
     vals['spots'] = sorted(spots, key=lambda x:(x.domain.name, x.name))
     # if d.notes.exists() or d.getmeasurements().exclude(amount=None).exists()
     vals['days'] = [d for d in Day.objects.filter(date__gte=start, date__lt=end).order_by('-date')]
-    
     vals['domaintable'] = domaintable
     vals['month'] = mm
     vals['pastmonth'] = add_months(mm, -1)
