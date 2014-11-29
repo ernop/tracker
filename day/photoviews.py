@@ -121,7 +121,8 @@ def photoset(request,tagset):
         killnames.append((','.join(nt),killtext, killcount))
         if len(names)!=1:
             jumps.append((name, name, photos.count()))
-    photos=photos.distinct().order_by('taken','photo_created')
+    photos=photos.distinct()
+    #self.taken or (self.day and self.day.date) or self.photo_created or No
     photoids=[p.id for p in photos]
     #PhotoHasTag.objects.filter(photo__id__in=photoids)
     rel_tags=PhotoTag.objects.filter(photos__photo__id__in=photoids)
@@ -137,7 +138,8 @@ def photoset(request,tagset):
         addnames.append((','.join(nt),addlinkname,rt.ct))
         jumps.append((rt.name,rt.name,rt.photos.count()))
     vals['photocount']=photos.count()
-    photos=photos[:5000]
+    photos=photos[:500]
+    photos.sort(key=lambda x:x.get_using_time())
     #addnames=[]
     vals['photos']=photos
     #vals['phototags']=[PhotoTag.objects.get(name=name) for name in names]

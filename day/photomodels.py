@@ -132,7 +132,15 @@ class Photo(DayModel):
     def __unicode__(self):
         return self.name or self.fp or 'no name'
     
-    def inhtml(self,clink=False,vlink=False,size='scaled',ajaxlink=False,tooltip_tags=False):
+    def get_using_time(self, formatter=None):
+        using_time=self.taken or (self.day and self.day.date) or self.photo_created or None
+        if using_time:
+            if not formatter:
+                formatter=DATE_DASH_REV_DAY
+            return using_time.strftime(formatter)
+        return ''
+    
+    def inhtml(self,clink=False,vlink=False,size='scaled',ajaxlink=False,tooltip_tags=True, date=True):
         if not vlink and not clink and not ajaxlink:
             clink=True
         thumb=False
@@ -164,6 +172,8 @@ class Photo(DayModel):
             src=self.get_external_fp()
         if tooltip_tags:
             tooltip=', '.join([t.tag.name for t in self.tags.all()])
+            if date:
+                tooltip += '&#10;'+self.get_using_time()
         else:
             tooltip=''
         if height:

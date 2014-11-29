@@ -35,7 +35,7 @@
 
 {% for photo in photos %}
     <div class="photolink hovertagable" hass="{% for tag in photo.tags.all() %}{{tag.tag.name}}{% if loop.last %}{% else %},{% endif %}{% endfor %}">
-        {{photo.inhtml(size='thumb',ajaxlink=True)|safe}}
+        {{photo.inhtml(size='thumb', ajaxlink=True, date=True)|safe}}
     </div>
 {% endfor %}
 

@@ -394,16 +394,14 @@ class PersonAdmin(OverriddenModelAdmin):
         dat=[]
         if obj.as_tag.exists():
             #from utils import ipdb;ipdb()
-            for pht in obj.as_tag.get().photos.order_by('photo__taken'):
-                ph=pht.photo
-                using_time=ph.taken or ph.day and ph.day.date or ph.photo_created or None
-                if using_time:
-                    phtime=using_time.strftime(DATE_DASH_REV_DAY)
-                else:phtime=''
+            photos=[pht.photo for pht in obj.as_tag.get().photos.distinct()]
+            photos.sort(key=lambda x:x.get_using_time())
+            for ph in photos:
+                using_time=ph.get_using_time()
                 #if ph==obj.founding_photo:
                     #dat.append((phtime,'<h2>Founding Photo</h2>'+div(contents=ph.inhtml(size='thumb', clink=True),klass='founding-photo photospot-photolist-admin')))
                 #else:
-                dat.append((phtime,ph.inhtml(size='thumb', clink=True)))
+                dat.append((using_time,ph.inhtml(ajaxlink=True, size='thumb', tooltip_tags=True,date=True)))
         return mktable(dat,non_max_width=True)
 
     def disable(self, request, queryset):
