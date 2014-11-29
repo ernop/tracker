@@ -117,7 +117,7 @@ def photoset(request,tagset):
             killtext=name
         killnames.append((','.join(nt),killtext))
         jumps.append((name,name))
-    photos=photos.distinct()
+    photos=photos.distinct().order_by('taken','photo_created')
     photoids=[p.id for p in photos]
     #PhotoHasTag.objects.filter(photo__id__in=photoids)
     rel_tags=PhotoTag.objects.filter(photos__photo__id__in=photoids)

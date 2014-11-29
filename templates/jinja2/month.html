@@ -49,7 +49,7 @@
 <div class="notification fixed-notification">
 </div>
 <table>
-{% for tag,count in span_tags %}
+{% for tag, count in span_tags %}
     <tr><td>{{tag.clink(text=tag.name+' db')|safe}}<td><a href="../../photo/photoset/{{tag.name}}/">{{tag.name}}</a><td>{{count}}
 {% endfor %}
 </table>

@@ -169,7 +169,14 @@ def mktable(dat, rights=None, bigs=None, skip_false=False, nb=False,non_max_widt
     return '<table class="%s" style="background-color:white;%s">%s</table>' % (tblklass,tblstyle,''.join(rows))
 
 
-def div(klass=None,contents=None):
+def nbspan(contents,klass=None,):
+    if not contents:contents=''
+    if not klass:
+        klass=''
+    res='<span class="nb %s">%s</span>'%(klass, contents)
+    return res
+
+def div(contents=None,klass=None):
     klasszone=''
     if klass:
         klasszone='class="%s"'%klass

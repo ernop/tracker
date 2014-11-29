@@ -129,6 +129,7 @@ class Photo(DayModel):
         return self.name or self.fp or 'no name'
     
     def inhtml(self,clink=False,vlink=False,size='scaled',ajaxlink=False):
+        #from utils import ipdb;ipdb()
         if not vlink and not clink and not ajaxlink:
             clink=True
         thumb=False
@@ -148,6 +149,7 @@ class Photo(DayModel):
         elif size=='thumb':
             height= settings.THUMB_HEIGHT
             thumb=True
+            width=int(1.0*settings.THUMB_HEIGHT*self.resolutionx/self.resolutiony)
         elif size=='orig':
             height=None
         else:

@@ -184,7 +184,7 @@ class PhotoTagAdmin(OverriddenModelAdmin):
     #date_hierarchy='created'
     #list_editable=['note',]
     search_fields= ['name']
-    list_filter=['control_tag', TagHasPersonFilter]
+    list_filter=['control_tag', TagHasPersonFilter,make_null_filter(include_empty_string=False,field='photos',title='has photos')]
     list_display='id myname myphotos mytags'.split()
     actions=['reinitialize_tags','create_people_tags','redo_classification','kill_all_days',]
     list_per_page=5
@@ -229,12 +229,12 @@ class PhotoTagAdmin(OverriddenModelAdmin):
             if pho.photo.id in done_ids:
                 continue
             realpho=pho.photo
-            res.append(realpho.inhtml(size='thumb'))
+            res.append(div(realpho.inhtml(size='thumb',ajaxlink=True),klass='nb float left'))
             done_ids.add(pho.photo.id)
         pres=''.join(res)
         alllink='<a href="../photo/?tagged_with=%s">All Photos</a>'%obj.id
-        res='<div class="big">%d</div><div style="display:inline-block;float:right;">%s</div>%s<br>%s'%(ct,sparkline,pres,alllink)
-        return res
+        txt='<div class="big">%d</div><div style="display:inline-block;float:right;">%s</div>%s<br>%s'%(ct,sparkline,pres,alllink)
+        return txt
         
     def mytags(self,obj):
         '''co-occuring tags'''
