@@ -148,6 +148,7 @@ def get_next_incoming(exclude=None, force_id=None):
         ii=0
         found=False
         ct=exis.count()
+        log.info("order %d",ct)
         while 1:
             if ii>=ct:
                 log.info("return false. %d",ii)

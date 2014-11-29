@@ -235,7 +235,6 @@ def ajax_photo_data(request):
                     exclude_ids=None
             except Exception,e:
                 from utils import ipdb;ipdb()
-            log.info('exclude ids %s',exclude_ids)
             if 'force id' in todo and todo['force id']:
                 nextphoto=get_next_incoming(force_id=todo['force id'], exclude=exclude_ids)
             else:
@@ -400,7 +399,8 @@ def ajax_photo_data(request):
         return r2j(vals)
     except Exception,e:
         from utils import ipdb;ipdb()
-        log.error('error; exception. %s %s %s',e,todo,nextphoto)
+        tb=traceback.format_exception()
+        log.error('error; exception. %s %s %s %s',e,todo,nextphoto,tb)
         vals['success']=False
         vals['message']='%s %s %s %s'%(todo,kind,e,nextphoto)
         return r2j(vals)
