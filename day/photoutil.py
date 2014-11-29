@@ -160,6 +160,7 @@ def get_next_incoming(exclude=None, force_id=None):
                     return img
             except:
                 log.error('file not exist %s',img)
+                ii+=1
                 continue
             else:
                 #its already deleted
