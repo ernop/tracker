@@ -160,7 +160,10 @@ class Photo(DayModel):
         elif size=='thumb':
             height= settings.THUMB_HEIGHT
             thumb=True
-            width=int(1.0*settings.THUMB_HEIGHT*self.resolutionx/self.resolutiony)
+            if self.resolutionx and self.resolutiony:
+                width=int(1.0*settings.THUMB_HEIGHT*self.resolutionx/self.resolutiony)
+            else:
+                width=''
         elif size=='orig':
             height=None
         else:
