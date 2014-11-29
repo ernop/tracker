@@ -120,7 +120,7 @@ def photoset(request,tagset):
             killcount=0
         killnames.append((','.join(nt),killtext, killcount))
         if len(names)!=1:
-            jumps.append((name, name, 100))
+            jumps.append((name, name, photos.count()))
     photos=photos.distinct().order_by('taken','photo_created')
     photoids=[p.id for p in photos]
     #PhotoHasTag.objects.filter(photo__id__in=photoids)
@@ -135,7 +135,7 @@ def photoset(request,tagset):
         nt.sort()
         addlinkname=rt.name
         addnames.append((','.join(nt),addlinkname,rt.ct))
-        jumps.append((rt.name,rt.name,100))
+        jumps.append((rt.name,rt.name,rt.photos.count()))
     vals['photocount']=photos.count()
     photos=photos[:5000]
     #addnames=[]
