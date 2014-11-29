@@ -225,6 +225,7 @@ def ajax_photo_data(request):
             todo=json.loads(request.raw_post_data)
             kind=todo['kind']
         goto_same=False
+        nextphoto=''
         if kind=='ajax photo preload':
             try:
                 if 'exclude_ids[]' in request.POST and request.POST['exclude_ids[]']:
@@ -397,9 +398,9 @@ def ajax_photo_data(request):
         return r2j(vals)
     except Exception,e:
         from utils import ipdb;ipdb()
-        log.error('error; exception. %s %s',e,todo)
+        log.error('error; exception. %s %s %s',e,todo,nextphoto)
         vals['success']=False
-        vals['message']='%s %s %s'%(todo,kind,e)
+        vals['message']='%s %s %s %s'%(todo,kind,e,nextphoto)
         return r2j(vals)
     
 
