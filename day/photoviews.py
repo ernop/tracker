@@ -235,10 +235,12 @@ def ajax_photo_data(request):
                     exclude_ids=None
             except Exception,e:
                 from utils import ipdb;ipdb()
+            log.info('exclude ids %s',exclude_ids)
             if 'force id' in todo and todo['force id']:
                 nextphoto=get_next_incoming(force_id=todo['force id'], exclude=exclude_ids)
             else:
                 nextphoto=get_next_incoming(exclude=exclude_ids)
+            log.info('got nextphoto %s',nextphoto)
             if not nextphoto:
                 vals['success']=False
                 vals['message']='could not get next incoming'
