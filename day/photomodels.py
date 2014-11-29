@@ -561,13 +561,13 @@ class Photo(DayModel):
     
     def links_table(self):
         from trackerutils import div
-        vtags=div(klass='vtagzone',contents=', '.join([tag.tag.vlink() for tag in self.tags.all()]))
+        #vtags=div(klass='vtagzone',contents=', '.join([tag.tag.vlink() for tag in self.tags.all()]))
         vspot=''
         if self.photospot:
             vspot=self.photospot.vlink()
         
         vspot=div(klass='vspotzone',contents=vspot or '&nbsp;')
-        data=(('tags vlink',vtags),
+        #data=(('tags vlink',vtags),
         ('photospot vlink',vspot),)
         res=mktable(data,skip_false=False)
         return res

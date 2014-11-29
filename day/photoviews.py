@@ -129,8 +129,9 @@ def photoset(request,tagset):
     from django.db.models import Count
     rel_tags=rel_tags.annotate(ct=Count('name')).order_by('-ct')
     for rt in rel_tags[:25]:
-        if rt.name in names:
+        if rt.name in names or rt.name in settings.EXCLUDE_FROM_PHOTOSET_TAGS:
             continue
+        
         nt=names[:]
         nt.append(rt.name)
         nt.sort()
