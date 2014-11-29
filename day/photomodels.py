@@ -456,8 +456,11 @@ class Photo(DayModel):
             id=self.id
             #storing local variables
             ufp=''
-        stat=os.stat(self.fp.encode('utf8'))
-        atime,mtime=stat.st_atime,stat.st_mtime
+        try:
+            stat=os.stat(self.fp):
+        except:
+            stat = os.stat(self.fp.encode('utf8'))
+        atime, mtime = stat.st_atime,stat.st_mtime
         if self.fp.endswith('webp'):
             #mogrify doesn't work on webp anyway.
             res=0
