@@ -448,6 +448,8 @@ class Photo(DayModel):
         if not os.path.exists(self.fp):
             log.error('tried to auto-orient an fp which then no longer existed. photoid:fp:%s',self.fp)
             return False
+        log.info('autoorient id %d',self.id)
+        log.info('autoorient %s',self.fp)
         try:
             ufp=self.fp.encode('utf8')
         except Exception,e:
