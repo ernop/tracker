@@ -154,9 +154,13 @@ def get_next_incoming(exclude=None, force_id=None):
                 log.info("return false. %d",ii)
                 return False
             img=exis[ii]
-            if img.file_exists():
-                log.info('returning img %s', img)
-                return img
+            try:
+                if img.file_exists():
+                    log.info('returning img %s', img)
+                    return img
+            except:
+                log.error('file not exist %s',img)
+                continue
             else:
                 #its already deleted
                 pass
