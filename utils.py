@@ -556,3 +556,6 @@ def get_span_tags(start, end, user=None):
     res=sorted(tag_counts.items(),key=lambda x:(-1*x[1]))
     res=[s for s in res if s[1]>2]
     return res
+
+def prespan(contents):
+    return '<span class="pre">%s</span>'%contents

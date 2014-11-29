@@ -19,7 +19,7 @@ class DayModel(models.Model):
     
     #should add default modified & created here.
 
-    def clink(self, text=None,wrap=True,skip_btn=False,klasses=None):
+    def clink(self, text=None,wrap=True,skip_btn=False,klasses=None, tooltip=None):
         if skip_btn:
             klass=''
         else:
@@ -32,7 +32,9 @@ class DayModel(models.Model):
             wrap=' nb'
         if not text:
             text=self
-        return u'<a class="%s%s" href="%s/day/%s/?id=%d">%s</a>'%(klass, wrap, settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
+        if not tooltip:
+            tooltip=''
+        return u'<a class="%s%s" title="%s" href="%s/day/%s/?id=%d">%s</a>'%(klass, tooltip, wrap, settings.ADMIN_EXTERNAL_BASE, self.__class__.__name__.lower(), self.id, text)
 
     def alink(self, text=None,wrap=True):
         if wrap:

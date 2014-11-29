@@ -98,20 +98,22 @@ class Photo(DayModel):
         if os.path.exists(self.thumbfp):
             os.remove(self.thumbfp)
 
-    def vlink(self,text=None, wrap=False):
+    def vlink(self,text=None, wrap=False, tooltip=None):
         if wrap:
             wrap=' nb'
         else:
             wrap=''
+        if not tooltip:
+            tooltip=''
         if not text:
             if self.name:
                 text=self.name
             else:
                 text='no name photo'
-        return '<a class="btn%s" href="%s">%s</a>'%(wrap,self.exhref(), text)
+        return '<a class="btn%s" title="%s" href="%s">%s</a>'%(wrap, tooltip, self.exhref(), text)
     
     
-    def ajaxlink(self,text=None,wrap=False):
+    def ajaxlink(self,text=None,wrap=False,tooltip=None):
         if wrap:
             wrap=' nb'
         else:
@@ -119,7 +121,9 @@ class Photo(DayModel):
         if not text:
             text='ajax link'
         '''link to /photo/photoajax/#!id'''
-        res='<a class="%s" href="/photo/photoajax/#!id=%d">%s</a>'%(wrap, self.id, text)
+        if not tooltip:
+            tooltip=''
+        res='<a class="%s" title="%s" href="/photo/photoajax/#!id=%d">%s</a>'%(wrap, tooltip, self.id, text)
         return res
     
     def exhref(self):
@@ -128,8 +132,7 @@ class Photo(DayModel):
     def __unicode__(self):
         return self.name or self.fp or 'no name'
     
-    def inhtml(self,clink=False,vlink=False,size='scaled',ajaxlink=False):
-        #from utils import ipdb;ipdb()
+    def inhtml(self,clink=False,vlink=False,size='scaled',ajaxlink=False,tooltip_tags=False):
         if not vlink and not clink and not ajaxlink:
             clink=True
         thumb=False
@@ -155,9 +158,14 @@ class Photo(DayModel):
         else:
             height=100
         if thumb:
+            tooltip_tags=True
             src=self.get_external_fp(thumb=True)
         else:
             src=self.get_external_fp()
+        if tooltip_tags:
+            tooltip=', '.join([t.tag.name for t in self.tags.all()])
+        else:
+            tooltip=''
         if height:
             if width:
                 img='<img src="%s" height=%d width=%d>'%(src, height, width)
@@ -166,11 +174,11 @@ class Photo(DayModel):
         else:
             img='<img src="%s">'%(self.get_external_fp())
         if vlink:
-            return self.vlink(text=img,wrap=False)
+            return self.vlink(text=img,wrap=False, tooltip=tooltip)
         elif clink:
-            return self.clink(text=img,wrap=False,skip_btn=True)
+            return self.clink(text=img,wrap=False,skip_btn=True, tooltip=tooltip)
         elif ajaxlink:
-            return self.ajaxlink(text=img,wrap=False)
+            return self.ajaxlink(text=img,wrap=False, tooltip=tooltip)
         return img
         
     def is_thumb_ok(self):

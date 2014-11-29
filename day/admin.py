@@ -289,10 +289,10 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id myinfo description origin myintroduced_to mywith mysources mydomains mypurchases'.split()
+    list_display='id myinfo myphotos myintroduced_to mywith mysources mydomains mypurchases'.split()
     list_filter=['origin', GenderFilter, AnyPurchaseFilter, KnownSinceLongAgo, HasPhotoFilter]
     date_hierarchy = 'created'
-    list_editable=['description','origin',]
+    #list_editable=['description','origin',]
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
     actions = ['disable','male','female','organization', 'set_longago', 'set_today', 'update_rough_purchase_counts', ]
@@ -361,6 +361,7 @@ class PersonAdmin(OverriddenModelAdmin):
         
         data=[('name',obj.name(),),
               ('origin',obj.origin or ''),
+              ('description',obj.description and prespan(obj.description) or ''),
               ('gender',obj.get_gender()),
               ('known since',known_since),
               ('met through',met_through),
@@ -372,7 +373,14 @@ class PersonAdmin(OverriddenModelAdmin):
               ('cday',latest_dclink),
               ('vday',latest_dvlink),
               ('taglink', obj.as_tag.exists() and obj.as_tag.get().clink() or ''),
+              ('photoset', obj.as_tag.exists() and obj.as_tag.get().clink() or ''),
+              
               ]
+        
+        tbl=mktable(data,skip_false=True)
+        return tbl
+    
+    def myphotos(self,obj):
         if obj.as_tag.exists():
             try:
                 photos='<br>'+''.join([p.photo.inhtml(size='thumb',ajaxlink=True) for p in obj.as_tag.get().photos.all()])
@@ -380,8 +388,23 @@ class PersonAdmin(OverriddenModelAdmin):
                 photos=''
         else:
             photos=''
-        tbl=mktable(data,skip_false=True)
-        return tbl+photos
+        return photos
+    
+    def myphotos(self,obj):
+        dat=[]
+        if obj.as_tag.exists():
+            #from utils import ipdb;ipdb()
+            for pht in obj.as_tag.get().photos.order_by('photo__taken'):
+                ph=pht.photo
+                using_time=ph.taken or ph.day and ph.day.date or ph.photo_created or None
+                if using_time:
+                    phtime=using_time.strftime(DATE_DASH_REV_DAY)
+                else:phtime=''
+                #if ph==obj.founding_photo:
+                    #dat.append((phtime,'<h2>Founding Photo</h2>'+div(contents=ph.inhtml(size='thumb', clink=True),klass='founding-photo photospot-photolist-admin')))
+                #else:
+                dat.append((phtime,ph.inhtml(size='thumb', clink=True)))
+        return mktable(dat,non_max_width=True)
 
     def disable(self, request, queryset):
         for pp in queryset:
@@ -465,7 +488,7 @@ class PersonAdmin(OverriddenModelAdmin):
                          'last_name':forms.TextInput(attrs={'cols':30})}
         return EditForm
 
-    adminify(mydescription,myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith)
+    adminify(mydescription,myintroduced_to, mysources, mypurchases, myinfo, mydomains, mywith,myphotos)
 
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name rmb_value symbol mytotal my3months'.split()
