@@ -399,7 +399,7 @@ def ajax_photo_data(request):
         return r2j(vals)
     except Exception,e:
         from utils import ipdb;ipdb()
-        tb=traceback.format_exception()
+        tb=traceback.format_exc()
         log.error('error; exception. %s %s %s %s',e,todo,nextphoto,tb)
         vals['success']=False
         vals['message']='%s %s %s %s'%(todo,kind,e,nextphoto)
