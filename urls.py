@@ -33,6 +33,7 @@ urlpatterns = patterns('',
 
     #-------------------------------------------AJAX-------------------------------------------
 
+    url(r'^ajax/get_data/$','day.ajax_views.ajax_get_data',name='ajax_get_data'),
     url(r'^ajax/get_purchases/$','day.ajax_views.ajax_get_purchases',name='ajax_get_purchases'),
     url(r'^ajax/get_popular/$','day.ajax_views.ajax_get_popular',name='ajax_get_popular'),
     url(r'^ajax/make_purchase/$','day.ajax_views.ajax_make_purchase',name='ajax_make_purchase'),

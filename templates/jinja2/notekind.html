@@ -12,9 +12,6 @@
         {% include "jinja2/noteview.html" %}
     {% endfor %}
     
-    <div class="row"><div>
-        <div id="notification" class="notification-zone">&nbsp;</div>
-    </div></div>
 {% endblock %}
 {% block footer %}{% for onk in allnks%}
 {{onk.vlink()|safe}}

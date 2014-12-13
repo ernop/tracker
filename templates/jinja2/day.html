@@ -6,8 +6,6 @@
     <script src='/static/js/recordmp3.js'></script>
     <script src='/static/js/recording_helpers.js'></script>
     <script src='/static/js/day.js'></script>
-    
-    
     <script>
         var today={{today|jsonify|safe}};
         var notekinds={{notekinds|jsonify|safe}};
@@ -19,11 +17,14 @@
         var hours={{hours|jsonify|safe}};
         var hour={{hour|jsonify|safe}};
         var measurement_spots={{measurement_spots|jsonify|safe}};
+        var day_id={{day.id}};
+        var noteids={{noteids|jsonify|safe}}
         $(document).ready(function(){
             $(".hoverable").popover({trigger:'hover',placement:'bottom'})
         })
     </script>
-    <style>.container{width:90%;}
+    <style>
+    .container{width:90%;}
     .popover{max-width:500px;}
     .popover-content{18px;}
     .note-outline{display:inline-block;width:90%;padding-bottom:18px;}
@@ -32,8 +33,9 @@
     .redborder{border:3px solid red;border-radius:4px;}
     </style>
 {% endblock %}
-{% block content %}{% if LOCAL %}LOCAL{% endif %}
-<div id="day_id" day_id="{{day.id}}"></div>
+
+{% block content %}
+{% if LOCAL %}<a class="btn-default btn" href="http://tracker{{path}}" target=_blank>live</a>{% endif %}
 <div class="row">
     <div>
         <h2>{{day.date}} {{day.show_day()}}</h2>
@@ -51,7 +53,6 @@
             <div class="historybox">
             <span class="float:left;">{{historyday.hoverblock()|safe}}</span>
             {% set taken_photos=historyday.get_day_taken_photos(user)%}
-            
             {% if taken_photos%}
                 {% for photo in taken_photos %}
                     <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
@@ -71,24 +72,19 @@
     </div>
 </div>
 
-<div class="span2" style="float:left;">
-    <div class="add-note">
-        <span class="glyphicon glyphicon-plus"></span>
+{% include "jinja2/noteblock.html" %}
+
+
+<div class="noteouter">
+    <div class="span2" style="float:left;">
+        <div class="add-note btn btn-default">
+            <span class="glyphicon glyphicon-plus"></span>
+        </div>
+    </div>
+    <a href="/admin/day/notekind/add" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>add notekind</a>
+    <div class="notezone">
     </div>
 </div>
-<br><br>
-<div class="notezone">
-{% for note in notes %}<br>
-    <div class="note-outline">{% include "jinja2/noteedit.html" %}</div>
-{% endfor %}
-</div>
-
-<div>
-    <div id="notification" class="notification-zone">&nbsp;</div>
-</div>
-<hr>
-
-    <a href="/admin/day/notekind/add" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>add notekind</a>
 
 
 <div>
@@ -103,8 +99,9 @@
         <tr><td>source <td><input id="purchase-source" style="width:190px;"></input><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/source/add"><span class="glyphicon glyphicon-plus"></span></a><td><div class="source-chooser">
         <tr><td>hour<td><input type=text id="purchase-hour" style="width:190px;" value="{{hour}}"></input><td><div class="hour-chooser">
         <tr><td>who<td><input id=purchase-who_with style="width:190px;"></input><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/person/add"><span class="glyphicon glyphicon-plus"></span></a><td><div class="who_with-chooser">
-        <tr><td>note<td><input type=text id=purchase-note style="width:180px;"></input>
+        
         <tr><td>currency<td><input type=text id=purchase-currency style="width:190px;"></input>
+        <tr><td>note<td><input type=text id=purchase-note style="width:180px;"></input>
         <tr><td>size<td><input type=text id=purchase-size  style="width:180px;"></input>
         <tr><td><div class="btn btn-default make-purchase">Save</div>
         <td>

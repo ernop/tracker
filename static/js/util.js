@@ -27,7 +27,9 @@ function fix_phototags(){
         }
     });
 }
-
+function clear_notifications(){
+	$('.fixed-notification .alert').slideUp()
+}
 
 function notify(msg, success){
 	if (success){
@@ -37,8 +39,6 @@ function notify(msg, success){
 	}
 	var note=$('<div class="alert alert-'+klass+'">'+msg+'</div>');
 	var nzone=$(".fixed-notification");
-	
-	if (!nzone.length){var nzone=$('.notification-zone')}
 	if (nzone.length){
 		nzone.find('.alert').slideUp(function(){this.remove()});
 		nzone.append(note);

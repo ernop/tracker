@@ -71,7 +71,7 @@ def gethour(hour=None):
     #log.info('hour %d res %s',hour, res)
     return res
 
-HOUR_CHOICES=zip([0,1,2,3,4,5], 'morning noon afternoon evening night midnight'.split())
+HOUR_CHOICES=zip([8,1,2,3,4,5], 'morning noon afternoon evening night midnight'.split())
 HOUR_CHOICES.append((6, 'deep night'))
 HOUR_CHOICES.append((7, 'early morning'))
 hour2name={}

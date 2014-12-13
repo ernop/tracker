@@ -3,8 +3,6 @@ function setup_change_describer(){
 	$("#purchase-source").change(show_popular_from_source)
 }
 
-
-
 function show_popular_from_product(){
 	//for the current selection of the product, show the popular prices, sources, hour etc. for quick selection!
 	var thing=$("#purchase-product").select2('data');
@@ -92,6 +90,14 @@ function add_thing_to_hour_zone(thing){
 	wc.append(txt);
 }
 
+
+function add_thing_to_price_zone(thing){
+	var pz=$(".price-chooser");
+	var txt=$("<div style='float:left;' class='autochooser price-autochooser' val="+thing[0]+">"+thing[0]+"</div>")
+	pz.append(txt);
+}
+
+
 function set_source(e){
 	$("#purchase-source").select2('val', $(e.target).attr('val_id'));
 }
@@ -113,12 +119,6 @@ function set_who_with(e){
 function set_price(e){
 	var thing=$(e.target);
 	$("#purchase-cost").val(thing.attr('val'))
-}
-
-function add_thing_to_price_zone(thing){
-	var pz=$(".price-chooser");
-	var txt=$("<div style='float:left;' class='autochooser price-autochooser' val="+thing[0]+">"+thing[0]+"</div>")
-	pz.append(txt);
 }
 
 function setup_new_purch(){
@@ -195,7 +195,7 @@ function submit_purchase(){
 	data=get_purchase_data();
 	if (data){
 		data['today']=today;
-		$('.make-purchase').before('<span style="float:left;" class="alert alert-error loading">saving</span>')
+		notify('saving',true)
 		$.ajax({
 			type:'POST',
 			url:'/ajax/make_purchase/',
@@ -204,6 +204,7 @@ function submit_purchase(){
 			//contentType: "application/json; charset=utf-8",
 			success:function(data){
 				$('.loading').slideUp();
+				clear_notifications()
 				display_purch();
 			},
 			error:function(a,b,c){
@@ -244,8 +245,6 @@ function display_purch(){
 		type:'POST',
 		url:'/ajax/get_purchases/',
 		data:{'today':today},
-		//dataType:"json",
-		//contentType: "application/json; charset=utf-8",
 		success:function(data){
 			var pz=$(".purchase-list");
 			pz.find('.purchase').remove();
@@ -265,8 +264,6 @@ function display_measurement(){
 		type:'POST',
 		url:'/ajax/get_measurements/',
 		data:{'today':today},
-		//dataType:"json",
-		//contentType: "application/json; charset=utf-8",
 		success:function(data){
 			var pz=$(".measurement-list");
 			pz.find('.measurement').remove();
@@ -307,13 +304,8 @@ function who_with_clinks(purchase){
 }
 
 function obj2measurement(measurement){
-	//return '<div class="measurement">'+m_clink(measurement)+' '+m_p_alink(measurement)+' '+ measurement.amount+'</div>';
 	return '<tr class="measurement"><td>'+m_clink(measurement)+'<td>'+m_p_alink(measurement)+'<td>'+measurement_all_spot(measurement)+'<td>'+measurement_domain_clink(measurement)+'<td>'+ measurement.amount+'</tr>';
 }
-
-//function m_clink(m){
-	//return '<a href="/admin/day/measurement/?spot__id='+m.spot+'">'+m.name+'</a>'
-//}
 
 function measurement_domain_clink(m){
 	return '<a href="/admin/day/domain/?id='+m.domain_id+'">'+m.domain_name+'</a>'

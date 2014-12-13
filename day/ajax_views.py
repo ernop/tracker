@@ -21,6 +21,28 @@ from forms import DayForm
 #def select2_people(request):
 
 @user_passes_test(staff_test)
+def ajax_get_data(request):
+    try:
+        data=request.POST.dict()
+        kind=data['kind']
+        kind2klass={'note':Note, }
+        objid=data['id']
+        if kind=='note':
+            if objid=='new':
+                day=Day.objects.get(id=data['other_data[day_id]'])
+                guy=Note(day=day)
+                guy.save()
+            else:
+                guy=Note.objects.get(id=data['id'])
+        html=guy.as_html()
+        res={'success':True,'html':html}
+        return r2j(res)
+    except Exception,e:
+        from utils import ipdb;ipdb()
+        res={'success':False,'message':'error: %s'%e}
+        return r2j(res)
+
+@user_passes_test(staff_test)
 def ajax_serve_mp3(request,mp3_filename):
     fn=make_safe_filename(mp3_filename)
     fp=os.path.join(settings.MP3_DIR,fn)

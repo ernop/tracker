@@ -6,10 +6,24 @@ $(document).ready(function(){
     setup_new_measurement();
     display_measurement();
     setup_change_describer();
-    $(".add-note").click(add_note);
-    $(".add-note").click();
+    
     setup_mp3_recording();
+    setup_notes()
 });
+
+function draw_note(html){
+    $('.noteouter').prepend(html);
+    setup_nkselect();
+    setup_textarea();
+    setup_savebutton();
+}
+
+function setup_notes(){
+    $.each(noteids, function(index, noteid){
+        get_data('note', noteid, null, draw_note)
+    })
+    $(".add-note").click(function(){get_data('note','new', {'day_id':day_id},draw_note)});
+}
 
 
 myinitSelection = function(element, callback) {
@@ -151,8 +165,28 @@ function data_changed(target, kind){
         data['note_id']=target.closest('.note-row').attr('note_id');
         data['notekind_ids']=target.attr('value');
     }
-    data['day_id']=$("#day_id").attr('day_id');
+    data['day_id']=day_id;
     send_data(data, target);
+}
+
+function get_data(kind, id, other_data, callback){
+    //lookup the html for a blob
+    //new version of day page: everything as just IDs and then js looks it up & draws it
+    data={'kind':kind,'id':id,'other_data':other_data}
+    $.ajax({
+        url:'/ajax/get_data/',
+        type:'POST',
+        data:data,
+        success:function(dat){
+            notify(dat['message'], dat['success'])
+            if (dat['success']){
+                callback(dat['html'])
+            }
+        },
+        error:function(dat){
+            notify('error',false)
+        }
+    });
 }
 
 function send_data(data, target){
@@ -161,8 +195,10 @@ function send_data(data, target){
         type:'POST',
         data:data,
         success:function(dat){
-            $("#notification").find('.alert').slideUp()
-            $("#notification").append($('<div class="alert alert-success">'+dat['message']+'</div>'));
+            clear_notifications()
+            notify(dat['message'],dat['success'])
+            //$("#notification").find('.alert').slideUp()
+            //$("#notification").append($('<div class="alert alert-success">'+dat['message']+'</div>'));
             setTimeout(function(){$(".alert").slideUp()}, 1500);
             target.closest('.note-row').attr('note_id',dat['note_id']);
             if (dat['deleted']){
@@ -177,14 +213,4 @@ function send_data(data, target){
     });
 }
 
-function add_note(){
-    var newouter=$('#notemodel').clone().removeAttr('id');
-    var innerrow=newouter.find('.note-row')
-    $(".notezone").prepend(newouter);
-    newouter.show();
-    newouter.find('.notekindselect').addClass('new');
-    setup_nkselect();
-    setup_textarea();
-    setup_savebutton();
-}
 

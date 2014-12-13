@@ -403,6 +403,7 @@ class Muscle(DayModel):
 
     def adm(self):
         return lnk('muscle',self.id, self)
+    
 class Note(DayModel):
     day=models.ForeignKey('Day', related_name='notes')
     text=models.TextField()
@@ -410,8 +411,15 @@ class Note(DayModel):
     kinds=models.ManyToManyField('NoteKind', related_name='notes', blank=True, null=True)
     mp3path=models.CharField(max_length=500,blank=True,null=True) #based on 
  
+    template='jinja2/objects/note.html' 
+ 
+    def as_html(self):
+        html=r2s(self.template, {'note':self})
+        return html
+ 
     class Meta:
         db_table='note'
+        
 
     def __unicode__(self):
         return '%s %s'%(str(self.day), self.nks() or 'no kind')
