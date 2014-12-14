@@ -407,13 +407,15 @@ class Muscle(DayModel):
 class Note(DayModel):
     day=models.ForeignKey('Day', related_name='notes')
     text=models.TextField()
+    deleted=models.BooleanField(default=False)
     created=models.DateTimeField(auto_now_add=True)
     kinds=models.ManyToManyField('NoteKind', related_name='notes', blank=True, null=True)
     mp3path=models.CharField(max_length=500,blank=True,null=True) #based on 
- 
     template='jinja2/objects/note.html' 
  
     def as_html(self):
+        if self.deleted:
+            return '[deleted]'
         html=r2s(self.template, {'note':self})
         return html
  
@@ -428,6 +430,8 @@ class Note(DayModel):
         return ','.join([str(nk) for nk in self.kinds.all()])
     
     def html(self):
+        if self.deleted:
+            return '[deleted]'
         txt=self.text
         txt=txt.replace('\n','<br>')
         return txt
@@ -439,7 +443,7 @@ class Note(DayModel):
         return ','.join([str(n.id) for n in self.kinds.all()])
 
     def get_height(self):
-        return (self.text and len(self.text)/4+80) or '250'
+        return (self.text and len(self.text)/4+80) or '50'
 
 class NoteKind(DayModel):
     name=models.CharField(max_length=100)

@@ -183,8 +183,8 @@ def aday(request, day):
     vals['allpeople']=Person.objects.all()
     vals['allpeople']=[]
     vals['name2hour']=name2hour
-    vals['notes']=day.notes.all()
-    vals['noteids']=[note.id for note in day.notes.all()]
+    vals['notes']=day.notes.filter(deleted=False)
+    vals['noteids']=[note.id for note in day.notes.filter(deleted=False).order_by('-created')]
     nextday=day.date+datetime.timedelta(days=1)
     vals['purchases']=Purchase.objects.filter(created__gte=day.date, created__lt=nextday).order_by('hour')
     vals['full_notekinds']=[{'id':n.id,'text':n.name} for n in NoteKind.objects.order_by('name')]

@@ -28,15 +28,18 @@
     .popover{max-width:500px;}
     .popover-content{18px;}
     .note-outline{display:inline-block;width:90%;padding-bottom:18px;}
-    .notekindzone{margin-left:15px;display:inline-block;}
+    .notekindzone{margin-left:15px;display:inline-block;float:left}
     .note-row{font-size:18px;line-height:18px;}
     .redborder{border:3px solid red;border-radius:4px;}
+    .ib {display:inline-block;}
+    .left{float:left;}
+    .clear{clear:both;}
     </style>
 {% endblock %}
 
 {% block content %}
 {% if LOCAL %}<a class="btn-default btn" href="http://tracker{{path}}" target=_blank>live</a>{% endif %}
-<div class="row">
+<div class="ib left clear">
     <div>
         <h2>{{day.date}} {{day.show_day()}}</h2>
         {% set dayphotos = day.get_day_taken_photos(user) %}
@@ -72,22 +75,19 @@
     </div>
 </div>
 
-{% include "jinja2/noteblock.html" %}
-
-
-<div class="noteouter">
-    <div class="span2" style="float:left;">
-        <div class="add-note btn btn-default">
-            <span class="glyphicon glyphicon-plus"></span>
-        </div>
+<div class="noteouter ib left clear">
+    <div class="add-note btn btn-default left ib">
+        <span class="glyphicon glyphicon-plus"></span>new note
     </div>
-    <a href="/admin/day/notekind/add" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>add notekind</a>
+    <div class="left ib">
+        <a href="/admin/day/notekind/add" target=_blank class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>add notekind</a>
+    </div>
     <div class="notezone">
     </div>
 </div>
 
 
-<div>
+<div class="ib left clear">
     <h2>Purchases</h2>
     <table class="purchase-list table"></table>
     <div class="purchase-zone span12">
@@ -111,40 +111,32 @@
     </div>
 </div>
 
-<div class="row">
+<div class="ib left clear">
     <h2>Measurement</h2>
-    <div>
     <table class="table thintable measurement-list">
     </table>
-    <div class="measurement-zone">
+    <div class="measurement-zone ib left">
         <table class="table"><tr>
         <tr><td><input  id="measurement-spot" style="width:190px;"></input><td><input type=text id="measurement-amount" style="width:190px;"></input>
         <tr><td><div class="btn btn-default make-measurement">Save</div><td><div class="measurement-loading-zone">&nbsp;</div>
         <tr><td><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/measurement/add"><span class="glyphicon glyphicon-plus"></span>new</a>
         </table>
     </div>
-</div></div>
+</div>
 
-<div class="row" style='display:none;'><div>
+<div class="ib left clear" style='display:none;'>
 <h2>Workouts</h2>
     {% for workout in day.getworkouts() %}
     {{workout.mysets()|safe}}<br>{% endfor %}
     <a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/day/add"><span class="glyphicon glyphicon-plus"></span> new</a><br>
-</div></div>
-
-<div id="notemodel" class="note-outline" style="display:none;">
-    <div class="note-row" note_id="new" >
-            <textarea class="textarea" id="note" note_id="new" style="float:left;height:100px;"></textarea>
-            <div class="notekindzone">
-                <div class="notekind-available"></div>
-                <button class="notekindselect" value=""></button>
-            </div>
-    </div>
 </div>
 
 <div class="notification fixed-notification">
 </div>
 
 {% endblock %}
-{% block footer %}{{super()}}{% include "jinja2/dayfooter.html" %}
+
+{% block footer %}{{super()}}
+<div class="ib left clear">{% include "jinja2/dayfooter.html" %}
+</div>
 {% endblock %}

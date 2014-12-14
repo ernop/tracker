@@ -11,18 +11,31 @@ $(document).ready(function(){
     setup_notes()
 });
 
-function draw_note(html){
-    $('.noteouter').prepend(html);
+function draw_note(dat){
+    $('.notezone').prepend(dat['html']);
     setup_nkselect();
     setup_textarea();
     setup_savebutton();
+    setup_notedel();
+}
+
+function del_note(dat){
+    //userland hide note (option to undo later)
+    $('.note-outline[note_id='+dat['note_id']+']').slideUp();
+}
+
+function setup_notedel(){
+    $('.del-note').unbind('click').click(function(e){
+        var note_id=$(this).closest('.note-outline').attr('note_id')
+        get_data({'kind':'note','id':note_id,'action':'delete'}, del_note)
+    })
 }
 
 function setup_notes(){
     $.each(noteids, function(index, noteid){
-        get_data('note', noteid, null, draw_note)
+        get_data({'kind':'note', 'id':noteid, 'action':'get'},draw_note)
     })
-    $(".add-note").click(function(){get_data('note','new', {'day_id':day_id},draw_note)});
+    $(".add-note").click(function(){get_data({'kind':'note', 'action':'new', 'day_id':day_id},draw_note)});
 }
 
 
@@ -169,10 +182,9 @@ function data_changed(target, kind){
     send_data(data, target);
 }
 
-function get_data(kind, id, other_data, callback){
+function get_data(data, callback){
     //lookup the html for a blob
     //new version of day page: everything as just IDs and then js looks it up & draws it
-    data={'kind':kind,'id':id,'other_data':other_data}
     $.ajax({
         url:'/ajax/get_data/',
         type:'POST',
@@ -180,7 +192,7 @@ function get_data(kind, id, other_data, callback){
         success:function(dat){
             notify(dat['message'], dat['success'])
             if (dat['success']){
-                callback(dat['html'])
+                callback(dat)
             }
         },
         error:function(dat){

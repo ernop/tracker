@@ -22,7 +22,11 @@ function setup_mp3_recording(){
     navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
       __log('No live audio input: ' + e);
     });
-      $('.recorder-start').unbind('click').bind('click', function(e){startRecording($(e.target))})
+    init_mp3_buttons()
+}
+
+function init_mp3_buttons(){
+    $('.recorder-start').unbind('click').bind('click', function(e){startRecording($(e.target))})
     $('.recorder-stop').unbind('click').bind('click', function(e){stopRecording($(e.target))})
 }
 

@@ -32,6 +32,7 @@ function clear_notifications(){
 }
 
 function notify(msg, success){
+	if (!msg){return;}
 	if (success){
 		var klass='success'}
 	else{

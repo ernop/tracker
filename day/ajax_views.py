@@ -25,17 +25,24 @@ def ajax_get_data(request):
     try:
         data=request.POST.dict()
         kind=data['kind']
-        kind2klass={'note':Note, }
-        objid=data['id']
+        action=data['action']
+        #kind2klass={'note':Note, }
         if kind=='note':
-            if objid=='new':
-                day=Day.objects.get(id=data['other_data[day_id]'])
+            if action=='new':
+                day=Day.objects.get(id=data['day_id'])
                 guy=Note(day=day)
                 guy.save()
-            else:
+                html=guy.as_html()
+                res={'success':True,'html':html,'message':None}
+            elif action=='delete':
                 guy=Note.objects.get(id=data['id'])
-        html=guy.as_html()
-        res={'success':True,'html':html}
+                guy.deleted=True
+                guy.save()
+                res={'success':True,'message':'deleted','note_id':data['id']}
+            elif action=='get':
+                guy=Note.objects.get(id=data['id'])
+                html=guy.as_html()
+                res={'success':True,'html':html,'message':None}
         return r2j(res)
     except Exception,e:
         from utils import ipdb;ipdb()
