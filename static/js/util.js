@@ -36,7 +36,7 @@ function notify(msg, success){
 	if (success){
 		var klass='success'}
 	else{
-		var klass='failure';
+		var klass='error';
 	}
 	var note=$('<div class="alert alert-'+klass+'">'+msg+'</div>');
 	var nzone=$(".fixed-notification");

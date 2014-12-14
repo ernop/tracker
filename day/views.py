@@ -191,6 +191,7 @@ def aday(request, day):
     vals['notekinds']=[n.name for n in NoteKind.objects.order_by('name')]
     vals['products']=[{'id':p.id,'text':p.name} for p in Product.objects.all()]
     vals['sources']=[source2obj(s) for s in Source.objects.all()]
+    vals['regions']=[region2obj(r) for r in Region.objects.all()]
     vals['people']=[per2obj(p) for p in Person.objects.exclude(disabled=True).order_by('-rough_purchase_count')]
     vals['currencies']=[currency2obj(c) for c in Currency.objects.all()]
     vals['hour']=name2hour[gethour()]

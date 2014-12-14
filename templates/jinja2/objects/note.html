@@ -1,23 +1,24 @@
-<div class="note-outline ib left" note_id="{{note.id}}">
+<div class="note-outline ib left clear" note_id="{{note.id}}">
     <div class="note-row ib left" note_id="{{note.id}}">
         <textarea class="textarea ib left" id="note" style="height:{{note.get_height()}}px;">{{note.text or ''|safe}}</textarea>
         <span class="notekindzone ib left">   
             <div class="notekind-available"></div>
             <button class="notekindselect new" value="{{note.nkids()}}"></button>
         </span>
+        {% if note.mp3path %}
+            <div class="mp3zone ib left">
+            <audio controls>
+                <source src="/ajax/serve_mp3/{{note.mp3path}}" type="audio/mpeg">
+            </audio>
+            </div>
+        {% else %}
+            <div class="mp3-creator mp3zone ib left" note_id={{note.id}}><h3>mp3 recording</h3>
+                <div class="btn recorder-start" style="display:none;" note_id={{note.id}}>start</div>
+                <div class="btn recorder-stop" style="display:none;" note_id={{note.id}}>stop</div>
+                <div class="alert alert-error">(Allow Recording on the dropdown)</div>
+            </div>
+        {% endif %}
     </div>
-    {% if note.mp3path %}
-        <div class="mp3zone ib left">
-        <audio controls>
-            <source src="/ajax/serve_mp3/{{note.mp3path}}" type="audio/mpeg">
-        </audio>
-        </div>
-    {% else %}
-        <div class="mp3-creator ib left" note_id={{note.id}}>create mp3 here.
-            <div class="btn recorder-start" note_id={{note.id}}>start</div>
-            <div class="btn recorder-stop" note_id={{note.id}}>stop</div>
-        </div>
-    {% endif %}
     <div class="span2" style="float:right;">
         <div class="del-note btn btn-default" note_id="{{note.id}}">
             <span class="glyphicon glyphicon-remove"></span>

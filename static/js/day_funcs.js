@@ -4,46 +4,33 @@ function setup_change_describer(){
 }
 
 function show_popular_from_product(){
-	//for the current selection of the product, show the popular prices, sources, hour etc. for quick selection!
+	//for the current selection of the product, 
+	//show the popular prices, sources, hour etc. for quick selection!
 	var thing=$("#purchase-product").select2('data');
-	if (!thing){
-		return
-	}
-
+	if (!thing){return}
 	var data={'product_id':thing.id}
 	$.ajax({
 		type:'POST',
 		url:'/ajax/get_popular/',
 		data:data,
-		//dataType:"json",
-		//contentType: "application/json; charset=utf-8",
-		success:function(data){
-			display_popular(data);
-		},
-			error:function(a,b,c){
-		}
+		success:function(data){display_popular(data);},
+		error:function(a,b,c){}
 	});
 }
 
 
 function show_popular_from_source(){
-	//for the current selection of the product, show the popular prices, sources, hour etc. for quick selection!
+	//for the current selection of the product, show the popular prices, 
+	//sources, hour etc. for quick selection!
 	var thing=$("#purchase-source").select2('data');
-	if (!thing){
-		return
-	}
+	if (!thing){return}
 	var data={'source_id':thing.id}
 	$.ajax({
 		type:'POST',
 		url:'/ajax/get_popular/',
 		data:data,
-		//dataType:"json",
-		//contentType: "application/json; charset=utf-8",
-		success:function(data){
-			display_popular(data);
-		},
-			error:function(a,b,c){
-		}
+		success:function(data){display_popular(data);},
+		error:function(a,b,c){}
 	});
 }
 
@@ -97,7 +84,6 @@ function add_thing_to_price_zone(thing){
 	pz.append(txt);
 }
 
-
 function set_source(e){
 	$("#purchase-source").select2('val', $(e.target).attr('val_id'));
 }
@@ -122,6 +108,8 @@ function set_price(e){
 }
 
 function setup_new_purch(){
+    //setup new purch zone. run it again whne you change people, products, sources etc. objects
+    //to get select2 to pick them up.
     var pz=$(".purchase-zone");
     $("#purchase-product").select2({data:products});
 	$("#purchase-source").select2({data:sources,initSelection: function (item, callback) {
@@ -138,8 +126,65 @@ function setup_new_purch(){
         },});
 	$("#purchase-currency").select2({data:currencies});
 	$("#purchase-who_with").select2({data:people, multiple: true});
+	$('#new_person_met_through').select2({data:people, multiple: false}).css("width','50px;");
+	$('#new_source_region_chooser').select2({data:regions, multiple: false}).css("width','50px;");
+	$('#new_source_region_chooser').select2('val',1)
 	$("#purchase-hour").select2({data:hours});
-    $(".make-purchase").click(submit_purchase)
+	$(".person-saver").unbind('click').click(function(e){
+		var saver=$(this).closest('.person-adder')
+		var fn=saver.find('.first-name').val()
+		var ln=saver.find('.last-name').val() || '?'
+		
+		var gender=saver.find('input[name=gender]:checked').val()
+		var met_through=saver.find('#new_person_met_through').select2('val')
+		var text=fn+' '+ln
+		if (!fn || !fn.length){	
+			notify('needs at least a first name',false)
+			return
+		}
+		var data={text:text,kind:'person',action:'new',first_name:fn,last_name:ln,
+			gender:gender,met_through:met_through}
+		get_data(data, wrap_callback_with_original_data(data, new_person_callback))
+	})
+	$('.person-adder-toggler').unbind('click').click(function(){$('.person-adder').slideToggle()})
+	$(".source-saver").unbind('click').click(function(e){
+		var saver=$(this).closest('.source-adder')
+		var name=saver.find('.name').val()
+		var region_id=saver.find('#new_source_region_chooser').select2('val')
+		var data={text:name, kind:'source', action:'new', name:name, region_id:region_id,}
+		get_data(data, wrap_callback_with_original_data(data, new_source_callback))
+	})
+	$('.source-adder-toggler').unbind('click').click(function(){$('.source-adder').slideToggle()})
+    $(".make-purchase").unbind('click').click(submit_purchase)
+}
+
+function wrap_callback_with_original_data(dat, inner_callback){
+	var orig_dat=dat
+	function x(return_data){
+		inner_callback(return_data, orig_dat)
+	}
+	
+	return x
+}
+
+function new_source_callback(dat, orig_dat){
+	notify(dat['message'],true)	
+	if (dat['success']){
+		sources.push({text:orig_dat['text'],name:orig_dat['name'],
+		id:dat['source_id']})
+		setup_new_purch()
+	}
+	
+}
+
+function new_person_callback(dat, orig_dat){
+	notify(dat['message'],true)	
+	if (dat['success']){
+		people.push({text:orig_dat['text'],first_name:orig_dat['first_name'],
+		last_name:orig_dat['last_name'],id:dat['person_id']})
+		setup_new_purch()
+	}
+	
 }
 
 function setup_new_measurement(){
@@ -165,9 +210,17 @@ function get_purchase_data(){
 	}
 	dat['source_id']=source.id;
 	dat['cost']=$("#purchase-cost").val();
+	if (!(dat['cost'])){
+		notify('cost missing.',false);
+		return false;
+	}
 	dat['quantity']=$("#purchase-quantity").val();
 	dat['size']=$("#purchase-size").val();
 	dat['hour']=$("#purchase-hour").select2('data').id;
+	if (!(dat['hour'])){
+		notify('hour missing.',false);
+		return false;
+	}
 	if (!dat['source_id']||!dat['cost']||!dat['hour']){
 		notify('data missing.'+dat,false);
 		return false;

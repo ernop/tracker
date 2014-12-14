@@ -26,8 +26,9 @@ function setup_mp3_recording(){
 }
 
 function init_mp3_buttons(){
-    $('.recorder-start').unbind('click').bind('click', function(e){startRecording($(e.target))})
-    $('.recorder-stop').unbind('click').bind('click', function(e){stopRecording($(e.target))})
+    $('.recorder-start').show().unbind('click').bind('click', function(e){startRecording($(e.target))})
+    $('.recorder-stop').show().unbind('click').bind('click', function(e){stopRecording($(e.target))})
+    $('.mp3zone').find('.alert').slideUp();
 }
 
 function startUserMedia(stream) {
@@ -40,6 +41,7 @@ function startUserMedia(stream) {
     
     recorder = new Recorder(input);
     __log('Recorder initialised.');
+    init_mp3_buttons();
   }
 
 function startRecording(button) {

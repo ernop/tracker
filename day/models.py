@@ -474,7 +474,6 @@ class Person(DayModel):
     description=models.TextField(blank=True,null=True)
     origin=models.CharField(max_length=100,blank=True,null=True)
     
-    
     def colored_clink(self,newperson=False):
         genderklass=self.gender_html_class()
         klass=genderklass

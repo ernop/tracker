@@ -15,6 +15,7 @@
         var people={{people|jsonify|safe}};
         var currencies={{currencies|jsonify|safe}};
         var hours={{hours|jsonify|safe}};
+        var regions={{regions|jsonify|safe}}
         var hour={{hour|jsonify|safe}};
         var measurement_spots={{measurement_spots|jsonify|safe}};
         var day_id={{day.id}};
@@ -34,6 +35,8 @@
     .ib {display:inline-block;}
     .left{float:left;}
     .clear{clear:both;}
+    .pre{}
+    .purchase-zone td div{vertical-align:top;}
     </style>
 {% endblock %}
 
@@ -76,6 +79,7 @@
 </div>
 
 <div class="noteouter ib left clear">
+    <h2>Notes</h2>
     <div class="add-note btn btn-default left ib">
         <span class="glyphicon glyphicon-plus"></span>new note
     </div>
@@ -87,7 +91,7 @@
 </div>
 
 
-<div class="ib left clear">
+<div class="ib left clear" style="width:100%;">
     <h2>Purchases</h2>
     <table class="purchase-list table"></table>
     <div class="purchase-zone span12">
@@ -96,17 +100,38 @@
         <td style="vertical-align:middle;"><input type=text style="width:30px;" id="purchase-cost"></input> money for
         <input type=text id=purchase-quantity style="width:28px;" value=1></input> guys<a class="btn btn-default" style="margin-left:38px;" href="{{ADMIN_EXTERNAL_BASE}}/day/product/add"><span class="glyphicon glyphicon-plus"></span></a><td><div class="price-chooser"></div>
         <div style="clear:both;float:left;" class="product-chooser"></div>
-        <tr><td>source <td><input id="purchase-source" style="width:190px;"></input><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/source/add"><span class="glyphicon glyphicon-plus"></span></a><td><div class="source-chooser">
+        <tr><td>source <td class=nb><input id="purchase-source" style="width:190px;"></input>
+        <div class="source-adder-toggler btn btn-default">
+            <span class="glyphicon glyphicon-plus"></span>
+        </div>
+        
+            <div class="ib source-adder" style="display:none;">
+                <input type=text placeholder='Source Name' width=10 class="ib left name"></input>
+                <div id=new_source_region_chooser></div>
+                <div class="source-saver btn btn-default">save new source</div>
+                
+        <td><div class="source-chooser">
         <tr><td>hour<td><input type=text id="purchase-hour" style="width:190px;" value="{{hour}}"></input><td><div class="hour-chooser">
-        <tr><td>who<td><input id=purchase-who_with style="width:190px;"></input><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/person/add"><span class="glyphicon glyphicon-plus"></span></a><td><div class="who_with-chooser">
+        <tr><td>who<td><input id=purchase-who_with style="width:190px;"></input>
+            <div class="person-adder-toggler btn btn-default">
+            <span class="glyphicon glyphicon-plus"></span></div>
+        
+            <div class="ib person-adder" style="display:none;">
+                <input type=text width=10 placeholder='First' class="ib left first-name"></input>
+                <input type=text width=10 placeholder='Last' class="ib left last-name"></input>
+                <input type="radio" name="gender"  value="male"><label for=male>male</label></input>
+                <input type="radio" name="gender" value="female"><label for=female>female</label></input>
+                <input type="radio" label='org' name="gender" value="organization"><label for=organization>organization</label></input>
+                <div id=new_person_met_through></div>
+                <div class="person-saver btn btn-default">save new person</div>
+                
+            <td><div class="who_with-chooser">
         
         <tr><td>currency<td><input type=text id=purchase-currency style="width:190px;"></input>
         <tr><td>note<td><input type=text id=purchase-note style="width:180px;"></input>
         <tr><td>size<td><input type=text id=purchase-size  style="width:180px;"></input>
         <tr><td><div class="btn btn-default make-purchase">Save</div>
         <td>
-        
-        
         </table>
     </div>
 </div>

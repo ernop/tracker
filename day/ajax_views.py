@@ -20,6 +20,7 @@ from forms import DayForm
 #@user_passes_test(staff_test)
 #def select2_people(request):
 
+
 @user_passes_test(staff_test)
 def ajax_get_data(request):
     try:
@@ -43,10 +44,48 @@ def ajax_get_data(request):
                 guy=Note.objects.get(id=data['id'])
                 html=guy.as_html()
                 res={'success':True,'html':html,'message':None}
+        elif kind=='person':
+            if action=='new':
+                exiperson=Person.objects.filter(first_name=data['first_name'],last_name=data['last_name'])
+                
+                if exiperson.exists():
+                    person=exiperson[0]
+                    res={'success':True,'person_id':person.id,'message':'person already existed'}
+                else:
+                    
+                    if 'gender' not in data or not data['gender']:
+                        res={'success':False,'message':'needs gender'}
+                        return r2j(res)
+                    gender=gender2id(data['gender'])
+                    if not 'met_through' in data or not data['met_through']:
+                        res={'success':False,'message':'needs met through'}
+                        return r2j(res)
+                    person=Person(first_name=data['first_name'],last_name=data['last_name'],gender=gender)
+                    person.save()
+                    through=Person.objects.get(id=data['met_through'])
+                    person.met_through.add(through)
+                    
+                    #only need to send new data, other stuff is wrapped.
+                    res={'success':True,'person_id':person.id,'message':'created %s'%person}
+        elif kind=='source':
+            if action=='new':
+                if 'name' not in data or not data['name']:
+                    res={'success':False,'message':'needs name'}
+                    return r2j(res)
+                exisource=Source.objects.filter(name=data['name'])
+                if exisource.exists():
+                    source=exisource[0]
+                    res={'success':True,'source_id':source.id,'message':'source already existed'}
+                else:
+                    region=Region.objects.get(id=data['region_id'])
+                    source=Source(name=data['name'],region=region)
+                    source.save()
+                    res={'success':True,'source_id':source.id,'message':'created %s'%source}
         return r2j(res)
     except Exception,e:
         from utils import ipdb;ipdb()
-        res={'success':False,'message':'error: %s'%e}
+        tb=traceback.format_exc(e)
+        res={'success':False,'message':'error: %s<div class="pre">%s</div>%s'%(e,tb,data)}
         return r2j(res)
 
 @user_passes_test(staff_test)
@@ -120,7 +159,10 @@ def ajax_get_popular(request):
     res['who_with'] = [((str(k[0]), k[0].id), k[1]) for k in sorted(who_with.items(), key=lambda x:-1*x[1])][:15]
     res['sources'] = [k for k in res['sources']][:15]
     res['prices'] = sorted([k for k in res['prices']], key=lambda x:x[0])
-    res['hours'] = [((hour2name[k[0]], k[0]), k[1]) for k in sorted(hours.items(), key=lambda x:-1*x[1]) if k[0] is not None]
+    try:
+        res['hours'] = [((hour2name[k[0]], k[0]), k[1]) for k in sorted(hours.items(), key=lambda x:-1*x[1]) if k[0] is not None]
+    except Exception,e:
+        from utils import ipdb;ipdb()
     return r2j(res)
 
 @user_passes_test(staff_test)

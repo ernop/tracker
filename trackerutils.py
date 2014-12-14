@@ -138,6 +138,9 @@ def per2obj(per):
 def source2obj(source):
     return {'id':source.id,'name':source.name,'text':source.name,}
 
+def region2obj(region):
+    return {'id':region.id,'name':region.name,'text':region.name,}
+
 def currency2obj(cur):
     return {'id':cur.id,'name':cur.name,'text':'%s %s'%(cur.symbol, cur.name),'symbol':cur.symbol,}
 

@@ -6,12 +6,12 @@ $(document).ready(function(){
     setup_new_measurement();
     display_measurement();
     setup_change_describer();
-    
     setup_mp3_recording();
     setup_notes()
 });
 
-function draw_note(dat){
+function draw_note(dat, orig_dat){
+    //callback for get_data(note)
     $('.notezone').prepend(dat['html']);
     setup_nkselect();
     setup_textarea();
@@ -33,11 +33,11 @@ function setup_notedel(){
 
 function setup_notes(){
     $.each(noteids, function(index, noteid){
-        get_data({'kind':'note', 'id':noteid, 'action':'get'},draw_note)
+        var data={'kind':'note', 'id':noteid, 'action':'get'}
+        get_data(data, wrap_callback_with_original_data(data, draw_note))
     })
     $(".add-note").click(function(){get_data({'kind':'note', 'action':'new', 'day_id':day_id},draw_note)});
 }
-
 
 myinitSelection = function(element, callback) {
     var data = [];

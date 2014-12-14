@@ -559,3 +559,11 @@ def get_span_tags(start, end, user=None):
 
 def prespan(contents):
     return '<span class="pre">%s</span>'%contents
+
+
+def gender2id(txt):
+    txt=txt.lower()
+    if txt=='male':return 1
+    if txt=='female':return 2
+    if txt=='organization':return 3
+    return 0
