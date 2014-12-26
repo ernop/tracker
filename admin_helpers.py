@@ -210,6 +210,51 @@ class BaseNullFilter(SimpleListFilter):
         if self.value()=='no':
             return queryset.filter(**self.args)
 
+PHOTO_SIZES=(
+            (3*1024,'3k',),
+            (10*1024,'10k', ),
+            (25*1024,'25k', ),
+            (50*1024,'50k', ),
+            (100*1024,'100k', ),
+            (150*1024,'150k', ),
+            (250*1024,'250k', ),
+            (500*1024,'500k', ),
+            (1024*1024,'1m', ),
+            ( 2048*1024,'2m',),
+        )
+
+class PhotoSizeFilterGreaterThan(SimpleListFilter):
+    title='size greater than'
+    parameter_name='size_gt'
+    def lookups(self, request, model_admin):
+        return PHOTO_SIZES
+    
+    def queryset(self, request, queryset):
+        val=self.value()
+        if val:
+            val=int(val)
+            for bits,name in PHOTO_SIZES:
+                if bits==val:
+                    comparator=bits
+                    break
+            return queryset.filter(filesize__gte=comparator)
+        
+class PhotoSizeFilterLessThan(SimpleListFilter):
+    title='size less than'
+    parameter_name='size_lt'
+    def lookups(self, request, model_admin):
+        return PHOTO_SIZES
+    
+    def queryset(self, request, queryset):
+        val=self.value()
+        if val:
+            val=int(val)
+            for bits,name in PHOTO_SIZES:
+                if bits==val:
+                    comparator=bits
+                    break
+            return queryset.filter(filesize__lte=comparator)
+
 class MyCameraFilter(SimpleListFilter):
     title='My Camera'
     parameter_name='mycam'
