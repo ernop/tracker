@@ -485,7 +485,10 @@ class Photo(DayModel):
         try:
             self.save()
         except Exception, e:
-            log.error("error saving self. %s %s",self,e)
+            try:
+                log.error("error saving self. %s %s",self,e)
+            except:
+                pass
             return False
         return True
     
