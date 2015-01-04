@@ -446,3 +446,8 @@ def days(request):
     return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
 def redir(request):
     return HttpResponseRedirect('/today/')
+
+def logout(request):
+    from django.contrib.auth import logout
+    from utils import ipdb;ipdb()
+    logout(request)

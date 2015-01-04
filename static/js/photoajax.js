@@ -450,7 +450,9 @@ function data_changed(target, kind, override){
             last_saved_tags_text=[]
             $.each(last_saved_tags_list, function(index,guy){
                 var tag=get_phototag(guy);
-                last_saved_tags_text.push(tag.name)
+		if (tag){
+		    last_saved_tags_text.push(tag.name)
+		}
             })
             last_saved_tags_text=last_saved_tags_text.join(' ')
             update_tag_info(last_saved_tags_list);

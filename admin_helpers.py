@@ -296,8 +296,8 @@ class PhotoExtensionFilter(SimpleListFilter):
             return queryset.filter(fp__endswith='.webp')
 
 class PhotoDoneFilter(SimpleListFilter):
-    title = 'photo done'
-    parameter_name = 'photo_done'
+    title = 'photo done tag'
+    parameter_name = 'photo_done_tag'
     def lookups(self, request, model_admin):
         return (
             ('yes', 'yes'),
