@@ -555,7 +555,7 @@ class Photo(DayModel):
              ('myphoto',icon(self.myphoto)),
              
              ('thumb ok',icon(self.thumb_ok)),
-             ('done',icon(self.done)),
+             ('done',icon(self.tags.filter(tag__name='done').exists())),
              ('crop',(self.xcrop or self.ycrop) and ('x=%d y=%d'%(self.xcrop,self.ycrop)) or ''),
              ('taken',self.taken and self.taken.strftime(DATE_DASH_REV_DAY) or ''),
              ('photo created',self.photo_created.strftime(DATE_DASH_REV_DAY)),
