@@ -16,7 +16,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     #list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
     list_display='id myname myinfo myexif'.split()
     #list_filter=' product__domain currency source who_with'.split()
-    list_filter=['incoming','deleted','done',PhotoHasDayFilter,PhotoDoneFilter,PhotoExtensionFilter, 
+    list_filter=['incoming','deleted',PhotoHasDayFilter,PhotoDoneFilter,PhotoExtensionFilter, 
                  PhotoSizeFilterGreaterThan,PhotoSizeFilterLessThan,
                  NullHashFilter,PhotoTaggedWithFilter, 
                  PhotoHasSpotFilter, MyCameraFilter,'iso','camera','thumb_ok','setup','myphoto',
