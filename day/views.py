@@ -250,8 +250,8 @@ def alltime(request):
 def summary_timespan(start,end,request,
                      include_people=True,
                      include_measurements=True,
-                     include_days=False,
-                     include_span_tags=False,
+                     include_days=True,
+                     include_span_tags=True,
                      top_purchases_count=3):
     vals = {}
     vals['start'] = start
