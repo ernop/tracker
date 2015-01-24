@@ -212,22 +212,59 @@ def aday(request, day):
     #vals['anniversary_photos']=day.get_photos_of_day(user=request.user)
     return r2r('jinja2/day.html', request, vals)
 
+
 @login_required
-def amonth(request, month):
-    mm = datetime.datetime.strptime(month, DATE_DASH_REV)
+def previous_year(request,dt):
+    mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
+    end = datetime.datetime(year=mm.year, month=mm.month, day=mm.day)
+    start = add_months(end, months=-12)
+    return summary_timespan(start,end,request,include_people=False,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=10)
+
+@login_required
+def previous_month(request,dt):
+    mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
+    end = datetime.datetime(year=mm.year, month=mm.month, day=mm.day)
+    start = add_months(end, months=-1)
+    return summary_timespan(start,end,request)
+
+@login_required
+def themonth(request, dt):
+    mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     start = datetime.datetime(year=mm.year, month=mm.month, day=1)
     end = add_months(start, months=1)
+    return summary_timespan(start,end,request)
+
+@login_required
+def theyear(request,dt):
+    mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
+    start = datetime.datetime(year=mm.year, month=1, day=1)
+    end = add_months(start, months=12)
+    return summary_timespan(start,end,request,include_people=False,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=10)
+
+def alltime(request):
+    start = settings.LONG_AGO
+    end = datetime.datetime.now()
+    return summary_timespan(start,end,request,include_people=False,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=15)
+    
+
+def summary_timespan(start,end,request,
+                     include_people=True,
+                     include_measurements=True,
+                     include_days=False,
+                     include_span_tags=False,
+                     top_purchases_count=3):
     vals = {}
     vals['start'] = start
     vals['end'] = end
     vals['startshow'] = start.strftime(DATE_DASH_REV)
     vals['endshow'] = end.strftime(DATE_DASH_REV)
+    vals['day']=Day.objects.get(date=end)
     bits = []
     monthtotal = 0
     FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()
     income=0
     for dd in Domain.objects.all():
-        dinfo = dd.spent_history(start=start, end=end)
+        dinfo = dd.spent_history(start=start, end=end, top_purchases_count=top_purchases_count)
         if dd.name=='money':
             income=-1*dinfo['total_cost']
         if dd.name not in FORCE_DOMAINS and not dinfo['counts']:
@@ -240,16 +277,23 @@ def amonth(request, month):
         if dd.name!='money':
             monthtotal += dinfo['total_cost']
     domaintable = mktable(bits, rights=[1, 2], bigs=[1, 2])
-    #purchases summary by domain
-    measurements = Measurement.objects.filter(created__gte=start, created__lt=end).exclude(amount=None)
-    spots = [MeasuringSpot.objects.get(id=ms) for ms in list(set([ms[0] for ms in measurements.values_list('spot__id').distinct()]))]
-    vals['spots'] = sorted(spots, key=lambda x:(x.domain.name, x.name))
-    # if d.notes.exists() or d.getmeasurements().exclude(amount=None).exists()
-    vals['days'] = [d for d in Day.objects.filter(date__gte=start, date__lt=end).order_by('-date')]
     vals['domaintable'] = domaintable
-    vals['month'] = mm
-    vals['pastmonth'] = add_months(mm, -1)
-    vals['nextmonth'] = add_months(mm, 1)
+    #purchases summary by domain
+    if include_measurements:
+        measurements = Measurement.objects.filter(created__gte=start, created__lt=end).exclude(amount=None)
+        spots = [MeasuringSpot.objects.get(id=ms) for ms in list(set([ms[0] for ms in measurements.values_list('spot__id').distinct()]))]
+        vals['spots'] = sorted(spots, key=lambda x:(x.domain.name, x.name))
+    else:
+        vals['spots']=[]
+    # if d.notes.exists() or d.getmeasurements().exclude(amount=None).exists()
+    if include_days:
+        vals['days'] = [d for d in Day.objects.filter(date__gte=start, date__lt=end).order_by('-date')]
+    else:
+        vals['days']=[]
+    
+    vals['month'] = start
+    vals['pastmonth'] = add_months(start, -1)
+    vals['nextmonth'] = add_months(start, 1)
     vals['monthtotal'] = monthtotal
     #calc savings amount.
     saved=None
@@ -261,23 +305,29 @@ def amonth(request, month):
     vals['saved']=saved
     vals['projected_saving'] = monthtotal
     #import ipdb;ipdb.set_trace()
-    vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
-    vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)
-    vals['monthpeople']=vals['monthpeople']|vals['metpeople']
-    vals['monthpeople']=vals['monthpeople'].distinct().order_by('-rough_purchase_count')
-    for pp in vals['monthpeople']:
-        pp.update_purchase_count()
-    for pp in vals['monthpeople']:
-        if pp in vals['metpeople']:
-            pp.newperson=True
-        else:
-            pp.newperson=False
-        pp.month_purchase_count=Purchase.objects.filter(created__gte=start,created__lt=end,who_with=pp).count()
-    vals['monthpeople']=[pp for pp in vals['monthpeople']]
-    vals['monthpeople'].sort(key=lambda x:-1*x.month_purchase_count)
+    if include_people:
+        vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
+        vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)
+        vals['monthpeople']=vals['monthpeople']|vals['metpeople']
+        vals['monthpeople']=vals['monthpeople'].distinct().order_by('-rough_purchase_count')
+        for pp in vals['monthpeople']:
+            pp.update_purchase_count()
+        for pp in vals['monthpeople']:
+            if pp in vals['metpeople']:
+                pp.newperson=True
+            else:
+                pp.newperson=False
+            pp.month_purchase_count=Purchase.objects.filter(created__gte=start,created__lt=end,who_with=pp).count()
+        vals['monthpeople']=[pp for pp in vals['monthpeople']]
+        vals['monthpeople'].sort(key=lambda x:-1*x.month_purchase_count)
+    else:
+        vals['monthpeople']=[]
     #import ipdb;ipdb.set_trace()
-    vals['span_tags']=get_span_tags(start,end,user=request.user)
-    return r2r('jinja2/month.html', request, vals)
+    if include_span_tags:
+        vals['span_tags']=get_span_tags(start,end,user=request.user)
+    else:
+        vals['span_tags']=[]
+    return r2r('jinja2/timespan_summary.html', request, vals)
 
 def mkinfobox(title, content):
     '''makes an html infobox which lists the title with a "more" button on the right that expands it inline and also hoveralbe'''

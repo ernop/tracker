@@ -396,7 +396,7 @@ def user_passes_test(test_func, login_url=None):
             if request.path:
                 extra = '?next=%s'% request.path
             else:extra = ''
-            return HttpResponseRedirect('..')
+            return HttpResponseRedirect('/')
         return _wrapped_view
     return decorator
 

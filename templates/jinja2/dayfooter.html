@@ -7,7 +7,9 @@
         <div class="bignav"><a class="btn btn-default"  href="/recent_connections/">recent people</a><a class="btn btn-default"  href="/people_connections/">people</a></div>
         <div class="bignav"><a class="btn btn-default"  href="/month_connections/">month people</a><a class="btn btn-default"  href="/initial_annual/">year ppl initial</a></div>
         <div class="bignav"><a class="btn btn-default"  href="/anon_annual/">year ppl anon</a></div>
-        <div class="bignav"><a class="btn btn-default"  href="/amonth/{{day.plus(months=0)}}">this month</a><a class="btn btn-default"  href="/amonth/{{day.plus(months=-1)}}">last month</a>
+        <div class="bignav"><a class="btn btn-default"  href="/themonth/{{day.plus(months=0)}}">this month</a><a class="btn btn-default"  href="/themonth/{{day.plus(months=-1)}}">last month</a>
+        <div class="bignav"><a class="btn btn-default"  href="/theyear/{{day.plus(months=0)}}">this year</a><a class="btn btn-default"  href="/theyear/{{day.plus(months=-12)}}">last month</a>
+        
         <br><a class="btn btn-default" href="/photo/incoming/">incoming</a><a class="btn btn-default" href="/admin/day/person/?created__year={{day.date.year}}&created__month={{day.date.month}}">people db</a></div>
         
         

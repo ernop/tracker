@@ -236,7 +236,7 @@ class Domain(DayModel):
     def all_purchases_link(self):
         return '<a href="/admin/day/purchase/?product__domain__id__exact=%d">all purch</a>'%(self.id)
 
-    def spent_history(self, start, end):
+    def spent_history(self, start, end, top_purchases_count=3):
         counts = {}
         costs = {}
         res = {}
@@ -254,9 +254,9 @@ class Domain(DayModel):
         res['total_cost'] = total_cost
         tops = costs.items()
         tops.sort(key=lambda x:-1*x[1])
-        res['top_purchases_html'] = '<div class="top-purchases">'+', '.join(['%s (%d)'%(Product.objects.get(id=top[0]).name, top[1]) for top in tops[:3]])+'</div>'
+        res['top_purchases_html'] = '<div class="top-purchases">'+', '.join(['%s (%d)'%(Product.objects.get(id=top[0]).name, top[1]) for top in tops[:top_purchases_count]])+'</div>'
         if len(tops) > 3:
-            res['all_purchases_html'] = '<div class="all-purchases">' + '<br> '.join(['%s (%d)'%(Product.objects.get(id=top[0]).name, top[1]) for top in tops[:3]])+'</div>'
+            res['all_purchases_html'] = '<div class="all-purchases">' + '<br> '.join(['%s (%d)'%(Product.objects.get(id=top[0]).name, top[1]) for top in tops[:top_purchases_count]])+'</div>'
         else:
             res['all_purchases_html'] = ''
         return res
