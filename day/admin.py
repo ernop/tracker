@@ -208,7 +208,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     fields='product cost source size quantity created hour who_with note currency '.split()
 
 class DomainAdmin(OverriddenModelAdmin):
-    list_display='id myproducts mypie mysource'.split()
+    list_display='id myproducts mypie myspots mysource'.split()
     list_filter=['name',]
 
     def mypie(self, obj):
@@ -286,7 +286,12 @@ class DomainAdmin(OverriddenModelAdmin):
 
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
-    adminify(myproducts, mysource, mycreated, mypie)
+    def myspots(self,obj):
+        spots=MeasuringSpot.objects.filter(domain=obj)
+        dat=[(sp.clink(),sp.measurements.count()) for sp in spots]
+        return mktable(dat)
+
+    adminify(myproducts, mysource, mycreated, mypie, myspots)
 
 class PersonAdmin(OverriddenModelAdmin):
     list_display='id myinfo myphotos mywith mysources mydomains mypurchases'.split()
