@@ -258,7 +258,13 @@ def summary_timespan(start,end,request,
     vals['end'] = end
     vals['startshow'] = start.strftime(DATE_DASH_REV)
     vals['endshow'] = end.strftime(DATE_DASH_REV)
-    vals['day']=Day.objects.get(date=end)
+    
+    try:
+        dd=Day.objects.get(date=end)
+    except Day.DoesNotExist:
+        dd=Day(created=datetime.datetime.now(), date=end)
+        dd.save()
+    vals['day']=dd
     bits = []
     monthtotal = 0
     FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()
