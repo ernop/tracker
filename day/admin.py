@@ -65,7 +65,7 @@ class ProductAdmin(OverriddenModelAdmin):
 
     def mypurchases(self, obj):
         #return obj.summary()
-        data= [(p.clink(),p.day.vlink()) for p in Purchase.objects.filter(product=obj)]
+        data= [(p.clink(),p.day.vlink()) for p in Purchase.objects.filter(product=obj).order_by('day__date')]
         
         alllink = '<a class="btn btn-default" href="../purchase/?product_id=%d">all</a>' % obj.id
         data.append(alllink)
