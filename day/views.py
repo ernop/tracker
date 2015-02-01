@@ -218,7 +218,8 @@ def previous_year(request,dt):
     mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     end = datetime.datetime(year=mm.year, month=mm.month, day=mm.day)
     start = add_months(end, months=-12)
-    return summary_timespan(start,end,request,include_people=False,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=10)
+    return summary_timespan(start,end,request,include_people=False,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=10,
+                            include_permonth=True)
 
 @login_required
 def previous_month(request,dt):
@@ -239,7 +240,8 @@ def theyear(request,dt):
     mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     start = datetime.datetime(year=mm.year, month=1, day=1)
     end = add_months(start, months=12)
-    return summary_timespan(start,end,request,include_people=False,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=10)
+    return summary_timespan(start,end,request,include_people=False,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=10,
+                            include_permonth=True)
 
 def alltime(request):
     start = settings.LONG_AGO
@@ -252,13 +254,14 @@ def summary_timespan(start,end,request,
                      include_measurements=True,
                      include_days=True,
                      include_span_tags=True,
-                     top_purchases_count=3):
+                     top_purchases_count=3,
+                     include_permonth=False):
     vals = {}
     vals['start'] = start
     vals['end'] = end
     vals['startshow'] = start.strftime(DATE_DASH_REV_DAY)
     vals['endshow'] = end.strftime(DATE_DASH_REV_DAY)
-    
+    vals['include_permonth'] = True
     try:
         dd=Day.objects.get(date=end)
     except Day.DoesNotExist:
@@ -279,7 +282,11 @@ def summary_timespan(start,end,request,
             summary = mkinfobox(title=dinfo['top_purchases_html'], content=dinfo['all_purchases_html'])
         else:
             summary = dinfo['top_purchases_html']
-        bits.append([dd.name, str(int(dinfo['total_cost'])), '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, str(int(dinfo['total_quantity']))), summary])
+        guy=[dd.name, str(int(dinfo['total_cost'])), '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, str(int(dinfo['total_quantity']))), summary]
+        if include_permonth:
+            val=int(dinfo['total_cost'])/12
+            guy.insert(1, val)
+        bits.append(guy)
         if dd.name!='money':
             monthtotal += dinfo['total_cost']
     domaintable = mktable(bits, rights=[1, 2], bigs=[1, 2])
@@ -296,7 +303,6 @@ def summary_timespan(start,end,request,
         vals['days'] = [d for d in Day.objects.filter(date__gte=start, date__lt=end).order_by('-date')]
     else:
         vals['days']=[]
-    
     vals['month'] = start
     vals['pastmonth'] = add_months(start, -1)
     vals['nextmonth'] = add_months(start, 1)
@@ -309,6 +315,7 @@ def summary_timespan(start,end,request,
         saverate=round(saved*1.0/income*100.0,1)
     vals['saverate']=saverate
     vals['saved']=saved
+    vals['savedshow']='%d'%(round(saved/1000))
     vals['projected_saving'] = monthtotal
     #import ipdb;ipdb.set_trace()
     if include_people:
