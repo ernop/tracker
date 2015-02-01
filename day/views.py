@@ -256,8 +256,8 @@ def summary_timespan(start,end,request,
     vals = {}
     vals['start'] = start
     vals['end'] = end
-    vals['startshow'] = start.strftime(DATE_DASH_REV)
-    vals['endshow'] = end.strftime(DATE_DASH_REV)
+    vals['startshow'] = start.strftime(DATE_DASH_REV_DAY)
+    vals['endshow'] = end.strftime(DATE_DASH_REV_DAY)
     
     try:
         dd=Day.objects.get(date=end)
