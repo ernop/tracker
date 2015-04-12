@@ -199,7 +199,7 @@ def aday(request, day):
     vals['measurement_spots']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
 
     #calculate histories
-    trydate=dtday.date()+datetime.timedelta(years=1)
+    trydate=dtday.date()+datetime.timedelta(days=365)
     #should include the current year! duh.
     histories=[]
     vals['histories']=histories
