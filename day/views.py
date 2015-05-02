@@ -197,9 +197,9 @@ def aday(request, day):
     vals['hour']=name2hour[gethour()]
     vals['hours'] = [{'id': id, 'name': name, 'text': name,} for name, id in name2hour.items()]
     vals['measurement_spots']=[{'id':p.id, 'name':p.name,'text':p.name,} for p in MeasuringSpot.objects.all()]
-
+    #from utils import ipdb;ipdb()
     #calculate histories
-    trydate=dtday.date()+datetime.timedelta(days=365)
+    trydate=add_months(dtday.date(),months=12)
     #should include the current year! duh.
     histories=[]
     vals['histories']=histories
@@ -309,8 +309,8 @@ def summary_timespan(start,end,request,
     vals['nextmonth'] = add_months(start, 1)
     vals['monthtotal'] = monthtotal
     #calc savings amount.
-    saved=None
-    saverate=None
+    saved=0
+    saverate=0
     if income:
         saved=income-monthtotal
         saverate=round(saved*1.0/income*100.0,1)
