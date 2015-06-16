@@ -156,7 +156,7 @@ def ajax_get_popular(request):
     res['prices'] = [k for k in sorted(prices.items(), key=lambda x:-1*x[1])  if k[1] > 1]
     res['sources'] = [((k[0].name, k[0].id), k[1]) for k in sorted(sources.items(), key=lambda x:-1*x[1]) if k[1] > 1]
     res['products'] =[((k[0].name, k[0].id), k[1]) for k in sorted(products.items(), key=lambda x:-1*x[1]) if k[1] > 1]
-    res['who_with'] = [((str(k[0]), k[0].id), k[1]) for k in sorted(who_with.items(), key=lambda x:-1*x[1])][:15]
+    res['who_with'] = [((str(k[0]), k[0].id), k[1]) for k in sorted(who_with.items(), key=lambda x:-1*x[1])][:50]
     res['sources'] = [k for k in res['sources']][:15]
     res['prices'] = sorted([k for k in res['prices']], key=lambda x:x[0])
     try:

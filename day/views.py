@@ -270,6 +270,8 @@ def summary_timespan(start,end,request,
         dd.save()
     vals['day']=dd
     bits = []
+    if include_permonth:
+        bits.append(['domain','per month','total','purchs','top'])
     monthtotal = 0
     FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()
     income=0
