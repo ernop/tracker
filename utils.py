@@ -332,7 +332,7 @@ def make_safe_tag_name(ss):
     OKS = ['-', '_', ' ']
     ss=ss.replace('_','-')
     for c in ss:
-        if c.isalnum() or c in OKS:
+        if (c.isalnum() and ord(c)<=122) or c in OKS:
             res.append(c)
     combo=''.join(res)
     combo=combo.lower()
@@ -344,7 +344,7 @@ def make_safe_filename(fn):
     OKS = ['-', '_', ]
     rawfn=rawfn.replace('_','-').replace('\'','-')
     for c in rawfn:
-        if (c.isalnum() and ord(c)<256) or c in OKS:res.append(c)
+        if (c.isalnum() and ord(c)<=122) or c in OKS:res.append(c)
     newfn=''.join(res)
     res=newfn+ext
     return res
