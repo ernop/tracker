@@ -318,9 +318,9 @@ def summary_timespan(start,end,request,
         saverate=round(saved*1.0/income*100.0,1)
     vals['saverate']=saverate
     vals['saved']=saved
-    vals['salaryshow']='%d'%(round(income/100)*10)
-    vals['expensesshow']='%d'%(round(monthtotal/100)*10)
-    vals['savedshow']='%d'%(round(saved/100)*10)
+    vals['salaryshow']='%0.1f'%(round(income/100)/10.0)
+    vals['expensesshow']='%0.1f'%(round(monthtotal/100)/10.0)
+    vals['savedshow']='%0.1f'%(round(saved/100)/10.0)
     vals['projected_saving'] = monthtotal
     if include_people:
         vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)

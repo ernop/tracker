@@ -3,8 +3,8 @@
 {% block head %}
     {{super()}}
     <script src='/static/js/day_funcs.js'></script>
-    <script src='/static/js/recordmp3.js'></script>
-    <script src='/static/js/recording_helpers.js'></script>
+    {% if 0 %}<script src='/static/js/recordmp3.js'></script>
+    <script src='/static/js/recording_helpers.js'></script>{% endif %}
     <script src='/static/js/day.js'></script>
     <script>
         var today={{today|jsonify|safe}};
