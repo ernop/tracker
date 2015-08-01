@@ -677,9 +677,13 @@ class Purchase(DayModel):
         '''because costs are stored in the local currency, sometimes you have to convert them.
 
         lots of things directly access cost which isn't really right. '''
-
-        if self.currency.name != 'rmb':
-            return self.currency.rmb_value * self.cost
+        
+        #obviously this should hit a default currency.
+        #let alone be able to deal with historical currency value changes
+        #or track them as-of X date
+        if self.currency.name != 'usd':
+            usd=Currency.objects.get(name='usd')
+            return self.currency.rmb_value * self.cost / usd.rmb_value
         return self.cost
     
 class Region(DayModel):
