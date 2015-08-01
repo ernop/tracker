@@ -318,9 +318,11 @@ def summary_timespan(start,end,request,
         saverate=round(saved*1.0/income*100.0,1)
     vals['saverate']=saverate
     vals['saved']=saved
+    salaryshow
+    vals['salaryshow']='%d'%(round(income/1000))
+    vals['expensesshow']='%d'%(round(monthtotal/1000))
     vals['savedshow']='%d'%(round(saved/1000))
     vals['projected_saving'] = monthtotal
-    #import ipdb;ipdb.set_trace()
     if include_people:
         vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
         vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)

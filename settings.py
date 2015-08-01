@@ -141,7 +141,7 @@ assert os.path.exists(THUMB_PHOTO_DIR),THUMB_PHOTO_DIR
 PHOTO_SCALED=750
 THUMB_HEIGHT=120
 
-DEFAULT_CURRENCIES=(('dollar','$',6.1),('rmb','rmb',1),)
+DEFAULT_CURRENCIES=(('dollar','$',6.21),('rmb','rmb',1),)
 DEFAULT_DOMAINS=('money','life','work','transportation','body','health','clothes','friends','fun','food','drink','alcohol',)
 DEFAULT_REGIONS=(('home','rmb',),('new york','dollar'),('beijing','rmb'),('shanghai','rmb'),('internet','dollar'),)
 DEFAULT_PRODUCTS=(('milk','drink',),('water','drink'),('chicken','food',),('vitamins','body',),('taxi','transportation',),('bike','transportation'),)
