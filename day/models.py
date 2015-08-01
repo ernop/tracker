@@ -681,8 +681,8 @@ class Purchase(DayModel):
         #obviously this should hit a default currency.
         #let alone be able to deal with historical currency value changes
         #or track them as-of X date
-        if self.currency.name != 'usd':
-            usd=Currency.objects.get(name='usd')
+        if self.currency.name != 'USD':
+            usd=Currency.objects.get(name='USD')
             return self.currency.rmb_value * self.cost / usd.rmb_value
         return self.cost
     
