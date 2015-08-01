@@ -6,7 +6,7 @@ $(document).ready(function(){
     setup_new_measurement();
     display_measurement();
     setup_change_describer();
-    setup_mp3_recording();
+    //setup_mp3_recording();
     setup_notes()
 });
 
