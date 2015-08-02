@@ -45,39 +45,11 @@
 <div class="ib left clear">
     <div>
         <h2>{{day.date}} {{day.show_day()}}</h2>
-        {% set dayphotos = day.get_day_taken_photos(user) %}
-        {% if dayphotos %}
-            <div class="historybox">
-            {% for photo in dayphotos %}
-                {% if loop.counter==0%}Today{%endif %}
-                <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
-            {% endfor %}
-            </div>
-        {% endif %}
         
-        {% for historyday in histories %}
-            <div class="historybox">
-            <span class="float:left;">{{historyday.hoverblock()|safe}}</span>
-            {% set taken_photos=historyday.get_day_taken_photos(user)%}
-            {% if taken_photos%}
-                {% for photo in taken_photos %}
-                    <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
-                {% endfor %}
-            {% endif %}
-            </div>
-            <div class="saved-day-box">
-                {% set created_photos=historyday.get_day_created_photos(user)%}
-                {% if created_photos%}
-                    {% for photo in created_photos %}
-                        <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        {% endfor %}
-
-    </div>
-</div>
-
+        
+        
+        
+        
 <div class="noteouter ib left clear">
     <h2>Notes</h2>
     <div class="add-note btn btn-default left ib">
@@ -148,6 +120,47 @@
         </table>
     </div>
 </div>
+        
+        
+        
+        
+        
+        
+        
+        
+        {% set dayphotos = day.get_day_taken_photos(user) %}
+        {% if dayphotos %}
+            <div class="historybox">
+            {% for photo in dayphotos %}
+                {% if loop.counter==0%}Today{%endif %}
+                <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% for historyday in histories %}
+            <div class="historybox">
+            <span class="float:left;">{{historyday.hoverblock()|safe}}</span>
+            {% set taken_photos=historyday.get_day_taken_photos(user)%}
+            {% if taken_photos%}
+                {% for photo in taken_photos %}
+                    <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
+                {% endfor %}
+            {% endif %}
+            </div>
+            <div class="saved-day-box">
+                {% set created_photos=historyday.get_day_created_photos(user)%}
+                {% if created_photos%}
+                    {% for photo in created_photos %}
+                        <div class="photolink">{{photo.inhtml(size='thumb',ajaxlink=True)|safe}}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+
+    </div>
+</div>
+
 
 <div class="ib left clear" style='display:none;'>
 <h2>Workouts</h2>
