@@ -107,7 +107,7 @@ class Day(DayModel):
             extra_style='width:inherit;'
         else:
             extra_style=''
-        return '<a style="%s" class="stdbtn btn btn-default nb" href="/aday/%s/">%s</a>'%(extra_style,str(self.date), text)
+        return '<a style="%s" class="btn btn-default nb" href="/aday/%s/">%s</a>'%(extra_style,str(self.date), text)
 
     def show_day(self):
         return datetime.datetime.strftime(self.date, '%A')
@@ -127,11 +127,13 @@ class Day(DayModel):
         purchases=Purchase.objects.filter(created__gte=self.date,created__lt=plusone)
         return purchases
     
-    def total_spend(self):
+    def total_spend(self, doround=False):
         purchs=self.get_purchases()
         total=0
         for purch in purchs:
             total+=purch.get_cost()
+        if doround:
+            return int(round(total))
         return total
 
     def getmeasurements(self):
