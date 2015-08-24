@@ -1,6 +1,5 @@
 import os
 
-
 ADVANCING_TAGS=[]
 EXCLUDED_TAGS=['done','delete','undelete',]
 #tags which if you add them, automatically advance to the next photo.
@@ -9,6 +8,7 @@ EXCLUDED_TAGS=['done','delete','undelete',]
 LOCAL=os.path.exists('local')
 #controls whether debugging will stop the server or be skipped
 from local_settings import *
+print 'DJANGO BASE is',DJANGO_BASE
 #you should put the db settings in there.
 
 DEBUG = True
@@ -71,7 +71,7 @@ LOGGING = {
         'file_log':{
             'level':'INFO',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': DJANGO_BASE+'/logs/tracker.log',
+            'filename': 'logs/tracker.log',
             'maxBytes': 500*1024**2, # 500 MB, dumb windows not being able to roll over...
             'backupCount': 5,
             'formatter':'verbose',
@@ -79,7 +79,7 @@ LOGGING = {
         'error_log':{
             'level':'ERROR',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': DJANGO_BASE+'/logs/error.log',
+            'filename': 'logs/error.log',
             'maxBytes': 500*1024**2, # 500 MB, dumb windows not being able to roll over...
             'backupCount': 5,
             'formatter':'verbose',

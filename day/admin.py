@@ -163,7 +163,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     list_filter='product__domain currency source who_with'.split()
     list_filter.insert(0,LastWeekPurchaseFilter)
     date_hierarchy='created'
-    list_editable=['note',]
+    #list_editable=['note',]
     search_fields= ['product__name']
     form=PurchaseForm
     list_per_page = 20
@@ -232,8 +232,9 @@ class DomainAdmin(OverriddenModelAdmin):
         return liferes + '<br>' + monthres
 
     def myproducts(self, obj):
-        total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(product__domain=obj).aggregate(Sum('cost'))['cost__sum']#.filter(created__gte=sixmonthago)
-        ear=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(product__domain=obj).order_by('created')
+        #total=Purchase.objects.filter(product__domain=obj).aggregate(Sum('cost'))['cost__sum']
+        total=sum([pp.get_cost() for pp in Purchase.objects.filter(product__domain=obj)])
+        ear=Purchase.objects.filter(product__domain=obj).order_by('created')
         earliest=None
         if ear:
             earliest=datetime.datetime.combine(ear[0].created, datetime.time())
@@ -242,7 +243,7 @@ class DomainAdmin(OverriddenModelAdmin):
         if total and ear:
             now=datetime.datetime.now()
             dayrange= abs((now-earliest).days)+1
-            total='%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), RMBSYMBOL, rstripz(total/dayrange), RMBSYMBOL, dayrange)
+            total='%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), '$', rstripz(total/dayrange), '$', dayrange)
         purch=Purchase.objects.filter(product__domain=obj)
         if not purch:
             costs=''
@@ -252,20 +253,8 @@ class DomainAdmin(OverriddenModelAdmin):
             for pu in purch:
                 date=pu.created.strftime(DATE)
                 res[date]=res.get(date, 0)+pu.get_cost()
-                #if not mindate or date<mindate:
-                    #mindate=date
-            #res is a dict of str datetime => total spent that day.
-            #itd be great to be able to group them by week / month / year and display here.
-            
             res2=group_day_dat(res, by='month',mindate=mindate)
-            
-            #while trying<now:
-                #res2.append((res.get(trying.strftime(DATE), 0)))
-                #trying=datetime.timedelta(days=1)+trying
-            #res2=[r[0] for r in res2]
             costs= nice_sparkline(results=res2, width=5, height=100)
-            #tmp=savetmp(im)
-            #graph='<img style="border:2px solid grey;" src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
         summary=obj.summary()
         return '<h2>%s</h2>%s<br>%s<br>%s<br>'%(obj.name, total, costs, summary)
 

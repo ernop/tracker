@@ -632,6 +632,7 @@ class Product(DayModel):
             valid=valid.filter(created__lt=end)
         cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
         return cost
+    
 class Purchase(DayModel):
     product=models.ForeignKey('Product', related_name='purchases')
     #domain=models.ForeignKey(Domain, related_name='purchases')
