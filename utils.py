@@ -213,7 +213,6 @@ def staff_test(user):
 def r2r(template, request, context=None, lang=None):
     if not context:
         context={}
-    from jinja2.environment import re
     from coffin.shortcuts import render_to_response
     return render_to_response(template, context, RequestContext(request))
 
