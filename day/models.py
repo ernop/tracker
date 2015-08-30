@@ -269,7 +269,7 @@ class Domain(DayModel):
             link, count, cost, symbol = pp.summarydat()
             if not cost:
                 continue
-            rows.append((link, count, '%s%s'%(cost, symbol), cost))
+            rows.append((link, count, '%s%s'%(round(cost,1), symbol), round(cost,1)))
         rows = sorted(rows, key=lambda x:x[3]*-1)
         rows = [r[:3] for r in rows]
         #sums=''.join([oo.summarydat() for oo in self.products.all() if oo.summary()])
@@ -518,7 +518,7 @@ class Person(DayModel):
         for domain in Domain.objects.all():
             if purch.filter(product__domain=domain).exists():
                 counts[domain.id] = purch.filter(product__domain=domain).count()
-                costs[domain.id]= purch.filter(product__domain=domain).aggregate(Sum('cost'))['cost__sum']
+                costs[domain.id]=sum([pur.get_cost() for pur in purch.filter(product__domain=domain)])
         res['counts'] = counts
         res['costs'] = costs
         return res
@@ -598,10 +598,11 @@ class Product(DayModel):
     def summarydat(self, source=None):
         '''return link, count, cost,symbol'''
         if source:
-            count=Purchase.objects.filter(product=self, source=source).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
+            #count=sum([pp.quantity for pp in ])
+            count=Purchase.objects.filter(product=self, source=source).count()
         else:
-            count=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS).aggregate(Sum('quantity'))['quantity__sum']
-            #we only count RMB stuff here cause it's freaking annoying otherwise.
+            #count=sum([pp.quantity for pp in ])
+            count=Purchase.objects.filter(product=self).count()
         if not count:
             count = 0
         if count == int(count):
@@ -623,14 +624,14 @@ class Product(DayModel):
         return vlink, count, cost, symbol
 
     def total_spent(self, start=None, end=None, source=None):
-        valid=Purchase.objects.filter(product=self).filter(currency__id__in=RMB_CURRENCY_IDS)
+        valid=Purchase.objects.filter(product=self)
         if source:
             valid=valid.filter(source=source)
         if start:
             valid=valid.filter(created__gt=start)
         if end:
             valid=valid.filter(created__lt=end)
-        cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
+        cost=sum([pur.get_cost() for pur in valid] or [0])
         return cost
     
 class Purchase(DayModel):
@@ -737,7 +738,8 @@ class Source(DayModel):
         for domain in Domain.objects.all():
             if purch.filter(product__domain=domain).exists():
                 counts[domain.id] = purch.filter(product__domain=domain).count()
-                costs[domain.id]= purch.filter(product__domain=domain).aggregate(Sum('cost'))['cost__sum']
+                #costs[domain.id]= purch.filter(product__domain=domain).aggregate(Sum('cost'))['cost__sum']
+                costs[domain.id]= sum([pur.get_cost() for pur in purch.filter(product__domain=domain)])
         res['counts'] = counts
         res['costs'] = costs
         return res
@@ -763,7 +765,7 @@ class Source(DayModel):
         return '<a href="/admin/day/purchase/?source__id=%d">all purch</a>'%(self.id)
 
     def total_spent(self, start=None, end=None, product=None, domain=None):
-        valid=Purchase.objects.filter(source=self).filter(currency__id__in=RMB_CURRENCY_IDS)
+        valid=Purchase.objects.filter(source=self)
         if domain:
             valid=valid.filter(product__domain=domain)
         if product:
@@ -772,7 +774,7 @@ class Source(DayModel):
             valid=valid.filter(created__gt=start)
         if end:
             valid=valid.filter(created__lt=end)
-        cost=valid.aggregate(Sum('cost'))['cost__sum'] or 0
+        cost=sum([pur.get_cost() for pur in valid] or [0])
         return cost
 
     def save(self, *args, **kwargs):

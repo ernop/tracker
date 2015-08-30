@@ -41,8 +41,8 @@ def chart_url(dat, size=None, text=None):
         text = 'Sources'
     dat=[d for d in dat if d[0] > 0]
     dat.sort(key=lambda x:x[0])
-    values = ','.join([str(s[0]) for s in dat])
-    offsets= ','.join(['%s (%s)'%(s[1], str(s[0])) for s in dat])
+    values = ','.join([str(round(s[0],1)) for s in dat])
+    offsets= ','.join(['%s (%s)'%(s[1], str(round(s[0]))) for s in dat])
     res = '<h3>%s</h3><div class="piespark" values="%s" labels="%s"></div>' % (text, values, offsets)
     return res
 
@@ -172,16 +172,18 @@ class PurchaseAdmin(OverriddenModelAdmin):
 
     @debu
     def mycreated(self, obj):
-        ct='<a href="/admin/day/purchase/?created__day=%d&created__month=%d&created__year=%d">%s</a>'%(obj.created.day, obj.created.month, obj.created.year, obj.created.strftime(DATE))
+        ct='<a href="/admin/day/purchase/?created__day=%d&created__month=%d&created__year=%d">all day purch</a>'%(obj.created.day, obj.created.month, obj.created.year, )
         try:
             vday=Day.objects.get(date=obj.created.date()).vlink()
         except Day.DoesNotExist:
             vday=None
         try:
-            cday=Day.objects.get(date=obj.created.date()).clink()
+            cday=Day.objects.get(date=obj.created.date()).clink(text='db day')
         except Day.DoesNotExist:
             cday=None
-        return mktable([('clink',obj.clink()),('day vlink',vday),('day clink',cday),('day purchases',ct)], skip_false=True)
+        return mktable([('clink',obj.clink(), ct),
+                        (vday, cday,  ),
+                        ], skip_false=True)
 
     @debu
     def mycost(self, obj):
@@ -222,11 +224,11 @@ class DomainAdmin(OverriddenModelAdmin):
             dat = []
             monthdat = []
         lifevalues = ','.join([str(s[0]) for s in dat])
-        lifeoffsets = ','.join(['%s (%s)'%(s[1], str(s[0])) for s in dat])
+        lifeoffsets = ','.join(['%s (%s)'%(s[1], str(round(s[0],1))) for s in dat])
         liferes = '<h3>Lifetime</h3><div class="piespark" values="%s" labels="%s"></div>' % (lifevalues, lifeoffsets)
 
         monthvalues = ','.join([str(s[0]) for s in monthdat])
-        monthoffsets = ','.join(['%s (%s)'%(s[1], str(s[0])) for s in monthdat])
+        monthoffsets = ','.join(['%s (%s)'%(s[1], str(round(s[0],1))) for s in monthdat])
         monthres = '<h3>Last Month</h3><div class="piespark" values="%s" labels="%s"></div>' % (monthvalues, monthoffsets)
 
         return liferes + '<br>' + monthres
@@ -562,7 +564,7 @@ class SourceAdmin(OverriddenModelAdmin):
 
     def myproducts(self, obj):
         products=Product.objects.filter(purchases__source=obj).distinct()
-        dat=[(oo.total_spent(source=obj),str(oo)) for oo in products]
+        dat=[(oo.total_spent(source=obj), str(oo)) for oo in products]
         return chart_url(dat, text='')
 
     def mydomains(self, obj):
@@ -571,7 +573,7 @@ class SourceAdmin(OverriddenModelAdmin):
         counts, costs = res['counts'], res['costs']
         rows = []
         for domain_id in counts.keys():
-            row = Domain.objects.get(id=domain_id).name, '%s times'%counts[domain_id], 'cost %s'%costs[domain_id]
+            row = Domain.objects.get(id=domain_id).name, '%s times'%counts[domain_id], 'cost %s$'%round(costs[domain_id],1)
             rows.append([counts[domain_id], row])
         rows.sort(key=lambda x:-1*x[0])
         rows = [r[1] for r in rows]
@@ -593,14 +595,13 @@ class SourceAdmin(OverriddenModelAdmin):
     @debu
     def mytotal(self, obj):
         #monthago=datetime.datetime.now()-datetime.timedelta(days=30)
-        purchases=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(source=obj).order_by('created')
-        total=purchases.aggregate(Sum('cost'))['cost__sum']
+        purchases=Purchase.objects.filter(source=obj).order_by('created')
+        total=sum([pp.get_cost() for pp in purchases])
         if purchases:
             earliest=datetime.datetime.combine(purchases[0].created, datetime.time())
-
         if total and earliest:
             dayrange=abs((datetime.datetime.now()-earliest).days)+1
-            return '<div class="nb">%0.0f%s<br>%s%s /day<br>(%d days)</div>'%(total, RMBSYMBOL, rstripz(total/dayrange), RMBSYMBOL, dayrange)
+            return '<div class="nb">%0.0f%s<br>%s%s /day<br>(%d days)</div>'%(total, '$', rstripz(total/dayrange), '$', dayrange)
 
     adminify(mytotal, mysummary, myproducts, mywith, myregion, mydomains)
 

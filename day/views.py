@@ -501,8 +501,8 @@ def person2obj(person, kind=None):
 @login_required
 def days(request):
     sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
-    total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(created__gte=sixmonthago).aggregate(Sum('cost'))['cost__sum']
-    ear=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).order_by('created')
+    total=sum([pur.get_cost() for pu in Purchase.objects.filter(created__gte=sixmonthago)])
+    ear=Purchase.objects.order_by('created')
     earliest=None
     if ear:
         earliest=datetime.datetime.combine(ear[0].created, datetime.time())
@@ -511,6 +511,7 @@ def days(request):
     now=datetime.datetime.now()
     dayrange=(abs((now-earliest).days))+1
     return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
+
 def redir(request):
     return HttpResponseRedirect('/today/')
 

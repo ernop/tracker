@@ -151,3 +151,4 @@ DEFAULT_PHOTOTAGS='delete undelete done myphoto timelapse friends family meme ba
 
 TEMPLATE_DEBUG = True
 EXCLUDE_FROM_PHOTOSET_TAGS=['done',]
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

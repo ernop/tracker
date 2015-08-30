@@ -57,36 +57,3 @@ def jumping_person(request, person_id):
     vals['edges'] = edges
     vals['recent_only'] = recent_only
     return r2r('jinja2/people_connections.html', request, vals)
-
-#def person2obj(person):
-    #return {'id': person.id,
-                               #'gender':person.gender,
-                               #'reflexive':False,
-                               #'left': True,
-                               #'right': False,
-                               #'name': person.d3_name(),
-                               #'created': person.created.strftime(DATE_DASH_REV),
-                               #'last_purchase': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).order_by('-created')[0].created.strftime(DATE_DASH_REV) or '2011-01-01',
-                               #'purchases_together': Purchase.objects.filter(who_with=person).count(),
-                               #'weight': 1,
-                               #'spent_together': Purchase.objects.filter(who_with=person).exists() and Purchase.objects.filter(who_with=person).aggregate(Sum('cost'))['cost__sum'] or 0,}
-
-#@login_required
-#def days(request):
-    #sixmonthago=datetime.datetime.now()-datetime.timedelta(days=180)
-    #total=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).filter(created__gte=sixmonthago).aggregate(Sum('cost'))['cost__sum']
-    #ear=Purchase.objects.filter(currency_id__in=RMB_CURRENCY_IDS).order_by('created')
-    #earliest=None
-    #if ear:
-        #earliest=datetime.datetime.combine(ear[0].created, datetime.time())
-    #else:
-        #return ''
-    #now=datetime.datetime.now()
-    #dayrange=(abs((now-earliest).days))+1
-    #return '%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), Currency.objects.get(id=1).symbol, rstripz(total/dayrange), Currency.objects.get(id=1).symbol, dayrange)
-
-
-
-#def redir(request):
-    #import ipdb;ipdb.set_trace()
-    #return HttpResponseRedirect('/today/')
