@@ -738,7 +738,7 @@ class Source(DayModel):
                 if count == int(count):
                     count = int(count)
                 pfilterlink = '<a href="/admin/day/purchase/?product__id=%d&source__id=%d">filter</a>' % (oo.id, self.id)
-                rowcosts.append(('<tr><td>%s<td>%0.0f$<td>%s<td>%s'% (link, cost, symbol, count, pfilterlink), cost))
+                rowcosts.append(('<tr><td>%s<td>%0.0f$<td>%s<td>%s'% (link, cost, count, pfilterlink), cost))
             rowcosts = sorted(rowcosts, key=lambda x:-1*x[1])
             ptable = '<table style="background-color:white;"  class="table">' + '\n'.join([th[0] for th in rowcosts])+ '</table>'
             return '%d purchases (%s)<br>%s'%(self.purchases.count(),
