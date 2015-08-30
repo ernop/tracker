@@ -266,25 +266,14 @@ class Domain(DayModel):
     def summary(self):
         rows = []
         for pp in self.products.all():
-            link, count, cost, symbol = pp.summarydat()
+            link, count, cost = pp.summarydat()
             if not cost:
                 continue
-            rows.append((link, count, '%s%s'%(round(cost,1), symbol), round(cost,1)))
+            rows.append((link, count, '%s$'%(round(cost,1)), round(cost,1)))
         rows = sorted(rows, key=lambda x:x[3]*-1)
-        rows = [r[:3] for r in rows]
-        #sums=''.join([oo.summarydat() for oo in self.products.all() if oo.summary()])
-        #ct=self.products.count()
-
+        rows = [r[:10] for r in rows]
         tbl = mktable(rows)
         return tbl
-        if ct:
-            return '%d products (%s) (%s)<br>%s'%(ct,
-
-                                                             self.all_products_link(),
-                                                             self.all_purchases_link(),
-                                                             sums,)
-        else:
-            return '%d products'%(ct,)
 
     def piechart(self):
         return clink('domain', self.id, self)
@@ -592,8 +581,8 @@ class Product(DayModel):
 
     def summary(self, source=None):
         """summary of all purchases of this product."""
-        vlink, count, cost, symbol= self.summarydat(source=source)
-        return ' %s%s for %0.1f%s' % (vlink, count != 1 and '(%d)' % count or '', cost, symbol)
+        vlink, count, cost= self.summarydat(source=source)
+        return ' %s%s for %s$' % (vlink, count != 1 and '(%d)' % count or '', round(cost,1))
 
     def summarydat(self, source=None):
         '''return link, count, cost,symbol'''
@@ -613,15 +602,11 @@ class Product(DayModel):
             purches=Purchase.objects.filter(product=self, source=source)
         else:
             purches=Purchase.objects.filter(product=self)
-        try:
-            symbol=purches[0].currency.symbol
-        except:
-            symbol = None
         cost=self.total_spent(source=source)
         if cost == int(cost):
             cost = int(cost)
         vlink = '<a href="/admin/day/product/?id=%d">%s</a>'%(self.id, str(self))
-        return vlink, count, cost, symbol
+        return vlink, count, cost
 
     def total_spent(self, start=None, end=None, source=None):
         valid=Purchase.objects.filter(product=self)
@@ -749,11 +734,11 @@ class Source(DayModel):
             ptable = ''
             rowcosts = []
             for oo in Product.objects.filter(purchases__source=self).distinct():
-                link, count, cost, symbol = oo.summarydat(source=self)
+                link, count, cost = oo.summarydat(source=self)
                 if count == int(count):
                     count = int(count)
                 pfilterlink = '<a href="/admin/day/purchase/?product__id=%d&source__id=%d">filter</a>' % (oo.id, self.id)
-                rowcosts.append(('<tr><td>%s<td>%0.0f%s<td>%s<td>%s'% (link, cost, symbol, count, pfilterlink), cost))
+                rowcosts.append(('<tr><td>%s<td>%0.0f$<td>%s<td>%s'% (link, cost, symbol, count, pfilterlink), cost))
             rowcosts = sorted(rowcosts, key=lambda x:-1*x[1])
             ptable = '<table style="background-color:white;"  class="table">' + '\n'.join([th[0] for th in rowcosts])+ '</table>'
             return '%d purchases (%s)<br>%s'%(self.purchases.count(),

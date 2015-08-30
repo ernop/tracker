@@ -234,7 +234,6 @@ class DomainAdmin(OverriddenModelAdmin):
         return liferes + '<br>' + monthres
 
     def myproducts(self, obj):
-        #total=Purchase.objects.filter(product__domain=obj).aggregate(Sum('cost'))['cost__sum']
         total=sum([pp.get_cost() for pp in Purchase.objects.filter(product__domain=obj)])
         ear=Purchase.objects.filter(product__domain=obj).order_by('created')
         earliest=None
@@ -245,7 +244,7 @@ class DomainAdmin(OverriddenModelAdmin):
         if total and ear:
             now=datetime.datetime.now()
             dayrange= abs((now-earliest).days)+1
-            total='%s%s<br>%s%s/day<br>(%d days)'%(rstripz(total), '$', rstripz(total/dayrange), '$', dayrange)
+            total='%s$<br>%s$/day<br>(%d days)'%(rstripz(total), rstripz(total/dayrange), dayrange)
         purch=Purchase.objects.filter(product__domain=obj)
         if not purch:
             costs=''
