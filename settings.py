@@ -76,7 +76,7 @@ LOGGING = {
         'error_log':{
             'level':'ERROR',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': 'logs/error.log',
+            'filename': '%s/logs/error.log'%DJANGO_BASE,
             'maxBytes': 500*1024**2, # 500 MB, dumb windows not being able to roll over...
             'backupCount': 5,
             'formatter':'verbose',
