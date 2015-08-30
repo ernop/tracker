@@ -245,15 +245,18 @@ class Domain(DayModel):
         ps = Purchase.objects.filter(product__domain=self, created__gte=start, created__lt=end)
         total_quantity = 0
         total_cost = 0
+        purchase_count = 0
         for p in ps:
             total_cost += p.get_cost()
             total_quantity += p.quantity
+            purchase_count += 1
             costs[p.product.id] = costs.get(p.product.id, 0) + p.get_cost()
             counts[p.product.id] = counts.get(p.product.id, 0) + p.quantity
         res['costs'] = costs
         res['counts'] = counts
         res['total_quantity'] = total_quantity
         res['total_cost'] = total_cost
+        res['purchase_count'] = purchase_count
         tops = costs.items()
         tops.sort(key=lambda x:-1*x[1])
         res['top_purchases_html'] = '<div class="top-purchases">'+', '.join(['%s (%d)'%(Product.objects.get(id=top[0]).name, top[1]) for top in tops[:top_purchases_count]])+'</div>'
