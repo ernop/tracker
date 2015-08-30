@@ -30,7 +30,6 @@ TEMPLATE_CONTEXT_PROCESSORS=(
     )
 
 MIDDLEWARE_CLASSES = (
-    'general_middleware.PatchDebugMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -38,8 +37,6 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'urls'
-
-
 
 INSTALLED_APPS = (
     'django.contrib.admin',
