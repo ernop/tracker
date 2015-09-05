@@ -442,12 +442,14 @@ def photostats(request):
                 break
             exifval=(getattr(guy,exiffield))
             res[exiffield].append((exifval,guy.ct))
+    from settings import MYCAMERAS
     vals={'res':res}
     vals['totaldone']=Photo.objects.filter(tags__tag__name='done').count()
     vals['totaldeleted']=Photo.objects.filter(deleted=True).count()
     vals['totalphotos']=Photo.objects.count()
     vals['totalincoming']=Photo.objects.filter(incoming=True).count()
-    vals['total_mycam']=Photo.objects.filter(incoming=True).count()
+    vals['totalincoming_mine']=Photo.objects.filter(incoming=True).filter(camera__in=MYCAMERAS).count()
+    vals['totalincoming_nonmine']=Photo.objects.filter(incoming=True).exclude(camera__in=MYCAMERAS).count()
     return r2r('jinja2/photo/photostats.html',request,vals)
 
 @user_passes_test(staff_test)
