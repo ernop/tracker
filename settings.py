@@ -6,6 +6,7 @@ EXCLUDED_TAGS=['done','delete','undelete',]
 #these are in addition to "done" etc. which are built in.
 
 LOCAL=os.path.exists('local')
+MYCAMERAS=[]
 #controls whether debugging will stop the server or be skipped
 from local_settings import *
 print 'DJANGO BASE is',DJANGO_BASE
@@ -148,3 +149,4 @@ DEFAULT_PHOTOTAGS='delete undelete done myphoto timelapse friends family meme ba
 
 TEMPLATE_DEBUG = True
 EXCLUDE_FROM_PHOTOSET_TAGS=['done',]
+

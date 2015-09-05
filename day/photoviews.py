@@ -20,7 +20,11 @@ from photoutil import *
 
 
 @user_passes_test(staff_test)
-def photoajax(request):
+def photoajax_nonmine(request):
+    return photoajax(nonmine=True, mine=False)
+
+@user_passes_test(staff_test)
+def photoajax(request, nonmine=False, mine=True):
     '''load & then preload a bunch of photos.  basically, ajax-enabled fast flickr
     
     format: load js only.
@@ -40,6 +44,8 @@ def photoajax(request):
     vals['delete_phototag_id']=PhotoTag.objects.get(name='delete').id
     vals['done_phototag_id']=PhotoTag.objects.get(name='done').id
     vals['screenshot_phototag_id']=PhotoTag.objects.get(name='screenshot').id
+    vals['nonmine']=nonmine
+    vals['mine']=mine
     return r2r('jinja2/photo/photoajax.html',request,vals)
 
 #def incoming_photospot_photos_ajax(request):
@@ -89,7 +95,6 @@ def photoset(request,tagset):
     from urllib import unquote
     names=unquote(unquote(tagset))
     names=names.split(',')
-    
     
     rawphotos=Photo.objects.filter(deleted=False)
     addnames=[]
@@ -212,7 +217,11 @@ def photo_passthrough(request, id, thumb=False):
     return response
 
 @user_passes_test(staff_test)
-def ajax_photo_data(request):
+def ajax_photo_data_nonmine(request):
+    return ajax_photo_data(request, mine=False, nonmine=True)
+
+@user_passes_test(staff_test)
+def ajax_photo_data(request, mine=True, nonmine=False):
     '''also if "force id" is sent just return that photo.'''
     vals={}
     try:
@@ -238,7 +247,7 @@ def ajax_photo_data(request):
             if 'force id' in todo and todo['force id']:
                 nextphoto=get_next_incoming(force_id=todo['force id'], exclude=exclude_ids)
             else:
-                nextphoto=get_next_incoming(exclude=exclude_ids)
+                nextphoto=get_next_incoming(exclude=exclude_ids, mine=mine, nonmine=nonmine)
             log.info('got nextphoto %s',nextphoto)
             if not nextphoto:
                 vals['success']=False
@@ -438,6 +447,7 @@ def photostats(request):
     vals['totaldeleted']=Photo.objects.filter(deleted=True).count()
     vals['totalphotos']=Photo.objects.count()
     vals['totalincoming']=Photo.objects.filter(incoming=True).count()
+    vals['total_mycam']=Photo.objects.filter(incoming=True).count()
     return r2r('jinja2/photo/photostats.html',request,vals)
 
 @user_passes_test(staff_test)

@@ -65,7 +65,9 @@ urlpatterns = patterns('',
     url(r'^photo_passthrough/(?P<id>[0-9]+).(jpg|gif|webp|png)$','day.photoviews.photo_passthrough',name='photo_passthrough'),
     url(r'^photo_thumb_passthrough/(?P<id>[0-9]+).(jpg|gif|webp|png)$','day.photoviews.photo_thumb_passthrough',name='photo_thumb_passthrough'),
     url(r'^ajax/photo_data/$','day.photoviews.ajax_photo_data',name='ajax_photo_data'),
+    url(r'^ajax/photo_data_nonmine/$','day.photoviews.ajax_photo_data_nonmine',name='ajax_photo_data_nonmine'),
     url(r'^photo/photoajax/$','day.photoviews.photoajax',name='ajax_photoajax'),
+    url(r'^photo/photoajax_nonmine/$','day.photoviews.photoajax_nonmine',name='ajax_photoajax_nonmine'),
     #url(r'^photo/photospotajax/$','day.photoviews.incoming_photospot_photos_ajax',name='ajax_photospotajax'),
     url(r'^photo/photoset/(?P<tagset>.*)/','day.photoviews.photoset')
 )

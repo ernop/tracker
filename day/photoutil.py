@@ -120,7 +120,7 @@ def get_nonexisting_fp(basedir,basefn):
             from util import ipdb;ipdb()
     return testfp
 
-def get_next_incoming(exclude=None, force_id=None):
+def get_next_incoming(exclude=None, force_id=None, mine=True, nonmine=False):
     #goto next incoming photo by id for quick shifting.
     #actually i should preload this...
     from day.models import Photo
@@ -133,9 +133,10 @@ def get_next_incoming(exclude=None, force_id=None):
         elif type(exclude) is not list:
             exclude=[exclude]
         exclude=[int(_) for _ in exclude]
-        if 1:
-            imgexis=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True,fp__icontains='img').order_by('taken','fp','id',)
-            for img in imgexis:
+        if mine and not nonmine:
+            from settings import MYCAMERAS
+            mycams=Photo.objects.exclude(deleted=True).exclude(id__in=exclude).filter(incoming=True, camera__in=MYCAMERAS).order_by('taken','fp','id',)#fp__icontains='img')
+            for img in mycams:
                 if img.file_exists():
                     log.info('returning img %s', img)
                     return img

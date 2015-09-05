@@ -63,7 +63,6 @@ function kill_day(restore){
 function load(donefunc, only_one){
     if (loaded_photos.length>25){initial_load_done=true;return}
     ii=ii+1
-    
     var fake=0
     if (fake){
         var fakephoto={tagids:[ii*3,ii*4+1],id:ii,fp:'/static/incomingphoto/'+ii+'.jpg',infozone:'<table class="table thintable"><tr><td>stuff</table>'}
@@ -83,7 +82,7 @@ function load(donefunc, only_one){
                 {exclude_ids.push(current_photo.id)}
         }
         if (!exclude_ids){exclude_ids=null}
-        var dat={'kind':'ajax photo preload','smithee':'blather'}
+        var dat={'kind':'ajax photo preload','smithee':'blather', 'mine':mine, 'nonmine':nonmine}
         if (exclude_ids && exclude_ids.length){
             dat['exclude_ids']=exclude_ids
         }
