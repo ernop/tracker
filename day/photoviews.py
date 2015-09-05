@@ -21,7 +21,7 @@ from photoutil import *
 
 @user_passes_test(staff_test)
 def photoajax_nonmine(request):
-    return photoajax(nonmine=True, mine=False)
+    return photoajax(request, nonmine=True, mine=False)
 
 @user_passes_test(staff_test)
 def photoajax(request, nonmine=False, mine=True):
