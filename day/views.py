@@ -273,6 +273,7 @@ def summary_timespan(start,end,request,
     if include_permonth:
         bits.append(['domain','per month','total','purchs','top'])
     monthtotal = 0
+    monthtotalreal = 0
     FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()
     income=0
     for dd in Domain.objects.all():
@@ -292,6 +293,8 @@ def summary_timespan(start,end,request,
         bits.append(guy)
         if dd.name!='money':
             monthtotal += dinfo['total_cost']
+            if dd.name not in ['tax','recurring',]:
+                monthtotalreal += dinfo['total_cost']
     domaintable = mktable(bits, rights=[1, 2], bigs=[1, 2])
     vals['domaintable'] = domaintable
     #purchases summary by domain
@@ -320,6 +323,7 @@ def summary_timespan(start,end,request,
     vals['saved']=saved
     vals['salaryshow']='%0.1f'%(round(income/100)/10.0)
     vals['expensesshow']='%0.1f'%(round(monthtotal/100)/10.0)
+    vals['realexpensesshow']='%0.1f'%(round(monthtotalreal/100)/10.0)
     vals['savedshow']='%0.1f'%(round(saved/100)/10.0)
     vals['projected_saving'] = monthtotal
     if include_people:
