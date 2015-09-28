@@ -329,7 +329,7 @@ def summary_timespan(start,end,request,
     vals['projected_saving'] = monthtotal
     if include_people:
         vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
-        ppls=[person.age() for person in [pp for pp in vals['metpeople'] if pp.birthday]]
+        ppls=[person.age(asof=start) for person in [pp for pp in vals['metpeople'] if pp.birthday]]
         vals['met_with_age_count']=len(ppls)
         vals['metaverageage']=ppls and ('%0.1f'%(sum(ppls)*1.0/len(ppls))) or None
         vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)
@@ -345,7 +345,7 @@ def summary_timespan(start,end,request,
                 pp.newperson=False
             pp.month_purchase_count=Purchase.objects.filter(created__gte=start,created__lt=end,who_with=pp).count()
         vals['monthpeople']=[pp for pp in vals['monthpeople']]
-        ppls=[(person.age(), person.month_purchase_count,) for person in [pp for pp in vals['monthpeople'] if pp.birthday] if person.month_purchase_count>0]
+        ppls=[(person.age(asof=start), person.month_purchase_count,) for person in [pp for pp in vals['monthpeople'] if pp.birthday] if person.month_purchase_count>0]
         vals['month_with_age_count']=len(ppls)
         vals['monthaverageage']=ppls and ('%0.1f'%(sum([_[0]*_[1] for _ in ppls])*1.0/sum([_[1] for _ in ppls]))) or None
         #weighted by frequency
