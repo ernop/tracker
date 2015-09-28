@@ -27,8 +27,10 @@ Saved {{savedshow}}k</h2>
         <span style="float:left;height:30px;width:220px;">{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}}) {% if not person.birthday %}*{% endif %}</span>
     {% endfor %}
     
-    <h3>{% if metaverageage %}Met average: {{metaverageage}} {% if met_with_age_count %}({{met_with_age_count}}){% endif %}{% endif %}
-    {% if monthaverageage %}<br>Weighted average: {{monthaverageage}}{% if month_with_age_count %}({{met_with_age_count}}){% endif %}{% endif %}</h3>
+    <h3>{% if metaverageage %}Met: {{metaverageage}} {% if met_with_age_count %}({{met_with_age_count}}){% endif %}{% endif %}
+    <br>All: {{monthaverage_raw}}
+    {% if monthaverageage %}<br>Weighted: {{monthaverageage}}{% if month_with_age_count %}({{met_with_age_count}}){% endif %}{% endif %}</h3>
+    
 {% endif %}
 
 {% if days %}
