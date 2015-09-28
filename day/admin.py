@@ -465,7 +465,7 @@ class PersonAdmin(OverriddenModelAdmin):
         data = []
         for domain_id in counts.keys():
             row = (Domain.objects.get(id=domain_id).name,'<a class="nb" href="../purchase/?product__domain__id=%d&who_with=%d">%s times</a>'% (domain_id, obj.id, counts[domain_id],),
-                   '%s' % costs[domain_id])
+                   '%0.1f' % costs[domain_id])
             data.append([counts[domain_id], row])
         data.sort(key=lambda x:-1*x[0])
         data = [r[1] for r in data]
