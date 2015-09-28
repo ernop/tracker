@@ -473,7 +473,10 @@ class Person(DayModel):
         
         if not self.birthday:
             return None
+        
         if asof:
+            if type(asof)==datetime.datetime:
+                asof=asof.date()
             assert type(asof)==datetime.date
         else:
             asof=datetime.date.today()
