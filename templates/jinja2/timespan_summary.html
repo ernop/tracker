@@ -24,8 +24,11 @@ Saved {{savedshow}}k</h2>
 
 {% if monthpeople %}
     {% for person in monthpeople %}
-        <span style="float:left;height:30px;width:220px;">{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}})</span>
+        <span style="float:left;height:30px;width:220px;">{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}}) {% if not person.birthday %}*{% endif %}</span>
     {% endfor %}
+    
+    <h3>{% if metaverageage %}Met average: {{metaverageage}} {% if met_with_age_count %}({{met_with_age_count}}){% endif %}{% endif %}
+    {% if monthaverageage %}<br>Weighted average: {{monthaverageage}}{% if month_with_age_count %}({{met_with_age_count}}){% endif %}{% endif %}</h3>
 {% endif %}
 
 {% if days %}
@@ -51,6 +54,8 @@ Saved {{savedshow}}k</h2>
 </table>
 {% endif %}
 
+{% include "jinja2/people_connections.html" %}
+
 <div class="notification fixed-notification">
 </div>
 
@@ -59,6 +64,9 @@ Saved {{savedshow}}k</h2>
     <tr><td>{{tag.clink(text=tag.name+' db')|safe}}<td><a href="../../photo/photoset/{{tag.name}}/">{{tag.name}}</a><td>{{count}}
 {% endfor %}
 </table>
+
+
+
 
 {% endblock %}
 

@@ -256,7 +256,8 @@ def summary_timespan(start,end,request,
                      include_days=True,
                      include_span_tags=True,
                      top_purchases_count=12,
-                     include_permonth=False):
+                     include_permonth=False,
+                     include_d3_people=True):
     vals = {}
     vals['start'] = start
     vals['end'] = end
@@ -328,9 +329,13 @@ def summary_timespan(start,end,request,
     vals['projected_saving'] = monthtotal
     if include_people:
         vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
+        ppls=[person.age() for person in [pp for pp in vals['metpeople'] if pp.birthday]]
+        vals['met_with_age_count']=len(ppls)
+        vals['metaverageage']=ppls and ('%0.1f'%(sum(ppls)*1.0/len(ppls))) or None
         vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)
         vals['monthpeople']=vals['monthpeople']|vals['metpeople']
         vals['monthpeople']=vals['monthpeople'].distinct().order_by('-rough_purchase_count')
+        
         for pp in vals['monthpeople']:
             pp.update_purchase_count()
         for pp in vals['monthpeople']:
@@ -340,6 +345,10 @@ def summary_timespan(start,end,request,
                 pp.newperson=False
             pp.month_purchase_count=Purchase.objects.filter(created__gte=start,created__lt=end,who_with=pp).count()
         vals['monthpeople']=[pp for pp in vals['monthpeople']]
+        ppls=[(person.age(), person.month_purchase_count,) for person in [pp for pp in vals['monthpeople'] if pp.birthday] if person.month_purchase_count>0]
+        vals['month_with_age_count']=len(ppls)
+        vals['monthaverageage']=ppls and ('%0.1f'%(sum([_[0]*_[1] for _ in ppls])*1.0/sum([_[1] for _ in ppls]))) or None
+        #weighted by frequency
         vals['monthpeople'].sort(key=lambda x:-1*x.month_purchase_count)
     else:
         vals['monthpeople']=[]
@@ -348,6 +357,9 @@ def summary_timespan(start,end,request,
         vals['span_tags']=get_span_tags(start,end,user=request.user)
     else:
         vals['span_tags']=[]
+    now=datetime.datetime.today().date()
+    people_connections_data=people_connections(request, since=start.date(), until=end, exclude_disabled=True, data_only=True)        
+    vals.update(people_connections_data)
     return r2r('jinja2/timespan_summary.html', request, vals)
 
 def mkinfobox(title, content):
@@ -404,7 +416,8 @@ def anon_annual(request):
 
 
 @login_required
-def people_connections(request, exclude_disabled=False, since=None,detail_level=None):
+def people_connections(request, exclude_disabled=False, since=None, until=None, detail_level=None,
+                       data_only=False):
     if not detail_level:
         detail_level='short name'
     vals = {}
@@ -422,17 +435,21 @@ def people_connections(request, exclude_disabled=False, since=None,detail_level=
     ID=45299
     newly_created=set()
     purch_existed=set()
-
+    
     for person in people:
         if person.id==ID:
             from util import ipdb;ipdb()
         #include them if they've got purch in the last year, or they introduced me to sb in the last year.
-        if since and person.created>since :
+        if since and person.created>since and ((not until) or person.created<=until):
             #at some point should also include them if they're in a new phototag.
             newly_created.add(person.id)
         if since:
-            if person.purchases.filter(created__gt=since).exists():
-                purch_existed.add(person.id)
+            if until:
+                if person.purchases.filter(created__gt=since).filter(created__lte=until).exists():
+                    purch_existed.add(person.id)                
+            else:
+                if person.purchases.filter(created__gt=since).exists():
+                    purch_existed.add(person.id)
         else:
             purch_existed.add(person.id)
         
@@ -470,6 +487,8 @@ def people_connections(request, exclude_disabled=False, since=None,detail_level=
             nodes[person.id]['supporting']=True
     vals['nodes'] = nodes
     vals['edges'] = edges
+    if data_only:
+        return vals
     return r2r('jinja2/people_connections.html', request, vals)
 
 def person2obj(person, kind=None):

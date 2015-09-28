@@ -468,6 +468,18 @@ class Person(DayModel):
     description=models.TextField(blank=True,null=True)
     origin=models.CharField(max_length=100,blank=True,null=True)
     
+    def age(self, asof=False):    
+        '''float representing their age asof asof'''
+        
+        if not self.birthday:
+            return None
+        if asof:
+            assert type(asof)==datetime.date
+        else:
+            asof=datetime.date.today()
+        td=asof-self.birthday
+        return td.days/365+(td.days%365)/365.0
+    
     def colored_clink(self,newperson=False):
         genderklass=self.gender_html_class()
         klass=genderklass

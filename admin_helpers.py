@@ -435,6 +435,30 @@ class NoteHasText(SimpleListFilter):
         elif self.value()=='no':
             return queryset.filter(text='')|queryset.filter(text=None)
 
+class DecadeFilter(SimpleListFilter):
+    title = "Decade"
+    parameter_name='decade'
+    def lookups(self,request,model_admin):
+        return ((nn*10, str(nn*10)+'s') for nn in range(0, 9))
+    
+    def queryset(self, request, queryset):
+        if self.value():
+            today=datetime.datetime.today()
+            lower=today-datetime.timedelta(days=(int(self.value())+10)*365)
+            higher=lower+datetime.timedelta(days=10*365)
+            return queryset.filter(birthday__gte=lower, birthday__lt=lower+datetime.timedelta(days=365))    
+
+class AgeFilter(SimpleListFilter):
+    title="Age"
+    parameter_name="age"
+    def lookups(self,request,model_admin):
+        return ((nn,nn) for nn in range(10, 70))
+    
+    def queryset(self, request, queryset):
+        if self.value():
+            lower=datetime.datetime.today()-datetime.timedelta(days=365*int(self.value())+1)
+            return queryset.filter(birthday__gte=lower, birthday__lt=lower+datetime.timedelta(days=365))
+
 class HasPhotoFilter(SimpleListFilter):
     title = 'Has Photos'
     parameter_name = 'has_photo'

@@ -284,10 +284,10 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie, myspots)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id myinfo myphotos mywith mysources mydomains mypurchases'.split()
-    list_filter=['origin', GenderFilter, AnyPurchaseFilter, KnownSinceLongAgo, HasPhotoFilter]
+    list_display='id origin birthday myinfo myphotos mywith mysources mydomains mypurchases'.split()
+    list_filter=['origin', GenderFilter, AnyPurchaseFilter, KnownSinceLongAgo, HasPhotoFilter, DecadeFilter, AgeFilter]
     date_hierarchy = 'created'
-    #list_editable=['description','origin',]
+    list_editable=['origin','birthday',]
     list_per_page = 10
     search_fields = 'first_name last_name'.split()
     actions = ['disable','male','female','organization', 'set_longago', 'set_today', 'update_rough_purchase_counts', ]
