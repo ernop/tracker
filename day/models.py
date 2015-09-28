@@ -473,7 +473,6 @@ class Person(DayModel):
         
         if not self.birthday:
             return None
-        
         if asof:
             if type(asof)==datetime.datetime:
                 asof=asof.date()
@@ -481,7 +480,7 @@ class Person(DayModel):
         else:
             asof=datetime.date.today()
         td=asof-self.birthday
-        return td.days/365+(td.days%365)/365.0
+        return td.days/365.0+(td.days%365)/365.0
     
     def colored_clink(self,newperson=False):
         genderklass=self.gender_html_class()
