@@ -241,7 +241,7 @@ def theyear(request,dt):
     mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     start = datetime.datetime(year=mm.year, month=1, day=1)
     end = add_months(start, months=12)
-    return summary_timespan(start,end,request,include_people=False,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=10,
+    return summary_timespan(start,end,request,include_people=True,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=10,
                             include_permonth=True)
 
 def alltime(request):
