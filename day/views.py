@@ -330,7 +330,6 @@ def summary_timespan(start,end,request,
     if include_people:
         vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
         ppls=[person.age(asof=start) for person in [pp for pp in vals['metpeople'] if pp.birthday]]
-        import ipdb;ipdb.set_trace()
         vals['met_with_age_count']=len(ppls)
         vals['metaverageage']=ppls and ('%0.1f'%(sum(ppls)*1.0/len(ppls))) or None
         vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)
