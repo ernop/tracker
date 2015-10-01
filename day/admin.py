@@ -120,41 +120,21 @@ class ProductAdmin(OverriddenModelAdmin):
 
     @debu
     def mysources(self, obj):
-        #return ''
         purch=Purchase.objects.filter(product=obj)
-
-        pie=''
         sources=Source.objects.filter(purchases__product=obj).distinct()
-        dat=[(ss.total_spent(product=obj), str(ss)) for ss in sources]
-
-
-        #ss=Source.objects.filter(purchases__product__domain=obj).distinct()
-
-
-        dat.sort(key=lambda x:x[0])
+        dat=[(ss.total_spent(product=obj), ss, ss.purchases.filter(product=obj).count()) for ss in sources]
+        #dat is amount spent, source, count of purchases
+        dat.sort(key=lambda x:-1*x[0])
         lifevalues = ','.join([str(s[0]) for s in dat])
-        lifeoffsets = ','.join(['%s (%s)'%(s[1], str(s[0])) for s in dat])
-        liferes = '<h3>Sources</h3><div class="piespark" values="%s" labels="%s"></div>' % (lifevalues, lifeoffsets)
+        lifeoffsets = ','.join(['%s (%s)'%(s[1].name, '%0.1f'%s[0]) for s in dat])
+        lifepie = '<h3>Sources</h3><div class="piespark" values="%s" labels="%s"></div>' % (lifevalues, lifeoffsets)
 
-        res = {}
-        for p in purch:
-            cl = p.source.id
-            res[cl] = res.get(cl, 0) + 1
-
-        ss = Source.objects.filter(purchases__product=obj).distinct()
-        filters = []
-        res = sorted(res.items(), key=lambda x:(-1*x[1], x[0]))
-        for n in range(len(res)):
-            source = Source.objects.get(id=res[n][0])
-            res[n] = res[n] + ('<a class="nb" href="/admin/day/purchase/?product__id=%d&source=%d">filter</a>'%(obj.id, source.id), )
-            res[n] = (source.clink(), ) + res[n][1:]
-
-
-
+        res=[]
+        for total, source, counts in dat:
+            filterlink='<a class="nb" href="/admin/day/purchase/?product__id=%d&source=%d">filter</a>'%(obj.id, source.id)
+            res.append([source.clink(), '%0.1f$'%total, counts, filterlink])
         tbl = mktable(res)
-        #sourcefilters = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
-
-        return liferes + '<br>' + tbl
+        return lifepie + '<br>' + tbl
 
     adminify(mysources, mypurchases, mydomain, myspark, mywith)
 
@@ -470,8 +450,6 @@ class PersonAdmin(OverriddenModelAdmin):
         data.sort(key=lambda x:-1*x[0])
         data = [r[1] for r in data]
         return mktable(data)
-
-    
 
     def get_changelist_form(self, request,**kwargs):
         class EditForm(forms.ModelForm):
