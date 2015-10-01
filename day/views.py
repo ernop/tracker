@@ -353,7 +353,7 @@ def summary_timespan(start,end,request,
         ppls=[(person, person.month_purchase_count,) for person in vals['monthpeople'] if person.month_purchase_count>0]
         data=weighted_average_age(ppls, asof=start)
         vals['month_with_age_count']=data['people_included_count']
-        vals['monthaverageage']='%0.1f'%data['average_age']
+        vals['monthaverageage']='%0.1f'%(data['average_age'] or 0)
         
         raw_ppls=[pp[0] for pp in ppls]
         unweighted_data=average_age(raw_ppls, asof=start)
