@@ -130,9 +130,15 @@ class ProductAdmin(OverriddenModelAdmin):
         lifepie = '<h3>Sources</h3><div class="piespark" values="%s" labels="%s"></div>' % (lifevalues, lifeoffsets)
 
         res=[]
+        countsum=0
+        alltotal=0
         for total, source, counts in dat:
             filterlink='<a class="nb" href="/admin/day/purchase/?product__id=%d&source=%d">filter</a>'%(obj.id, source.id)
             res.append([source.clink(), '%0.1f$'%total, counts, filterlink])
+            countsum+=counts
+            alltotal+=total
+        lastrow=['all','%0.1f'%alltotal,countsum,'',]
+        res.append(lastrow)
         tbl = mktable(res)
         return lifepie + '<br>' + tbl
 
@@ -429,13 +435,11 @@ class PersonAdmin(OverriddenModelAdmin):
             if p.product.id in doneprod:
                 continue
             doneprod.add(p.product.id)
-            bits.append([counts[p.product.id], p.product.clink(), '<a href="../purchase/?product_id=%d&who_with=%d">%d (%0.1f)</a>' % (p.product.id, obj.id, counts[p.product.id], costs[p.product.id])])
+            bits.append([counts[p.product.id], p.product.clink(), 'from %s'%p.source.clink(), '<a href="../purchase/?product_id=%d&who_with=%d">%d (%0.1f)</a>' % (p.product.id, obj.id, counts[p.product.id], costs[p.product.id])])
         bits.sort(key=lambda x:-1*x[0])
         bits = [b[1:] for b in bits]
         tbl = mktable(bits)
         return tbl + '<br>' + alllink
-        #prods = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
-        #return prods + '<br>' + alllink
 
     def mydomains(self, obj):
         res = obj.domain_summary_data()
