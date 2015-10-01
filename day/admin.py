@@ -417,17 +417,16 @@ class PersonAdmin(OverriddenModelAdmin):
         
         ps = obj.purchases.all()
         peopleids=set()
-        for p in ps:
-            togethercount = p.who_with.count()
-            for person in p.who_with.exclude(id=obj.id):
+        for purch in ps:
+            togethercount = purch.who_with.count()
+            for person in purch.who_with.exclude(id=obj.id):
                 counts[person.id] = counts.get(person.id, 0) + 1
-                costs[person.id] = costs.get(person.id, 0) + (p.get_cost() / togethercount)
-                if p.id not in peopleids:
-                    peopleids.add(p.id)
+                costs[person.id] = costs.get(person.id, 0) + (purch.get_cost() / togethercount)
+                if purch.id not in peopleids:
+                    peopleids.add(person.id)
         res.extend([(Person.objects.get(id=p).clink(), counts[p], '%0.1f' % costs[p]) for p,v in sorted(counts.items(), key=lambda x:-1*costs[x[0]])])
         totalrow=['total', len(peopleids)]
         res.append(totalrow)
-    
         people=Person.objects.filter(id__in=peopleids)
         today=datetime.date.today()
         agedata=average_age(people=people, asof=today)
@@ -604,7 +603,7 @@ class SourceAdmin(OverriddenModelAdmin):
                 cl = person.clink()
                 res[cl] = res.get(cl, 0) + 1
                 if p.id not in peopleids:
-                    peopleids.add(p.id)
+                    peopleids.add(person.id)
                 
         totalrow=['total', len(peopleids)]
         res=sorted(res.items(), key=lambda x:(-1*x[1], x[0]))
