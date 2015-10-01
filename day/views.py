@@ -357,7 +357,7 @@ def summary_timespan(start,end,request,
         
         raw_ppls=[pp[0] for pp in ppls]
         unweighted_data=average_age(raw_ppls, asof=start)
-        vals['monthaverage_raw']='%0.1f'%unweighted_data['average_age']
+        vals['monthaverage_raw']='%0.1f'%(unweighted_data['average_age'] or 0)
         vals['monthpeople'].sort(key=lambda x:-1*x.month_purchase_count)
     else:
         vals['monthpeople']=[]
