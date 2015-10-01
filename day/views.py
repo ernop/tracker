@@ -335,7 +335,7 @@ def summary_timespan(start,end,request,
         vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
         data=average_age(vals['metpeople'], asof=start)
         vals['met_with_age_count']=data['people_included_count']
-        vals['metaverageage']='%0.1f'%data['average_age']
+        vals['metaverageage']='%0.1f'%(data['average_age'] or 0)
         
         vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)
         vals['monthpeople']=vals['monthpeople']|vals['metpeople']
