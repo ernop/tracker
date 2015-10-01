@@ -126,7 +126,7 @@ class ProductAdmin(OverriddenModelAdmin):
         today=datetime.date.today()
         agedata=average_age(people=people, asof=today)
         knowndata=average_time_known(people=people, asof=today)
-        ageline=['average age: %0.1f (%d)'%(agedata['average_age'] or 0, agedata['people_included_count'] or 0), 'time known: %0.1f'%knowndata['average_age']]
+        ageline=['average age: %0.1f (%d)'%(agedata['average_age'] or 0, agedata['people_included_count'] or 0), 'time known: %0.1f'%(knowndata['average_age'] or 0)]
         
         res.append(ageline)
         tbl = mktable(res)
