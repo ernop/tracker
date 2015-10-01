@@ -468,6 +468,8 @@ class Person(DayModel):
     description=models.TextField(blank=True,null=True)
     origin=models.CharField(max_length=100,blank=True,null=True)
     
+    
+    
     def age(self, asof=False):    
         '''float representing their age asof asof'''
         
@@ -481,6 +483,18 @@ class Person(DayModel):
             asof=datetime.date.today()
         td=asof-self.birthday
         return td.days/365.0+(td.days%365)/365.0
+    
+    def howlongknown(self, asof=False):    
+        if not self.created:
+            return None
+        if asof:
+            if type(asof)==datetime.datetime:
+                asof=asof.date()
+            assert type(asof)==datetime.date
+        else:
+            asof=datetime.date.today()
+        td=asof-self.created
+        return td.days/365.0+(td.days%365)/365.0    
     
     def colored_clink(self,newperson=False):
         genderklass=self.gender_html_class()

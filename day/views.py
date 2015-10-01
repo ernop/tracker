@@ -327,11 +327,16 @@ def summary_timespan(start,end,request,
     vals['realexpensesshow']='%0.1f'%(round(monthtotalreal/100)/10.0)
     vals['savedshow']='%0.1f'%(round(saved/100)/10.0)
     vals['projected_saving'] = monthtotal
+    
+    
+    
+    
     if include_people:
         vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
-        ppls=[person.age(asof=start) for person in [pp for pp in vals['metpeople'] if pp.birthday]]
-        vals['met_with_age_count']=len(ppls)
-        vals['metaverageage']=ppls and ('%0.1f'%(sum(ppls)*1.0/len(ppls))) or None
+        data=average_age(vals['metpeople'], asof=start)
+        vals['met_with_age_count']=data['people_included_count']
+        vals['metaverageage']='%0.1f'%data['average_age']
+        
         vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)
         vals['monthpeople']=vals['monthpeople']|vals['metpeople']
         vals['monthpeople']=vals['monthpeople'].distinct().order_by('-rough_purchase_count')
@@ -345,11 +350,14 @@ def summary_timespan(start,end,request,
                 pp.newperson=False
             pp.month_purchase_count=Purchase.objects.filter(created__gte=start,created__lt=end,who_with=pp).count()
         vals['monthpeople']=[pp for pp in vals['monthpeople']]
-        ppls=[(person.age(asof=start), person.month_purchase_count,) for person in [pp for pp in vals['monthpeople'] if pp.birthday] if person.month_purchase_count>0]
-        vals['monthaverage_raw']=ppls and '%0.1f'%(sum([_[0] for _ in ppls])*1.0/len(ppls)) or None
-        vals['month_with_age_count']=len(ppls)
-        vals['monthaverageage']=ppls and ('%0.1f'%(sum([_[0]*_[1] for _ in ppls])*1.0/sum([_[1] for _ in ppls]))) or None
-        #weighted by frequency
+        ppls=[(person, person.month_purchase_count,) for person in vals['monthpeople'] if person.month_purchase_count>0]
+        data=weighted_average_age(ppls, asof=start)
+        vals['month_with_age_count']=data['people_included_count']
+        vals['monthaverageage']='%0.1f'%data['average_age']
+        
+        raw_ppls=[pp[0] for pp in ppls]
+        unweighted_data=average_age(raw_ppls, asof=start)
+        vals['monthaverage_raw']='%0.1f'%unweighted_data['average_age']
         vals['monthpeople'].sort(key=lambda x:-1*x.month_purchase_count)
     else:
         vals['monthpeople']=[]
@@ -359,7 +367,9 @@ def summary_timespan(start,end,request,
     else:
         vals['span_tags']=[]
     now=datetime.datetime.today().date()
-    people_connections_data=people_connections(request, since=start.date(), until=end, exclude_disabled=True, data_only=True)        
+    if type(start) is not datetime.date:
+        start=start.date()
+    people_connections_data=people_connections(request, since=start, until=end, exclude_disabled=True, data_only=True)        
     vals.update(people_connections_data)
     return r2r('jinja2/timespan_summary.html', request, vals)
 
@@ -419,6 +429,8 @@ def anon_annual(request):
 @login_required
 def people_connections(request, exclude_disabled=False, since=None, until=None, detail_level=None,
                        data_only=False):
+    if type(until) is datetime.datetime:
+        until=until.date()
     if not detail_level:
         detail_level='short name'
     vals = {}

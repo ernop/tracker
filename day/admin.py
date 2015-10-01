@@ -64,8 +64,7 @@ class ProductAdmin(OverriddenModelAdmin):
         return obj.domain.clink()
 
     def mypurchases(self, obj):
-        #return obj.summary()
-        data= [(p.clink(),p.day.vlink()) for p in Purchase.objects.filter(product=obj).order_by('day__date')]
+        data= [(p.clink(),p.source.clink(),p.day.vlink()) for p in Purchase.objects.filter(product=obj).order_by('day__date')]
         
         alllink = '<a class="btn btn-default" href="../purchase/?product_id=%d">all</a>' % obj.id
         data.append(alllink)
@@ -109,11 +108,28 @@ class ProductAdmin(OverriddenModelAdmin):
     def mywith(self, obj):
         res = {}
         ps = Purchase.objects.filter(product=obj)
+        
+        peopleids=set()
         for p in ps:
             for person in p.who_with.all():
                 cl = person.clink()
                 res[cl] = res.get(cl, 0) + 1
-        tbl = mktable(sorted(res.items(), key=lambda x:(-1*x[1], x[0])))
+                if person.id not in peopleids:
+                    peopleids.add(person.id)
+                
+        
+        res=sorted(res.items(), key=lambda x:(-1*x[1], x[0]))
+        totalrow=['total', len(peopleids)]
+        res.append(totalrow)
+        
+        people=Person.objects.filter(id__in=peopleids)
+        today=datetime.date.today()
+        agedata=average_age(people=people, asof=today)
+        knowndata=average_time_known(people=people, asof=today)
+        ageline=['average age: %0.1f (%d)'%(agedata['average_age'] or 0, agedata['people_included_count'] or 0), 'time known: %0.1f'%knowndata['average_age']]
+        
+        res.append(ageline)
+        tbl = mktable(res)
         return tbl
         #res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
         #return res
@@ -133,7 +149,7 @@ class ProductAdmin(OverriddenModelAdmin):
         countsum=0
         alltotal=0
         for total, source, counts in dat:
-            filterlink='<a class="nb" href="/admin/day/purchase/?product__id=%d&source=%d">filter</a>'%(obj.id, source.id)
+            filterlink='<a class="nb" href="/admin/day/purchase/?product__id=%d&source=%d">view</a>'%(obj.id, source.id)
             res.append([source.clink(), '%0.1f$'%total, counts, filterlink])
             countsum+=counts
             alltotal+=total
@@ -396,17 +412,32 @@ class PersonAdmin(OverriddenModelAdmin):
     def mywith(self, obj):
         counts = {}
         costs = {}
-        bits=[]
-        bits.extend([('Introduced to',p.clink(), get_day_link(p.created)) for p in obj.introduced_to.order_by('created','first_name', 'last_name')])
+        res=[]
+        res.extend([('Introduced to',p.clink(), get_day_link(p.created)) for p in obj.introduced_to.order_by('created','first_name', 'last_name')])
         
         ps = obj.purchases.all()
+        peopleids=set()
         for p in ps:
             togethercount = p.who_with.count()
             for person in p.who_with.exclude(id=obj.id):
                 counts[person.id] = counts.get(person.id, 0) + 1
                 costs[person.id] = costs.get(person.id, 0) + (p.get_cost() / togethercount)
-        bits.extend([(Person.objects.get(id=p).clink(), counts[p], '%0.1f' % costs[p]) for p,v in sorted(counts.items(), key=lambda x:-1*costs[x[0]])])
-        tbl = mktable(bits)
+                if p.id not in peopleids:
+                    peopleids.add(p.id)
+        res.extend([(Person.objects.get(id=p).clink(), counts[p], '%0.1f' % costs[p]) for p,v in sorted(counts.items(), key=lambda x:-1*costs[x[0]])])
+        totalrow=['total', len(peopleids)]
+        res.append(totalrow)
+    
+        people=Person.objects.filter(id__in=peopleids)
+        today=datetime.date.today()
+        agedata=average_age(people=people, asof=today)
+        knowndata=average_time_known(people=people, asof=today)
+        ageline=['average age: %0.1f (%d)'%(agedata['average_age'] or 0, agedata['people_included_count'] or 0), 'time known: %0.1f'%(knowndata['average_age'] or 0)]
+    
+        res.append(ageline)        
+        
+        
+        tbl = mktable(res)
         return tbl
 
     def mysources(self, obj):
@@ -435,7 +466,7 @@ class PersonAdmin(OverriddenModelAdmin):
             if p.product.id in doneprod:
                 continue
             doneprod.add(p.product.id)
-            bits.append([counts[p.product.id], p.product.clink(), 'from %s'%p.source.clink(), '<a href="../purchase/?product_id=%d&who_with=%d">%d (%0.1f)</a>' % (p.product.id, obj.id, counts[p.product.id], costs[p.product.id])])
+            bits.append([counts[p.product.id], p.product.clink(), p.source.clink(), '<a href="../purchase/?product_id=%d&who_with=%d">%d (%0.1f)</a>' % (p.product.id, obj.id, counts[p.product.id], costs[p.product.id])])
         bits.sort(key=lambda x:-1*x[0])
         bits = [b[1:] for b in bits]
         tbl = mktable(bits)
@@ -567,12 +598,26 @@ class SourceAdmin(OverriddenModelAdmin):
     def mywith(self, obj):
         res = {}
         ps = Purchase.objects.filter(source=obj)
+        peopleids=set()
         for p in ps:
             for person in p.who_with.all():
                 cl = person.clink()
                 res[cl] = res.get(cl, 0) + 1
-        tbl = mktable(sorted(res.items(), key=lambda x:(-1*x[1], x[0])))
+                if p.id not in peopleids:
+                    peopleids.add(p.id)
+                
+        totalrow=['total', len(peopleids)]
+        res=sorted(res.items(), key=lambda x:(-1*x[1], x[0]))
+        res.append(totalrow)
+        people=Person.objects.filter(id__in=peopleids)
+        today=datetime.date.today()
+        agedata=average_age(people=people, asof=today)
+        knowndata=average_time_known(people=people, asof=today)
+        ageline=['average age: %0.1f (%d)'%(agedata['average_age'] or 0, agedata['people_included_count'] or 0), 'time known: %0.1f'%(knowndata['average_age'] or 0)]
+        res.append(ageline)                        
+        tbl = mktable(res)
         return tbl
+    
     @debu
     def mytotal(self, obj):
         #monthago=datetime.datetime.now()-datetime.timedelta(days=30)

@@ -567,3 +567,27 @@ def gender2id(txt):
     if txt=='female':return 2
     if txt=='organization':return 3
     return 0
+
+def average_time_known(people, asof=None):
+    return weighted_average_time_known([(pp,1) for pp in people], asof=asof)
+
+def weighted_average_time_known(peopleweights, asof=None):
+    return weighted_average_age(peopleweights, key='howlongknown')
+
+def weighted_average_age(peopleweights, asof=None, key='birthday'):
+    if not key:
+        key='birthday'
+    if not asof:
+        asof=datetime.datetime.now()
+    #weighted average age of (people, weight) asof asof
+    res={'people_included_count':0,'average_age':None}
+    if key=='birthday':
+        ageweights=[(person.age(asof=asof), weight) for person, weight in [pp for pp in peopleweights if pp[0].birthday]]
+    elif key=='howlongknown':
+        ageweights=[(person.howlongknown(asof=asof), weight) for person, weight in [pp for pp in peopleweights if pp[0].created]]
+    res['people_included_count']=len(ageweights)
+    res['average_age']=ageweights and (sum([age*weight for age,weight in ageweights])*1.0/sum([weight for person,weight in ageweights])) or None
+    return res
+
+def average_age(people, asof=None):
+    return weighted_average_age([(pp, 1) for pp in people], asof=asof)
