@@ -257,7 +257,9 @@ def summary_timespan(start,end,request,
                      include_span_tags=True,
                      top_purchases_count=12,
                      include_permonth=False,
-                     include_d3_people=True):
+                     include_d3_people=True,
+                     include_ages=True,
+                     include_origins=False):
     vals = {}
     vals['start'] = start
     vals['end'] = end
@@ -330,13 +332,18 @@ def summary_timespan(start,end,request,
     
     
     
-    
+    vals['met_with_age_count']=None
+    vals['metagerageage']=None
+    vals['month_with_age_count']=None
+    vals['monthaverageage']=None
+    vals['monthaverage_raw']=None    
+    origins={}
+    vals['origins']=origins
     if include_people:
         vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
         data=average_age(vals['metpeople'], asof=start)
         vals['met_with_age_count']=data['people_included_count']
         vals['metaverageage']='%0.1f'%(data['average_age'] or 0)
-        
         vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)
         vals['monthpeople']=vals['monthpeople']|vals['metpeople']
         vals['monthpeople']=vals['monthpeople'].distinct().order_by('-rough_purchase_count')
@@ -349,12 +356,25 @@ def summary_timespan(start,end,request,
             else:
                 pp.newperson=False
             pp.month_purchase_count=Purchase.objects.filter(created__gte=start,created__lt=end,who_with=pp).count()
+            
+            if pp.origin:
+                if pp.origin in origins:
+                    oldpeople=origins[pp.origin]
+                    if pp not in oldpeople:
+                        oldpeople.append(pp)
+                    origins[pp.origin]=oldpeople
+                else:
+                    origins[pp.origin]=[pp,]
+        vals['origins_counted']=sum([len(v) for k,v in origins.items()])
+        for k,v in origins.items():
+            v.sort(key=lambda x:x.rough_purchase_count and x.rough_purchase_count*-1 or 0)
+        origins_list=sorted(origins.items(), key=lambda x:len(x[1])*-1)
+        vals['origins']=origins_list
         vals['monthpeople']=[pp for pp in vals['monthpeople']]
         ppls=[(person, person.month_purchase_count,) for person in vals['monthpeople'] if person.month_purchase_count>0]
         data=weighted_average_age(ppls, asof=start)
         vals['month_with_age_count']=data['people_included_count']
         vals['monthaverageage']='%0.1f'%(data['average_age'] or 0)
-        
         raw_ppls=[pp[0] for pp in ppls]
         unweighted_data=average_age(raw_ppls, asof=start)
         vals['monthaverage_raw']='%0.1f'%(unweighted_data['average_age'] or 0)

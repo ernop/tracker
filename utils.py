@@ -591,3 +591,4 @@ def weighted_average_age(peopleweights, asof=None, key='birthday'):
 
 def average_age(people, asof=None):
     return weighted_average_age([(pp, 1) for pp in people], asof=asof)
+

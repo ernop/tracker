@@ -24,13 +24,20 @@ Saved {{savedshow}}k</h2>
 
 {% if monthpeople %}
     {% for person in monthpeople %}
-        <span style="float:left;height:30px;width:220px;">{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}}) {% if not person.birthday %}*{% endif %}</span>
+        <span style="float:left;height:30px;width:220px;">{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}}) {% if not person.birthday or not person.origin %}*{% endif %}</span>
     {% endfor %}
     
     <h3>{% if metaverageage %}<br>Met: {{metaverageage}} {% if met_with_age_count %}({{met_with_age_count}}){% endif %}{% endif %}
     {% if monthaverage_raw%}<br>All: {{monthaverage_raw}}{% endif %}
     {% if monthaverageage %}<br>Weighted: {{monthaverageage}}{% if month_with_age_count %}({{met_with_age_count}}){% endif %}{% endif %}</h3>
     
+    {% if origins %}
+        <table>
+        <thead><th>origin<th>count<th>people
+        {% for origin, people in origins%}
+            <tr><td>{{origin}}<td>{{people.__length__}}{% for pp in people %}{{pp.clink()|safe}}{% endfor %}
+        {% endfor %}
+    {% endif %}
 {% endif %}
 
 {% if days %}
