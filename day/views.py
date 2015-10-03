@@ -366,6 +366,7 @@ def summary_timespan(start,end,request,
                 else:
                     origins[pp.origin]=[pp,]
         vals['origins_counted']=sum([len(v) for k,v in origins.items()])
+        vals['len']=len
         for k,v in origins.items():
             v.sort(key=lambda x:x.rough_purchase_count and x.rough_purchase_count*-1 or 0)
         origins_list=sorted(origins.items(), key=lambda x:len(x[1])*-1)

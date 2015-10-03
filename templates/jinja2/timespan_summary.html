@@ -35,7 +35,7 @@ Saved {{savedshow}}k</h2>
         <table>
         <thead><th>origin<th>count<th>people
         {% for origin, people in origins%}
-            <tr><td>{{origin}}<td>{{people.__length__}}{% for pp in people %}{{pp.clink()|safe}}{% endfor %}
+            <tr><td>{{origin}}<td>{{len(people)}}<td>{% for pp in people %}{{pp.clink()|safe}}{% endfor %}
         {% endfor %}
     {% endif %}
 {% endif %}
