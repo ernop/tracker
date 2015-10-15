@@ -15,6 +15,8 @@ log=logging.getLogger(__name__)
 def monthago():
     return datetime.datetime.now()-datetime.timedelta(days=30)
 
+class GoodAdminModel()
+
 class DayModel(models.Model):
     
     #should add default modified & created here.

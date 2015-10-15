@@ -777,14 +777,15 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
             mes=mes.exclude(amount=0)
         if not mes:
             return
-        #mindate=None
+        mindate=None
         res={}
         for m in mes:
             date=m.created.strftime(DATE)
             res[date]=m.amount
-            #if not mindate or date<mindate:
-                #mindate=date
-        mindate=settings.LONG_AGO_STR
+            if not mindate or date<mindate:
+                mindate=date
+        if not obj.exclude_leading_zeros:
+            mindate=settings.LONG_AGO_STR
         first=datetime.datetime.strptime(mindate, DATE)
         now=datetime.datetime.now()
         trying=first

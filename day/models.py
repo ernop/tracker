@@ -359,7 +359,8 @@ class MeasuringSpot(DayModel):
     name=models.CharField(max_length=100, unique=True)
     domain=models.ForeignKey('Domain', related_name='measuring_spots')
     created=models.DateField(auto_now_add=True)
-    exclude_zeros=models.BooleanField()
+    exclude_zeros=models.BooleanField(default=False)
+    exclude_leading_zeros=models.BooleanField(default=False)
     def __unicode__(self):
         return '%s'%(self.name, )
 
