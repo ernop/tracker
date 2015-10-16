@@ -347,12 +347,12 @@ class Measurement(DayModel):
     def save(self):
         if not self.created:
             self.created=datetime.datetime.now()
-        try:
-            self.day
-        except:
-            self.day=Day.objects.get(date=self.created)
-        #if not self.pk:
-            #self.created=datetime.datetime.now()
+        #try:
+            #self.day
+        #except:
+            #self.day=Day.objects.get(date=self.created)
+        #if self.day.created!=self.created:
+        self.day=Day.objects.get(date=self.created)
         super(Measurement, self).save()
         
 class MeasuringSpot(DayModel):

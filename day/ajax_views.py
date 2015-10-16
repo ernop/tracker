@@ -167,11 +167,9 @@ def ajax_get_popular(request):
 
 @user_passes_test(staff_test)
 def ajax_get_measurements(request):
-    #import ipdb;ipdb.set_trace()
     day=request.POST['today']
     day=datetime.datetime.strptime(day, DATE)
     dayobj=Day.objects.get(date=day.date())
-    #ms=Measurement.objects.filter(created__year=day.year, created__month=day.month, created__day=day.day)
     ms=Measurement.objects.filter(day=dayobj)
     res={'success':True, 'message':'got', 'measurements':[measurement2obj(m) for m in ms]}
     return r2j(res)
