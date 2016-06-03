@@ -294,7 +294,7 @@ def summary_timespan(start,end,request,
             val=int(dinfo['total_cost'])/12
             guy.insert(1, val)
         bits.append(guy)
-        if 1 or dd.name!='money':
+        if dd.name!='money':
             monthtotal += dinfo['total_cost']
             if dd.name not in ['tax','recurring',]:
                 monthtotalreal += dinfo['total_cost']
