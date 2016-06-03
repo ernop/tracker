@@ -289,12 +289,12 @@ def summary_timespan(start,end,request,
             summary = mkinfobox(title=dinfo['top_purchases_html'], content=dinfo['all_purchases_html'])
         else:
             summary = dinfo['top_purchases_html']
-        guy=[dd.name, str(int(dinfo['total_cost'])), '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, str(int(dinfo['purchase_count']))), summary]
+        guy=[dd.clink(), str(int(dinfo['total_cost'])), '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, str(int(dinfo['purchase_count']))), summary]
         if include_permonth:
             val=int(dinfo['total_cost'])/12
             guy.insert(1, val)
         bits.append(guy)
-        if dd.name!='money':
+        if 1 or dd.name!='money':
             monthtotal += dinfo['total_cost']
             if dd.name not in ['tax','recurring',]:
                 monthtotalreal += dinfo['total_cost']
@@ -329,8 +329,6 @@ def summary_timespan(start,end,request,
     vals['realexpensesshow']='%0.1f'%(round(monthtotalreal/100)/10.0)
     vals['savedshow']='%0.1f'%(round(saved/100)/10.0)
     vals['projected_saving'] = monthtotal
-    
-    
     
     vals['met_with_age_count']=None
     vals['metagerageage']=None
