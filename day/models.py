@@ -280,6 +280,7 @@ class Domain(DayModel):
 
     def piechart(self):
         return clink('domain', self.id, self)
+    
 class Exercise(DayModel):
     name=models.CharField(max_length=100, unique=True)
     pmuscles=models.ManyToManyField('Muscle', related_name='primary_exercises')

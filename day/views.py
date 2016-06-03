@@ -289,7 +289,7 @@ def summary_timespan(start,end,request,
             summary = mkinfobox(title=dinfo['top_purchases_html'], content=dinfo['all_purchases_html'])
         else:
             summary = dinfo['top_purchases_html']
-        guy=[dd.clink(), str(int(dinfo['total_cost'])), '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, str(int(dinfo['purchase_count']))), summary]
+        guy=[dd.clink(skip_btn = True), str(int(dinfo['total_cost'])), '<a href="/admin/day/purchase/?created__month=%d&created__year=%d&product__domain__id=%d">%s</a>'% (start.month, start.year, dd.id, str(int(dinfo['purchase_count']))), summary]
         if include_permonth:
             val=int(dinfo['total_cost'])/12
             guy.insert(1, val)
