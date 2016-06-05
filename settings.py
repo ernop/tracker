@@ -69,7 +69,7 @@ LOGGING = {
         'file_log':{
             'level':'INFO',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': 'logs/tracker.log',
+            'filename': '%slogs/tracker.log' % (not LOCAL and DJANGO_BASE or ''),
             'maxBytes': 500*1024**2, # 500 MB, dumb windows not being able to roll over...
             'backupCount': 5,
             'formatter':'verbose',
@@ -77,7 +77,7 @@ LOGGING = {
         'error_log':{
             'level':'ERROR',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': 'logs/error.log',
+            'filename': '%slogs/error.log' % (not LOCAL and DJANGO_BASE or ''),
             'maxBytes': 500*1024**2, # 500 MB, dumb windows not being able to roll over...
             'backupCount': 5,
             'formatter':'verbose',
