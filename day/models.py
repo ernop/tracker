@@ -166,6 +166,7 @@ class Day(DayModel):
     def get_day_taken_photos(self,user=None):
         '''classified ones on this day exactly'''
         res=[]
+        #return []
         photos=self.photos.exclude(incoming=True).exclude(deleted=True).exclude(tags=None)
         photos=photos.order_by('photo_created')
         for ph in photos:
@@ -179,6 +180,7 @@ class Day(DayModel):
     
     def get_day_created_photos(self,user=None):
         res=[]
+        #return []
         photos=Photo.objects.filter(day=None,deleted=False,incoming=False,photo_created__day=self.date.day,photo_created__month=self.date.month,photo_created__year=self.date.year)
         photos=photos.order_by('photo_created')
         for ph in photos:
@@ -376,6 +378,7 @@ class MeasuringSpot(DayModel):
         if not self.pk:
             self.created=datetime.datetime.now()
         super(MeasuringSpot, self).save()
+        
 class MeasurementSet(DayModel):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
@@ -386,6 +389,7 @@ class MeasurementSet(DayModel):
 
     def __unicode__(self):
         return u'MeasurementSet %s'%self.name
+    
 class Muscle(DayModel):
     name=models.CharField(max_length=100)
     created=models.DateField(auto_now_add=True)
@@ -457,7 +461,8 @@ class NoteKind(DayModel):
         if not text:
             text='%s (%d)'%(self.name, self.notes.count())
         return '<a class="btn btn-default"  href="/notekind/%s/">%s </a>'%(self.id, text)
-    
+
+
 class Person(DayModel):
     first_name=models.CharField(max_length=100)
     last_name=models.CharField(max_length=100, blank=True, null=True)
@@ -469,8 +474,6 @@ class Person(DayModel):
     rough_purchase_count = models.IntegerField(default=0)
     description=models.TextField(blank=True,null=True)
     origin=models.CharField(max_length=100,blank=True,null=True)
-    
-    
     
     def age(self, asof=False):    
         '''float representing their age asof asof'''
@@ -514,13 +517,49 @@ class Person(DayModel):
         ordering=['first_name','last_name',]
         
     def update_purchase_count(self):
-        self.rough_purchase_count = self.purchases.count()
+        #self.rough_purchase_count = self.purchases.count()
+        #import ipdb;ipdb.set_trace()
+        queryset = self.purchases.all()
+        object_date_field = 'day__date'
+        interval_size_days = 90
+        self.rough_purchase_count = self.weighted_interval_score(queryset, object_date_field)
         self.save()
+
+    #calculate a score, weighing the most recent interval 1, the prior 1/2, prior 1/4 etc.
+    def weighted_interval_score(self, queryset, object_date_field, interval_size_days = 90, untildate = None):
+        
+        if untildate == None:
+            untildate = datetime.date.today()
+        if not queryset.exists():
+            return 0
+        earliest = queryset.order_by(object_date_field)[0]
+        target = earliest
+        for piece in object_date_field.split('__'):
+            target = getattr(target, piece)
+        earliest_date = target
+        total = queryset.count()
+        accounted_for = 0
+        interval_start = untildate - datetime.timedelta(days = interval_size_days)
+        interval_end = untildate
+        interval_count = 0
+        score = 0.0
+        while interval_end > earliest_date:
+            lb = object_date_field + '__gt'
+            ub = object_date_field + '__lte'
+            dct = {lb: interval_start, ub: interval_end,}
+            queryset_interval = queryset.filter( **dct).count()
+            accounted_for += queryset_interval
+            score += queryset_interval / (2.0 ** interval_count)
+            interval_count += 1
+            interval_end = interval_start
+            interval_start = interval_start - datetime.timedelta(days = interval_size_days)
+            if interval_count > 1000:
+                import ipdb;ipdb.set_trace()
+        return score
 
     def __unicode__(self):
         return self.name()
-        return '%s%s'%(self.first_name, self.last_name and ' %s' % self.last_name)
-    
+        #return '%s%s'%(self.first_name, self.last_name and ' %s' % self.last_name)
 
     def short_name(self):
         return self.first_name.title().replace('\'S', '\'s')

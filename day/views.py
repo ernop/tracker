@@ -16,6 +16,7 @@ import logging
 log=logging.getLogger(__name__)
 
 from forms import DayForm
+from personviews import person
 
 def do_measurementset(request, measurementset_id=None):
     vals={}
@@ -141,7 +142,6 @@ def index(request):
     today=datetime.date(year=now.year, day=now.day, month=now.month)
     day, new=Day.objects.get_or_create(date=today)
     vals={}
-
     vals['day']=day
     vals['df']=DayForm()
     return r2r('jinja2/day.html',request, vals)
@@ -150,8 +150,6 @@ def index(request):
 def today(request):
     today=gettoday()
     return HttpResponseRedirect('/aday/%s'%str(today))
-    #d,created=Day.objects.get_or_create(date=today)
-    return aday(request, d)
 
 @login_required
 def yesterday(request):
@@ -169,7 +167,7 @@ def y2day(request):
 def aday(request, day):
     dtday=datetime.datetime.strptime(day, DATE_DASH_REV)
     vals={}
-    #log.info('day is %s',day)
+    
     vals['today']=day
     day,created=Day.objects.get_or_create(date=dtday)
     day.save()
@@ -180,7 +178,7 @@ def aday(request, day):
     vals['exitags']=day.tags.all()
     vals['alltags']=Tag.objects.all()
     vals['exipeople']=set([pd.person for pd in day.persondays.all()])
-    vals['allpeople']=Person.objects.all()
+    #vals['allpeople']=Person.objects.all()
     vals['allpeople']=[]
     vals['name2hour']=name2hour
     vals['notes']=day.notes.filter(deleted=False)
@@ -215,7 +213,10 @@ def aday(request, day):
 
 
 @login_required
-def previous_year(request,dt):
+def previous_year(request,dt = None):
+    if dt == None:
+        today = datetime.datetime.today().date().strftime(DATE_DASH_REV)
+        return HttpResponseRedirect('/prevyear/%s'%str(today))
     mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     end = datetime.datetime(year=mm.year, month=mm.month, day=mm.day)
     start = add_months(end, months=-12)
@@ -223,8 +224,12 @@ def previous_year(request,dt):
                             include_permonth=True)
 
 @login_required
-def previous_month(request,dt):
-    mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
+def previous_month(request,dt = None):
+    if dt == None:
+        today = datetime.datetime.today().date().strftime(DATE_DASH_REV)
+        return HttpResponseRedirect('/prevmonth/%s'%str(today))
+    else:
+        mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     end = datetime.datetime(year=mm.year, month=mm.month, day=mm.day)
     start = add_months(end, months=-1)
     return summary_timespan(start,end,request)
@@ -380,7 +385,6 @@ def summary_timespan(start,end,request,
         vals['monthpeople'].sort(key=lambda x:-1*x.month_purchase_count)
     else:
         vals['monthpeople']=[]
-    #import ipdb;ipdb.set_trace()
     if include_span_tags:
         vals['span_tags']=get_span_tags(start,end,user=request.user)
     else:

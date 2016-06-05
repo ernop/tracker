@@ -7,7 +7,8 @@ $(document).ready(function(){
     display_measurement();
     setup_change_describer();
     //setup_mp3_recording();
-    setup_notes()
+    setup_notes();
+    setup_popular_measurements();
 });
 
 function draw_note(dat, orig_dat){
@@ -117,6 +118,21 @@ function place_people(){
             $("#allpeople").append(tagify(allpeople[index]));
         }
     })
+}
+
+//make them into clickable buttons.
+function display_common_measurements(data){
+    var dest = $(".common-measurement-spots");
+    
+    $.each(['samedate','samedow','all'], function(index, klass){
+        var target = dest.find('#'+klass);
+        $.each(data[klass], function(index, thing){
+            var thingie='<div class="measurement-autochooser autochooser" val_id='+thing['id']+'>'+thing['name']+' ('+thing['count']+')</div>';
+            target.append(thingie);
+        });
+    });
+    
+    $('.measurement-autochooser').click(function(e){set_measurement(e)});
 }
 
 function setup_tag_clicks(){

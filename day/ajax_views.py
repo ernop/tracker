@@ -17,10 +17,6 @@ from choices import *
 log=logging.getLogger(__name__)
 from forms import DayForm
 
-#@user_passes_test(staff_test)
-#def select2_people(request):
-
-
 @user_passes_test(staff_test)
 def ajax_get_data(request):
     try:
@@ -47,12 +43,10 @@ def ajax_get_data(request):
         elif kind=='person':
             if action=='new':
                 exiperson=Person.objects.filter(first_name=data['first_name'],last_name=data['last_name'])
-                
                 if exiperson.exists():
                     person=exiperson[0]
                     res={'success':True,'person_id':person.id,'message':'person already existed'}
                 else:
-                    
                     if 'gender' not in data or not data['gender']:
                         res={'success':False,'message':'needs gender'}
                         return r2j(res)
@@ -138,6 +132,8 @@ def ajax_get_popular(request):
     elif 'source_id' in request.POST:
         source_id = request.POST['source_id']
         purches = Purchase.objects.filter(source__id=source_id)
+    else:
+        import ipdb;ipdb.set_trace()
     prices = {}
     products = {}
     sources = {}
@@ -172,6 +168,53 @@ def ajax_get_measurements(request):
     dayobj=Day.objects.get(date=day.date())
     ms=Measurement.objects.filter(day=dayobj)
     res={'success':True, 'message':'got', 'measurements':[measurement2obj(m) for m in ms]}
+    return r2j(res)
+
+# based on the day of week, date, and total count, display measurement categories, one year cutoff
+@user_passes_test(staff_test)
+def ajax_get_common_measurements(request):
+    res = {'samedate': [], 'samedow': [], 'all': [],}
+    #this should actually be based on the day in question.
+    source_date = datetime.datetime.strptime(request.POST['today'], DATE_DASH_REV)
+    #by date of month
+    day = source_date.day
+    yearago = source_date - datetime.timedelta(days = 365)
+    samedate = Measurement.objects.filter(day__date__day = day, day__date__gte = yearago)
+    
+    #should add in measurements which are also "last day of month" style.
+    spotcounts = {}
+    for mm in samedate:
+        spotcounts[mm.spot] = spotcounts.get(mm.spot, 0) + 1
+    
+    byday = [{'name': spot.name, 'id': spot.id,'count': count,} for spot, count in spotcounts.items()]
+    byday.sort(key = lambda x:(-1 * x['count'], x['name']))
+    res['samedate'] = byday[:10]
+    done_spotids = set([thing['id'] for thing in byday[:10]])
+    
+    #by day of week
+    dows = [source_date - datetime.timedelta(days = 7 * n) for n in range(52)]
+    samedows =  Measurement.objects.filter(day__date__in = dows, day__date__gte = yearago)
+    spotcounts = {}
+    for mm in samedows:
+        if mm.spot.id in done_spotids:continue
+        spotcounts[mm.spot] = spotcounts.get(mm.spot, 0) + 1
+    
+    bydow = [{'name': spot.name, 'id': spot.id,'count': count,} for spot, count in spotcounts.items()]
+    bydow.sort(key = lambda x:(-1 * x['count'], x['name']))
+    res['samedow'] = bydow[:10]
+    done_spotids.update(set([thing['id'] for thing in bydow[:10]]))
+    
+    #by all
+    allms = Measurement.objects.filter(day__date__gte = yearago)
+    spotcounts = {}
+    for mm in allms:
+        if mm.spot.id in done_spotids:continue
+        spotcounts[mm.spot] = spotcounts.get(mm.spot, 0) + 1
+    allthings= [{'name': spot.name, 'id': spot.id,'count': count,} for spot, count in spotcounts.items()]
+    allthings.sort(key = lambda x:(-1 * x['count'], x['name']))
+    res['all'] = allthings[:10]
+    done_spotids = set([thing['id'] for thing in allthings[:10]])
+    
     return r2j(res)
 
 @user_passes_test(staff_test)

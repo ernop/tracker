@@ -114,9 +114,15 @@
     </table>
     <div class="measurement-zone ib left">
         <table class="table"><tr>
-        <tr><td><input  id="measurement-spot" style="width:190px;"></input><td><input type=text id="measurement-amount" style="width:190px;"></input>
+        <tr><td><input type="text" style="width:190px;" id="measurement-spot" ></input><td><input type=text id="measurement-amount" style="width:190px;"></input>
+            <td><div class="common-measurement-spots">
+                <div id="samedow" style="float:left;clear:left"><span style="float:left;clear:left">DOW</span></div>
+                <div id="samedate" style="float:left;clear:left"><span style="float:left;clear:left">DATE</span></div>
+                <div id="all" style="float:left;clear:left"><span style="float:left;clear:left">ALL</span></div>
+            </div>
         <tr><td><div class="btn btn-default make-measurement">Save</div><td><div class="measurement-loading-zone">&nbsp;</div>
         <tr><td><a class="btn btn-default" href="{{ADMIN_EXTERNAL_BASE}}/day/measurement/add"><span class="glyphicon glyphicon-plus"></span>new</a>
+        
         </table>
     </div>
 </div>

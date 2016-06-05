@@ -297,6 +297,7 @@ class PersonAdmin(OverriddenModelAdmin):
     def mydescription(self,obj):
         return '<blockquote>%s</>'%(obj.description or '')
     
+    #this is now time decaying.
     def update_rough_purchase_counts(self, request, queryset):
         sixmonths = datetime.datetime.now() - datetime.timedelta(days=180)
         for person in Person.objects.all():

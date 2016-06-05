@@ -106,23 +106,6 @@ def format_exception(maxTBlevel=10):
     res='%s\n%s\n%s\n%s'%(excName, str(exc)[:100]+'...', excArgs, ''.join(excTb))
     return res
 
-#class ConnectionRefresher(sqlalchemy.interfaces.PoolListener):
-    #def __init__(self):
-        #self.retried = False
-    #def checkout(self, dbapi_con, con_record, con_proxy):
-        #import sqlalchemy
-        #import sqlalchemy.interfaces
-        #import _mysql_exceptions
-        #try:
-            #dbapi_con.cursor().execute('select now()')
-        #except mysql_exceptions.OperationalError:
-            #if self.retried:
-                #self.retried = False
-                #raise
-            #self.retried = True
-            #raise sqlalchemy.exc.DisconnectionError
-
-
 def is_valid_password(pw):
     OK_PASSWORD_CHARS='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-_=+[{]}|;:,<.>/?`~'
     if not pw:

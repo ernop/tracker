@@ -7,7 +7,7 @@ requires = [
     'ipdb',
     'jinja2',
     'coffin',    
-    'simplejson',
+    #'simplejson',
     'pygooglechart',
     'django_extensions',
     'pyreadline',

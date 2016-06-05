@@ -1,0 +1,37 @@
+{% extends 'jinja2/day_base.html' %}
+{% block title %}{{person}}{% endblock %}
+{% block head %}
+    {{super()}}
+    <style>
+    .container{width:90%;}
+    .popover{max-width:500px;}
+    .popover-content{18px;}
+    .note-outline{display:inline-block;width:90%;padding-bottom:18px;}
+    .notekindzone{margin-left:15px;display:inline-block;float:left}
+    .note-row{font-size:18px;line-height:18px;}
+    .redborder{border:3px solid red;border-radius:4px;}
+    .ib {display:inline-block;}
+    .left{float:left;}
+    .clear{clear:both;}
+    .pre{}
+    .purchase-zone td div{vertical-align:top;}
+    </style>
+{% endblock %}
+
+{% block content %}
+{% if LOCAL %}<a class="btn-default btn" href="http://tracker{{path}}" target=_blank>live</a>{% endif %}
+<div class="ib left clear">
+    <div>
+        <h2>{{person}}</h2>
+    </div>
+</div>
+
+<div class="notification fixed-notification">
+</div>
+
+{% endblock %}
+
+{% block footer %}{{super()}}
+<div class="ib left clear">
+</div>
+{% endblock %}

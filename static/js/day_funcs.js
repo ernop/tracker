@@ -34,6 +34,16 @@ function show_popular_from_source(){
 	});
 }
 
+function setup_popular_measurements(){
+	var data={'today':today};
+	$.ajax({
+		type:'POST',
+		url:'/ajax/get_common_measurements/',
+		data:data,
+		success:function(data){display_common_measurements(data);},
+		error:function(a,b,c){}
+	});
+}
 
 function display_popular(data){
 	$(".autochooser").remove();
@@ -105,6 +115,12 @@ function set_who_with(e){
 function set_price(e){
 	var thing=$(e.target);
 	$("#purchase-cost").val(thing.attr('val'))
+}
+
+function set_measurement(e){
+	var thing=$(e.target);
+	notify(thing.attr('val'));
+	$("#measurement-spot").select2('val', $(e.target).attr('val_id'));
 }
 
 function setup_new_purch(){
