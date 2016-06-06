@@ -257,7 +257,7 @@ class DomainAdmin(OverriddenModelAdmin):
                 date=pu.created.strftime(DATE)
                 res[date]=res.get(date, 0)+pu.get_cost()
             res2=group_day_dat(res, by='month',mindate=mindate)
-            costs= line_sparkline(results=res2, width=5, height=100)
+            costs= sparkline(labelresults=res2, width=5, height=100)
         summary=obj.summary()
         return '<h2>%s</h2>%s<br>%s<br>%s<br>'%(obj.name, total, costs, summary)
 
