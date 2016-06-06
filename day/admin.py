@@ -795,6 +795,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         label2value=[]
         lastt=None
         val = 0
+        barwidth = 1
         while trying<= now:
             dd = trying.strftime(DATE)
             if dd in res:
@@ -806,7 +807,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
                 else:
                     val = 0
                 if obj.exclude_zeros:
-                    pass
+                    barwidth = 4
                 else:
                     label2value.append((val, dd))
             trying=datetime.timedelta(days=1)+trying
@@ -814,7 +815,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         if obj.interpolate:
             rendered = sparkline(labelresults = label2value, width=600, height= 150, kind = 'line')
         else:
-            rendered = sparkline(labelresults = label2value, width= 600, height= 150)
+            rendered = sparkline(labelresults = label2value, width= 600, height= 150, kind = 'bar', barwidth = barwidth)
         return '<div>%s</div>'% (rendered)
 
     def mydomain(self, obj):

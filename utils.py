@@ -474,7 +474,7 @@ def insert_defaults():
 def line_sparkline(labelresults,width,height):
     return sparkline(labelresults, width, height, kind = 'line')
     
-def sparkline(labelresults, width, height, kind = 'bar'):
+def sparkline(labelresults, width, height, kind = 'bar', barwidth = 4):
     ii=0
     num_results=[]
     labels={}
@@ -492,8 +492,8 @@ def sparkline(labelresults, width, height, kind = 'bar'):
     height:%s,\
     width:%s,\
     chartRangeMin:0,\
-    barWidth: 2,\
-    tooltipValueLookups: {offset:%s}})});</script>'%(rnd, data, kind, height, width, labels)
+    barWidth: %d,\
+    tooltipValueLookups: {offset:%s}})});</script>'%(rnd, data, kind, height, width, barwidth, labels)
     res += scriptpart
     return res
 
