@@ -578,3 +578,24 @@ def logout(request):
     from django.contrib.auth import logout
     from utils import ipdb;ipdb()
     logout(request)
+
+@login_required
+def summaries(request):
+    vals={}
+    
+    for key, queryset, field in [('source', Source.objects.all(), 'created', ),
+                                  ('people', Person.objects.all(), 'created', ),
+                                  ('product', Product.objects.all(), 'created', )]:
+        res = {}
+        mindate = datetime.datetime.strptime(settings.LONG_AGO_STR, DATE).date()
+        for obj in queryset:
+            date = obj.created.strftime(DATE)
+            res[date] = res.get(date, 0) + 1
+            mindate = min(mindate, obj.created)
+        res2=group_day_dat(res, by = 'month', mindate=mindate)
+        width = 1200
+        height = 300
+        line = sparkline(res2, width, height, kind = 'bar')
+        vals[key] = line
+    
+    return r2r('jinja2/summaries.html', request, vals)

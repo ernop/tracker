@@ -85,8 +85,8 @@ class ProductAdmin(OverriddenModelAdmin):
                 date=pu.created.strftime(DATE)
                 res[date]=res.get(date, 0)+pu.quantity
                 costres[date] = costres.get(date, 0) + pu.get_cost()
-                #if not mindate or date<mindate:
-                    #mindate=date
+                if not mindate or date<mindate:
+                    mindate=date
             res2=group_day_dat(res, by='month',mindate=mindate)
             costres2=group_day_dat(costres, by='month',mindate=mindate)
             #first=datetime.datetime.strptime(mindate, DATE)
@@ -99,8 +99,8 @@ class ProductAdmin(OverriddenModelAdmin):
                 #res2.append((res.get(dt, 0)))
                 #costres2.append((costres.get(dt, 0)))
                 #trying=datetime.timedelta(days=1)+trying
-            counts = line_sparkline(results=res2, width=5, height=30)
-            costs = line_sparkline(results=costres2, width=5, height=30)
+            counts = sparkline(labelresults=res2, width= 400, height= 100, kind = 'bar')
+            costs = sparkline(labelresults=costres2, width= 400, height= 100, kind = 'bar')
             return 'Counts %s<br>Costs%s' % (counts, costs)
             #tmp=savetmp(im)
             #spark='<img style="border:2px solid grey;"  src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
@@ -278,6 +278,7 @@ class DomainAdmin(OverriddenModelAdmin):
 
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
+    
     def myspots(self,obj):
         spots=MeasuringSpot.objects.filter(domain=obj)
         dat=[(sp.clink(),sp.measurements.count()) for sp in spots]
