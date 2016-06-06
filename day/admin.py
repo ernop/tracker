@@ -804,7 +804,6 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
                     pass
                 else:
                     val = 0 
-                val=val or 0
                 label2value.append((val, dd))
             trying=datetime.timedelta(days=1)+trying
             
