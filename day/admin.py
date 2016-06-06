@@ -804,8 +804,11 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
                 if obj.interpolate:
                     pass
                 else:
-                    val = 0 
-                label2value.append((val, dd))
+                    val = 0
+                if obj.exclude_zeros:
+                    pass
+                else:
+                    label2value.append((val, dd))
             trying=datetime.timedelta(days=1)+trying
             
         if obj.interpolate:
