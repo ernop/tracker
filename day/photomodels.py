@@ -743,8 +743,8 @@ class PhotoTag(DayModel):
         #
         dat2=group_day_dat(res,by='month',mindate=md)
         #
-        from utils import nice_sparkline
-        spl=nice_sparkline(dat2,500,300)
+        from utils import line_sparkline
+        spl=line_sparkline(dat2,500,300)
         return spl
 
 class PhotoSpot(DayModel):

@@ -471,32 +471,30 @@ def insert_defaults():
         pt=PhotoTag(name=name)
         pt.save()
         
-def nice_sparkline(results,width,height):
-    '''a better one, results now consists of value & label'''
-    '''stick the labels for x into labels[rnd]
+def line_sparkline(labelresults,width,height):
+    return sparkline(labelresults, width, height, kind = 'line')
     
-    to produce: make {'2014-05-24': 15.0, '2014-05-21': 155.0}
-    then produce results with costres2=group_day_dat(costres, by='month',mindate=mindate)
-    
-    '''
+def sparkline(labelresults, width, height, kind = 'bar'):
     ii=0
     num_results=[]
     labels={}
-    for total,label in results:
+    #import ipdb;ipdb.set_trace()
+    for total,label in labelresults:
         label+=' %d'%two_sig(total)
         labels[ii]=label
         ii+=1
         num_results.append(total)
     data=','.join([str(s) for s in num_results])
     rnd=str(int(random.random()*100000))
-    res = '<div sparkid="%s" class="sparkline-data">%s</div>'%(rnd,data)    
-    res+='<script>$(document).ready(function(){labels[%s]=%s});</script>'%(rnd,json.dumps(labels))
-    return res
-    
-    
-def simple_sparkline(results, width, height):
-    #itd be nice if this was way better for labelling and stuff.
-    res = '<div class="simple-sparkline-data">%s</div>'%(','.join([str(s) for s in results]))
+    res = '<div id="spk%s"></div>'%(rnd)    
+    scriptpart = '<script>$(document).ready(function(){$("#spk%s").sparkline([%s], {tooltipFormat: "{{offset:offset}}", \
+    type:"%s",\
+    height:%s,\
+    width:%s,\
+    chartRangeMin:0,\
+    barWidth: 2,\
+    tooltipValueLookups: {offset:%s}})});</script>'%(rnd, data, kind, height, width, labels)
+    res += scriptpart
     return res
 
 def two_sig(n):

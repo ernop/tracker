@@ -99,8 +99,8 @@ class ProductAdmin(OverriddenModelAdmin):
                 #res2.append((res.get(dt, 0)))
                 #costres2.append((costres.get(dt, 0)))
                 #trying=datetime.timedelta(days=1)+trying
-            counts = nice_sparkline(results=res2, width=5, height=30)
-            costs = nice_sparkline(results=costres2, width=5, height=30)
+            counts = line_sparkline(results=res2, width=5, height=30)
+            costs = line_sparkline(results=costres2, width=5, height=30)
             return 'Counts %s<br>Costs%s' % (counts, costs)
             #tmp=savetmp(im)
             #spark='<img style="border:2px solid grey;"  src="/static/sparklines/%s">'%(tmp.name.split('/')[-1])
@@ -257,7 +257,7 @@ class DomainAdmin(OverriddenModelAdmin):
                 date=pu.created.strftime(DATE)
                 res[date]=res.get(date, 0)+pu.get_cost()
             res2=group_day_dat(res, by='month',mindate=mindate)
-            costs= nice_sparkline(results=res2, width=5, height=100)
+            costs= line_sparkline(results=res2, width=5, height=100)
         summary=obj.summary()
         return '<h2>%s</h2>%s<br>%s<br>%s<br>'%(obj.name, total, costs, summary)
 
@@ -759,7 +759,8 @@ class WorkoutAdmin(OverriddenModelAdmin):
 
 
 class MeasuringSpotAdmin(OverriddenModelAdmin):
-    list_display='id myname myhistory'.split()
+    list_display='id interpolate myname myhistory exclude_zeros exclude_leading_zeros'.split()
+    list_editable = ['interpolate', 'exclude_zeros', 'exclude_leading_zeros', ]
     list_filter=['domain',]
     def myname(self, obj):
         ct=obj.measurements.all()
@@ -770,19 +771,20 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
             indexes=linesample(6,len(ct[2:]))+[len(ct)-1]
             ct=ct[:2]+[ct[th] for th in indexes]
         meas='<br>'.join([m.clink() for m in ct])
-        return '<h3>%s</h3><h4>%s</h4>%s'%(obj.name, obj.domain.clink(), meas)
+        alllink = "<a href='../measurement/?spot__id__exact=%s'>all</a>" % obj.id
+        return '<h3>%s</h3><h4>%s</h4>%s<br>%s'%(obj.name, obj.domain.clink(), meas, alllink)
 
     def myhistory(self, obj):
-        mes=obj.measurements.all()
+        measurements=obj.measurements.all()
         if obj.exclude_zeros:
-            mes=mes.exclude(amount=0)
-        if not mes:
+            measurements=measurements.exclude(amount=0)
+        if not measurements:
             return
         mindate=None
-        res={}
-        for m in mes:
-            date=m.created.strftime(DATE)
-            res[date]=m.amount
+        res={}  #{date:value}
+        for measurement in measurements:
+            date=measurement.created.strftime(DATE)
+            res[date]=measurement.amount
             if not mindate or date<mindate:
                 mindate=date
         if not obj.exclude_leading_zeros:
@@ -790,27 +792,37 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         first=datetime.datetime.strptime(mindate, DATE)
         now=datetime.datetime.now()
         trying=first
-        res2=[]
+        label2value=[]
         lastt=None
-        while trying<now:
-            if trying.strftime(DATE) in res:
-                lastt=res.get(trying.strftime(DATE))
-            lastt=lastt or 0
-            res2.append(lastt)
+        while trying<= now:
+            dd = trying.strftime(DATE)
+            if dd in res:
+                val =res.get(dd)
+                label2value.append((val, dd))
+            else:
+                if obj.interpolate:
+                    pass
+                else:
+                    val = 0 
+                val=val or 0
+                label2value.append((val, dd))
             trying=datetime.timedelta(days=1)+trying
-        
-        thang = simple_sparkline(results=res2, width=2, height=100)
-        return '<div>%s</div>'% thang
-
+            
+        if obj.interpolate:
+            rendered = sparkline(labelresults = label2value, width=600, height= 150, kind = 'line')
+        else:
+            rendered = sparkline(labelresults = label2value, width= 600, height= 150)
+        return '<div>%s</div>'% (rendered)
 
     def mydomain(self, obj):
         return '<a href=/admin/day/domain/?id=%d>%s</a>'%(obj.domain.id, obj.domain)
+    
     def mysets(self, obj):
         return ' | '.join([ms.clink() for ms in obj.measurementset_set.all()])
     adminify( myhistory, mydomain, mysets, myname)
 
 class MeasurementAdmin(OverriddenModelAdmin):
-    list_display='id myspot mycreated amount'.split()
+    list_display='id myspot myday mycreated amount'.split()
     list_filter=['spot',]
 
     def myspot(self, obj):
@@ -818,11 +830,13 @@ class MeasurementAdmin(OverriddenModelAdmin):
 
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
+    
+    def myday(self, obj):
+        return obj.day.clink()
 
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
-    adminify(mycreated, myspot)
-    #fields='spot amount created'.split()
-    fields=(('spot','amount','created',),)
+    adminify(mycreated, myspot, myday)
+    fields=(('spot','amount','created', ),)
 
 class TagAdmin(OverriddenModelAdmin):
     list_display='name mydays'.split()
@@ -831,6 +845,7 @@ class TagAdmin(OverriddenModelAdmin):
     @debu
     def mydays(self, obj):
         return ', '.join([day.clink() for day in obj.days.all()])
+    
     adminify(mydays)
 
 #class TagDayAdmin(OverriddenModelAdmin):
