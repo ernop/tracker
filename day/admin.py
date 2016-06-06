@@ -795,7 +795,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
         label2value=[]
         lastt=None
         val = 0
-        barwidth = 1
+        barwidth = 2
         while trying<= now:
             dd = trying.strftime(DATE)
             if dd in res:
