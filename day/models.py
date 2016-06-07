@@ -244,7 +244,7 @@ class Domain(DayModel):
         counts = {}
         costs = {}
         res = {}
-        ps = Purchase.objects.filter(product__domain=self, created__gte=start, created__lt=end)
+        ps = Purchase.objects.filter(product__domain=self, created__gt=start, created__lte=end)
         total_quantity = 0
         total_cost = 0
         purchase_count = 0

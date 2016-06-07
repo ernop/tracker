@@ -712,10 +712,6 @@ class PhotoTag(DayModel):
             else:
                 text='no name phototag'
         return '<a class="btn btn-default" href="/photo/phototag/%s/">%s</a>'%(self.name, text)
-
-
-        #
-
     
     def photosetlink(self,text=None):
         if not text:

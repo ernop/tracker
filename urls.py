@@ -30,6 +30,7 @@ urlpatterns = patterns('',
     url(r'^prevyear/?$','day.views.previous_year', name='previous-year'),
     url(r'^alltime/$','day.views.alltime', name='all-time'),
     url(r'^summaries/$','day.views.summaries', name='summaries'),
+    url(r'^timeline$','day.views.timeline', name='timeline'),
     #url(r'^alltime/$','day.views.alltime', name='all-time'),
     #url(r'^alltime/$','day.views.alltime', name='all-time'),
 

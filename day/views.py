@@ -307,14 +307,14 @@ def summary_timespan(start,end,request,
     vals['domaintable'] = domaintable
     #purchases summary by domain
     if include_measurements:
-        measurements = Measurement.objects.filter(created__gte=start, created__lt=end).exclude(amount=None)
+        measurements = Measurement.objects.filter(created__gt=start, created__lte=end).exclude(amount=None)
         spots = [MeasuringSpot.objects.get(id=ms) for ms in list(set([ms[0] for ms in measurements.values_list('spot__id').distinct()]))]
         vals['spots'] = sorted(spots, key=lambda x:(x.domain.name, x.name))
     else:
         vals['spots']=[]
     # if d.notes.exists() or d.getmeasurements().exclude(amount=None).exists()
     if include_days:
-        vals['days'] = [d for d in Day.objects.filter(date__gte=start, date__lt=end).order_by('-date')]
+        vals['days'] = [d for d in Day.objects.filter(date__gt=start, date__lte=end).order_by('-date')]
     else:
         vals['days']=[]
     vals['month'] = start
@@ -343,11 +343,11 @@ def summary_timespan(start,end,request,
     origins={}
     vals['origins']=origins
     if include_people:
-        vals['metpeople']=Person.objects.filter(created__lt=end,created__gte=start)
+        vals['metpeople']=Person.objects.filter(created__lte=end,created__gt=start)
         data=average_age(vals['metpeople'], asof=start)
         vals['met_with_age_count']=data['people_included_count']
         vals['metaverageage']='%0.1f'%(data['average_age'] or 0)
-        vals['monthpeople']=Person.objects.filter(purchases__created__lt=end,purchases__created__gte=start)
+        vals['monthpeople']=Person.objects.filter(purchases__created__lte=end,purchases__created__gt=start)
         vals['monthpeople']=vals['monthpeople']|vals['metpeople']
         vals['monthpeople']=vals['monthpeople'].distinct().order_by('-rough_purchase_count')
         
@@ -358,7 +358,7 @@ def summary_timespan(start,end,request,
                 pp.newperson=True
             else:
                 pp.newperson=False
-            pp.month_purchase_count=Purchase.objects.filter(created__gte=start,created__lt=end,who_with=pp).count()
+            pp.month_purchase_count=Purchase.objects.filter(created__gt=start,created__lte=end,who_with=pp).count()
             
             if pp.origin:
                 if pp.origin in origins:
@@ -599,3 +599,79 @@ def summaries(request):
         vals[key] = line
     
     return r2r('jinja2/summaries.html', request, vals)
+
+@login_required
+def timeline(request):
+    vals={}
+    vals['people'] = partition_queryset(Person.objects.all(), by = 'week', field = 'created', skip_first = True)
+    vals['source'] = partition_queryset(Source.objects.all(), by = 'week', field = 'created', skip_first = True)
+    vals['product'] = partition_queryset(Product.objects.all(), by = 'week', field = 'created', skip_first = True)
+    #ordered
+    
+    vals['keys'] = sorted(vals['people'].keys())
+    vals['regions'] = {}
+    vals['purchases'] = {}
+    for k in vals['keys']:
+        purchases = Purchase.objects.filter(day__date__gte = k, day__date__lt = vals['people'][k]['end'])
+        pids = [p.id for p in purchases]
+        regions = Region.objects.filter(source__purchases__id__in = pids)
+        counts = {}
+        for reg in regions:
+            counts[reg] = counts.get(reg, 0) + 1
+        vals['regions'][k] = {'queryset': [kk.clink(text = '%s (%d)' % (kk.name, vv)) for kk, vv in sorted(counts.items())]}
+        vals['purchases'][k] = {'count': purchases.count()}
+    
+    return r2r('jinja2/newtimeline.html', request, vals)
+
+def partition_queryset(queryset, by=None, mindate=None, field = None, enddate = None, skip_first = False):
+    if enddate == None:
+        enddate = datetime.date.today()
+    from choices import DATE,MONTH_YEAR,YEAR_MONTH
+    if not mindate:
+        mindate = settings.LONG_AGO
+        if skip_first:
+            mindate = mindate + datetime.timedelta(days = 7)
+    if type(mindate)==datetime.date:
+        mindate=datetime.datetime.strftime(mindate, DATE)
+    adder_day=0
+    adder_month=0
+    adder_year=0
+    first=datetime.datetime.strptime(mindate, DATE)
+    now=datetime.datetime.now()
+    start=mindate
+    
+    if not by:
+        by='day'
+    if by=='day':
+        adder_day=1
+        #move start back to the monday
+        first=first.date()
+    elif by=='week':
+        adder_day=7
+        #move start back to the monday
+        while first.weekday()!=6:
+            first=first-datetime.timedelta(days=1)
+        first=first.date()
+    elif by=='month':
+        adder_month=1
+        #move start back to the 1st of the month
+        first=datetime.date(year=first.year,month=first.month,day=1)
+    elif by=='year':
+        adder_month=12
+        #move start back to jan 1
+        first=datetime.date(year=first.year,month=1,day=1)
+    
+    #start correctly defined, and the interval defined.    
+    trying=first
+    res = {}
+    thisinterval_start=trying
+    
+    while 1:
+        next_interval_start = add_months(thisinterval_start,adder_month)+datetime.timedelta(days=adder_day)
+        ft = {field + '__gt' : thisinterval_start, field + '__lte' : next_interval_start }
+        key = thisinterval_start.strftime(DATE_DASH_REV)
+        res[key] = {'start':thisinterval_start , 'end':next_interval_start, 'queryset': queryset.filter( **ft)}
+        thisinterval_start = next_interval_start
+        if thisinterval_start > enddate:
+            break
+    return res
