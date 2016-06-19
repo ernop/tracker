@@ -8,8 +8,15 @@
     .popbar{
         display:inline-block;
         background-color:lightblue;
-        height:10px;
+        height:19px;
+        float:right;
+        margin:3px;
+        margin-right:5px;
         }
+    .dateline{
+        vertical-align:top;
+        font-size:24px;
+    }
     </style>
 {% endblock %}
 
@@ -27,28 +34,25 @@
 <table>
 <tr><td>Span<td>People<td>Source<td>Product</td><td>All regions<td>purch count</tr>
 {% for key in keys %}
-    <tr><td class=nb>{{key}}
-    <td>
+    <tr><td class="nb dateline">{{key}}
+    <td class="timelinecell">
         {% for person in people[key]['queryset'] %}
             <div>
                 {{person.clink()|safe}}
                 <span class="popbar" style="width:{{person.rough_purchase_count}}px"></span>
             </div>
-            {% if not loop.last %}
-                <br>
-            {% endif %}
         {% endfor %}
-    <td>{% if source[key] %}
+    <td class="timelinecell">{% if source[key] %}
             {% for source in source[key]['queryset'] %}
                 {{source.clink()|safe}}
             {% endfor %}
         {% endif %}
-    <td>{% if product[key]%}
+    <td class="timelinecell">{% if product[key]%}
             {% for product in product[key]['queryset'] %}
                 {{product.clink()|safe}}
             {% endfor %}
         {% endif %}
-    <td>{% if regions[key]%}
+    <td class="timelinecell">{% if regions[key]%}
             {% for region in regions[key]['queryset'] %}
                 {{region|safe}}
             {% endfor %}

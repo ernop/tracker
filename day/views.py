@@ -582,7 +582,6 @@ def logout(request):
 @login_required
 def summaries(request):
     vals={}
-    
     for key, queryset, field in [('source', Source.objects.all(), 'created', ),
                                   ('people', Person.objects.all(), 'created', ),
                                   ('product', Product.objects.all(), 'created', )]:
@@ -603,7 +602,7 @@ def summaries(request):
 @login_required
 def timeline(request):
     vals={}
-    vals['people'] = partition_queryset(Person.objects.all(), by = 'week', field = 'created', skip_first = True)
+    vals['people'] = partition_queryset(Person.objects.all(), by = 'week', field = 'created', skip_first = True, order_by = '-rough_purchase_count')
     vals['source'] = partition_queryset(Source.objects.all(), by = 'week', field = 'created', skip_first = True)
     vals['product'] = partition_queryset(Product.objects.all(), by = 'week', field = 'created', skip_first = True)
     #ordered
@@ -625,7 +624,8 @@ def timeline(request):
     
     return r2r('jinja2/newtimeline.html', request, vals)
 
-def partition_queryset(queryset, by=None, mindate=None, field = None, enddate = None, skip_first = False):
+def partition_queryset(queryset, by=None, mindate=None, field = None,
+                       enddate = None, skip_first = False, order_by = None):
     if enddate == None:
         enddate = datetime.date.today()
     from choices import DATE,MONTH_YEAR,YEAR_MONTH
@@ -672,7 +672,10 @@ def partition_queryset(queryset, by=None, mindate=None, field = None, enddate = 
         next_interval_start = add_months(thisinterval_start,adder_month)+datetime.timedelta(days=adder_day)
         ft = {field + '__gt' : thisinterval_start, field + '__lte' : next_interval_start }
         key = thisinterval_start.strftime(DATE_DASH_REV)
-        res[key] = {'start':thisinterval_start , 'end':next_interval_start, 'queryset': queryset.filter( **ft)}
+        qs = queryset.filter( **ft)
+        if order_by:
+            qs = qs.order_by(order_by)
+        res[key] = {'start':thisinterval_start , 'end':next_interval_start, 'queryset': qs}
         thisinterval_start = next_interval_start
         if thisinterval_start > enddate:
             break
