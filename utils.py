@@ -310,6 +310,9 @@ def add_months(sourcedate,months):
     day = min(sourcedate.day,calendar.monthrange(year,month)[1])
     return datetime.date(year,month,day)
 
+def add_days(sourcedate, days):
+    return sourcedate + datetime.timedelta(days = days)
+
 def make_safe_tag_name(ss):
     res = []
     OKS = ['-', '_', ' ']

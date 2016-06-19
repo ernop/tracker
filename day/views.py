@@ -238,7 +238,7 @@ def previous_month(request,dt = None):
 def themonth(request, dt):
     mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     start = datetime.datetime(year=mm.year, month=mm.month, day=1)
-    end = add_months(start, months=1)
+    end = add_days(add_months(start, months=1), days = -1)
     return summary_timespan(start,end,request)
 
 @login_required
