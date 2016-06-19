@@ -314,7 +314,7 @@ def summary_timespan(start,end,request,
         vals['spots']=[]
     # if d.notes.exists() or d.getmeasurements().exclude(amount=None).exists()
     if include_days:
-        vals['days'] = [d for d in Day.objects.filter(date__gt=start, date__lte=end).order_by('-date')]
+        vals['days'] = [d for d in Day.objects.filter(date__gte=start, date__lte=end).order_by('-date')]
     else:
         vals['days']=[]
     vals['month'] = start
@@ -614,10 +614,12 @@ def timeline(request):
     for k in vals['keys']:
         purchases = Purchase.objects.filter(day__date__gte = k, day__date__lt = vals['people'][k]['end'])
         pids = [p.id for p in purchases]
-        regions = Region.objects.filter(source__purchases__id__in = pids)
+        sources = Source.objects.filter(purchases__id__in = pids)
+        #regions = Region.objects.filter(source__purchases__id__in = pids)
         counts = {}
-        for reg in regions:
-            counts[reg] = counts.get(reg, 0) + 1
+        for source in sources:
+            if not source.region:continue
+            counts[source.region] = counts.get(source.region, 0) + 1
         vals['regions'][k] = {'queryset': [kk.clink(text = '%s (%d)' % (kk.name, vv)) for kk, vv in sorted(counts.items())]}
         vals['purchases'][k] = {'count': purchases.count()}
     

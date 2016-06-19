@@ -19,24 +19,26 @@
 {% endblock %}
 
 {% block content %}
-{% if LOCAL %}<a class="btn-default btn" href="http://tracker{{path}}" target=_blank>live</a>{% endif %}
-<div class="ib left clear">
-    <div>
-        <h2>Summaries</h2>
+    {% if LOCAL %}
+        <a class="btn-default btn" href="http://tracker{{path}}" target=_blank>live</a>
+    {% endif %}
+    <div class="ib left clear">
+        <div>
+            <h2>Summaries</h2>
+        </div>
     </div>
-</div>
-
-<div class="notification fixed-notification">
-</div>
-
-<h2>Sources</h2>
-{{source|safe}}
-
-<h2>People</h2>
-{{people|safe}}
-
-<h2>Products</h2>
-{{product|safe}}
+    
+    <div class="notification fixed-notification">
+    </div>
+    
+    <h2>Sources</h2>
+    {{source|safe}}
+    
+    <h2>People</h2>
+    {{people|safe}}
+    
+    <h2>Products</h2>
+    {{product|safe}}
 
 {% endblock %}
 

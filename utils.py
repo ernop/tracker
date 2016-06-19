@@ -486,14 +486,20 @@ def sparkline(labelresults, width, height, kind = 'bar', barwidth = 4):
         num_results.append(total)
     data=','.join([str(s) for s in num_results])
     rnd=str(int(random.random()*100000))
-    res = '<div id="spk%s"></div>'%(rnd)    
-    scriptpart = '<script>$(document).ready(function(){$("#spk%s").sparkline([%s], {tooltipFormat: "{{offset:offset}}", \
-    type:"%s",\
-    height:%s,\
-    width:%s,\
-    chartRangeMin:0,\
-    barWidth: %d,\
-    tooltipValueLookups: {offset:%s}})});</script>'%(rnd, data, kind, height, width, barwidth, labels)
+    res = '<div id="spk%s"></div>'%(rnd)
+    #width:%s,
+    #barWidth: %d,
+    scriptpart = '''<script>$(document).ready(function(){$("#spk%s").sparkline([%s], {tooltipFormat: "{{offset:offset}}", \
+    type:"%s",
+    height:%s,
+    
+    chartRangeMin:0,
+    
+    tooltipValueLookups: {offset:%s}})});</script>'''%(rnd, data, kind,
+                                                       height,
+                                                     #width,
+                                                     #barwidth,
+                                                     labels)
     res += scriptpart
     return res
 
