@@ -533,7 +533,10 @@ class RegionAdmin(OverriddenModelAdmin):
     def mysources(self, obj):
         myobjs = Source.objects.filter(region=obj)
         links = ', '.join([source.clink() for source in myobjs[:10]])
-        return '%s (%d total)' % (links, myobjs.count())
+        line = '%s (%d total)' % (links, myobjs.count())
+        alllink = '<a href="../source/?region__id__exact=%d">all</a>' % obj.id
+        res = '%s <br>%s' % (line, alllink)
+        return res
 
     def mypurchases(self, obj):
         return "<a href='../purchase/?source__region__id__exact=%d'>all purchases</a>" % obj.id
