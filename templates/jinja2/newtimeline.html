@@ -5,6 +5,11 @@
     <style>
     td {padding:3px;}
     tr {border-bottom:lightblue 2px dashed;}
+    .popbar{
+        display:inline-block;
+        background-color:lightblue;
+        height:10px;
+        }
     </style>
 {% endblock %}
 
@@ -20,24 +25,38 @@
 </div>
 
 <table>
-<tr><td>Span<td>People<td>Source<td>Product</td></tr>
+<tr><td>Span<td>People<td>Source<td>Product</td><td>All regions<td>purch count</tr>
 {% for key in keys %}
     <tr><td class=nb>{{key}}
     <td>
         {% for person in people[key]['queryset'] %}
-            {{person.clink()|safe}}
+            <div>
+                {{person.clink()|safe}}
+                <span class="popbar" style="width:{{person.rough_purchase_count}}px"></span>
+            </div>
+            {% if not loop.last %}
+                <br>
+            {% endif %}
         {% endfor %}
-    <td>{% for source in source[key]['queryset'] %}
-            {{source.clink()|safe}}
-        {% endfor %}
-    <td>{% for product in product[key]['queryset'] %}
-            {{product.clink()|safe}}
-        {% endfor %}
-    <td>{% for region in regions[key]['queryset'] %}
-            {{region|safe}}
-        {% endfor %}
+    <td>{% if source[key] %}
+            {% for source in source[key]['queryset'] %}
+                {{source.clink()|safe}}
+            {% endfor %}
+        {% endif %}
+    <td>{% if product[key]%}
+            {% for product in product[key]['queryset'] %}
+                {{product.clink()|safe}}
+            {% endfor %}
+        {% endif %}
+    <td>{% if regions[key]%}
+            {% for region in regions[key]['queryset'] %}
+                {{region|safe}}
+            {% endfor %}
+        {% endif %}
     <td>
+    {% if key in purchases %}
         {{purchases[key]['count'] }}
+    {% endif %}
 {% endfor %}
 
 </table>
