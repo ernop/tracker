@@ -162,7 +162,7 @@ class ProductAdmin(OverriddenModelAdmin):
 
 class PurchaseAdmin(OverriddenModelAdmin):
     list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
-    list_filter='product__domain currency source who_with'.split()
+    list_filter='product__domain source__region currency source who_with'.split()
     list_filter.insert(0,LastWeekPurchaseFilter)
     date_hierarchy='created'
     #list_editable=['note',]
@@ -373,7 +373,6 @@ class PersonAdmin(OverriddenModelAdmin):
               ('vday',latest_dvlink),
               ('taglink', obj.as_tag.exists() and obj.as_tag.get().clink() or ''),
               ('photoset', obj.as_tag.exists() and obj.as_tag.get().clink() or ''),
-              
               ]
         
         tbl=mktable(data,skip_false=True)
@@ -409,8 +408,6 @@ class PersonAdmin(OverriddenModelAdmin):
             pp.save()
             messages.info(request, 'disabled %s'%pp)
 
-
-        
     def mywith(self, obj):
         counts = {}
         costs = {}
@@ -528,7 +525,7 @@ class CurrencyAdmin(OverriddenModelAdmin):
     adminify(mytotal, my3months)
 
 class RegionAdmin(OverriddenModelAdmin):
-    list_display = 'name currency mysources'.split()
+    list_display = 'name currency mysources mypurchases'.split()
     list_per_page = 10
     search_fields = ['name', ]
     actions = []
@@ -538,7 +535,10 @@ class RegionAdmin(OverriddenModelAdmin):
         links = ', '.join([source.clink() for source in myobjs[:10]])
         return '%s (%d total)' % (links, myobjs.count())
 
-    adminify(mysources)
+    def mypurchases(self, obj):
+        return "<a href='../purchase/?source__region__id__exact=%d'>all purchases</a>" % obj.id
+
+    adminify(mysources, mypurchases)
 
 class SourceAdmin(OverriddenModelAdmin):
     list_display='name mytotal myproducts mywith mysummary mydomains myregion'.split()
