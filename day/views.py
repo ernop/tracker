@@ -619,7 +619,8 @@ def timeline(request):
         for source in sources:
             if not source.region:continue
             counts[source.region] = counts.get(source.region, 0) + 1
-        vals['regions'][k] = {'queryset': [kk.clink(text = '%s (%d)' % (kk.name, vv)) for kk, vv in sorted(counts.items())]}
+        regionqs = [kk.clink(text = '%s (%d)' % (kk.name, vv)) for kk, vv in sorted(counts.items(), key = lambda x:-1 *x[1])]
+        vals['regions'][k] = {'queryset': regionqs}
         vals['purchases'][k] = {'count': purchases.count()}
     
     return r2r('jinja2/newtimeline.html', request, vals)
