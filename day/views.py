@@ -608,7 +608,7 @@ def timeline(request):
     vals['product'] = partition_queryset(Product.objects.all(), by = 'week', field = 'created', skip_first = True)
     #ordered
     
-    vals['keys'] = sorted(vals['people'].keys())[:10]
+    vals['keys'] = sorted(vals['people'].keys())
     vals['regions'] = {}
     vals['purchases'] = {}
     for k in vals['keys']:
