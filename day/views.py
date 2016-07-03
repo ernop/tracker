@@ -238,7 +238,7 @@ def previous_month(request,dt = None):
 def themonth(request, dt = None):
     if dt == None:
         today = datetime.datetime.today().date().strftime(DATE_DASH_REV)
-        return HttpResponseRedirect('/prevmonth/%s'%str(today))
+        return HttpResponseRedirect('/themonth/%s'%str(today))
     else:
         mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     start = datetime.datetime(year=mm.year, month=mm.month, day=1)
@@ -249,7 +249,7 @@ def themonth(request, dt = None):
 def theyear(request,dt = None):
     if dt == None:
         today = datetime.datetime.today().date().strftime(DATE_DASH_REV)
-        return HttpResponseRedirect('/prevmonth/%s'%str(today))
+        return HttpResponseRedirect('/theyear/%s'%str(today))
     else:
         mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     start = datetime.datetime(year=mm.year, month=1, day=1)
