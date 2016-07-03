@@ -235,15 +235,23 @@ def previous_month(request,dt = None):
     return summary_timespan(start,end,request)
 
 @login_required
-def themonth(request, dt):
-    mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
+def themonth(request, dt = None):
+    if dt == None:
+        today = datetime.datetime.today().date().strftime(DATE_DASH_REV)
+        return HttpResponseRedirect('/prevmonth/%s'%str(today))
+    else:
+        mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     start = datetime.datetime(year=mm.year, month=mm.month, day=1)
     end = add_days(add_months(start, months=1), days = -1)
     return summary_timespan(start,end,request)
 
 @login_required
-def theyear(request,dt):
-    mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
+def theyear(request,dt = None):
+    if dt == None:
+        today = datetime.datetime.today().date().strftime(DATE_DASH_REV)
+        return HttpResponseRedirect('/prevmonth/%s'%str(today))
+    else:
+        mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
     start = datetime.datetime(year=mm.year, month=1, day=1)
     end = add_months(start, months=12)
     return summary_timespan(start,end,request,include_people=True,include_measurements=False,include_days=False,include_span_tags=False,top_purchases_count=10,
