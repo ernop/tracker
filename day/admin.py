@@ -287,7 +287,7 @@ class DomainAdmin(OverriddenModelAdmin):
     adminify(myproducts, mysource, mycreated, mypie, myspots)
 
 class PersonAdmin(OverriddenModelAdmin):
-    list_display='id origin birthday myinfo myphotos mywith mysources mydomains mypurchases'.split()
+    list_display='id origin birthday myinfo myphotos mywith mysources mydomains mypurchases myinteractions'.split()
     list_filter=['origin', GenderFilter, AnyPurchaseFilter, KnownSinceLongAgo, HasPhotoFilter, DecadeFilter, AgeFilter]
     date_hierarchy = 'created'
     list_editable=['origin','birthday',]
@@ -297,6 +297,9 @@ class PersonAdmin(OverriddenModelAdmin):
 
     def mydescription(self,obj):
         return '<blockquote>%s</>'%(obj.description or '')
+    
+    def myinteractions(self, obj):
+        return ', '.join([i.clink() for i in obj.interactions.all()])
     
     #this is now time decaying.
     def update_rough_purchase_counts(self, request, queryset):
@@ -494,7 +497,7 @@ class PersonAdmin(OverriddenModelAdmin):
                          'last_name':forms.TextInput(attrs={'cols':30})}
         return EditForm
 
-    adminify(mydescription, mysources, mypurchases, myinfo, mydomains, mywith,myphotos)
+    adminify(mydescription, myinteractions, mysources, mypurchases, myinfo, mydomains, mywith,myphotos)
 
 class CurrencyAdmin(OverriddenModelAdmin):
     list_display='name rmb_value symbol mytotal my3months'.split()
@@ -544,7 +547,7 @@ class RegionAdmin(OverriddenModelAdmin):
     adminify(mysources, mypurchases)
 
 class SourceAdmin(OverriddenModelAdmin):
-    list_display='name mytotal myproducts mywith mysummary mydomains myregion'.split()
+    list_display='name mytotal myproducts mywith mysummary mydomains myinteractions myregion'.split()
     list_per_page = 10
     list_filter = ['region', ]
     search_fields = ['name', ]
@@ -633,7 +636,10 @@ class SourceAdmin(OverriddenModelAdmin):
             dayrange=abs((datetime.datetime.now()-earliest).days)+1
             return '<div class="nb">%0.0f%s<br>%s%s /day<br>(%d days)</div>'%(total, '$', rstripz(total/dayrange), '$', dayrange)
 
-    adminify(mytotal, mysummary, myproducts, mywith, myregion, mydomains)
+    def myinteractions(self, obj):
+        return ', '.join([i.clink() for i in obj.interactions.all()])
+
+    adminify(mytotal, mysummary, myproducts, mywith, myregion, mydomains, myinteractions)
 
 class PMuscleInline(admin.StackedInline):
     model = Exercise.pmuscles.through
@@ -953,6 +959,94 @@ class MeasurementSetAdmin(OverriddenModelAdmin):
     adminify(mydo, mycontains)
 
 
+
+
+
+
+class InteractionMeasurementAdmin(OverriddenModelAdmin):
+    list_display='id myinteraction myscale myvalue mycreated'.split()
+    list_filter=['interaction_scale',]
+
+    def myinteraction(self, obj):
+        return obj.interaction.clink()
+    
+    def myscale(self, obj):
+        return obj.interaction_scale.clink()
+
+    def mycreated(self, obj):
+        return obj.created.strftime(DATE)
+    
+    def myvalue(self, obj):
+        return obj.value
+
+    formfield_for_dbfield=mk_default_field({'created':nowdate,})
+    adminify(mycreated, myinteraction, myscale, mycreated, myvalue)
+    #fields=(('spot','amount','created', ),)
+    
+class InteractionScaleAdmin(OverriddenModelAdmin):
+    list_display = 'id myname mycreated myinteractions'.split()
+    def mymeasurements(self, obj):
+        return ', '.join([m.clink() for m in obj.measurements.all()])
+    def myname(self, obj):
+        return obj.name
+    def mycreated(self, obj):
+        return obj.created.strftime(DATE)
+    def myinteractions(self, obj):
+        return ', '.join(['%s value %d' % (m.interaction.clink(), m.value) for m in obj.measurements.all()])
+    adminify(myname, myinteractions, mymeasurements, mycreated)
+    
+class InteractionAdmin(OverriddenModelAdmin):
+    list_display = 'id myday mypeople mysource mymeasurements mytype myformat mycreated'.split()
+    list_filter = 'type format'.split()
+    
+    def myday(self, obj):
+        return obj.day.clink()
+    def mypeople(self, obj):
+        return ', '.join([p.clink() for p in obj.people.all()])
+    def mymeasurements(self, obj):
+        return ', '.join([m.clink() for m in obj.measurements.all()])
+    def mytype(self, obj):
+        return obj.type.clink()
+    def myformat(self, obj):
+        return obj.format.clink()
+    def mycreated(self, obj):
+        return obj.created.strftime(DATE)
+    def mysource(self, obj):
+        return obj.source.clink()
+    adminify(mypeople, myday, mysource, mymeasurements, mytype, myformat, mycreated)
+
+class InteractionTypeAdmin(OverriddenModelAdmin):
+    list_display = 'id myname mycount mycreated myinteractions'.split()
+    def myname(self, obj):
+        return obj.name
+    def mycreated(self, obj):
+        return obj.created.strftime(DATE)
+    def myinteractions(self, obj):
+        return ', '.join([i.clink() for i in obj.interactions.all()])
+    def mycount(self, obj):
+        alllink = '<a href="../interaction/?type=%d">all</a>' % obj.id
+        res = '%d %s' % (obj.interactions.count(), alllink)
+        return res
+    adminify(myname, mycount, mycreated, myinteractions)
+
+class InteractionFormatAdmin(OverriddenModelAdmin):
+    list_display = 'id myname mycount mycreated'.split()
+    def mycount(self, obj):
+        alllink = '<a href="../interaction/?format=%d">all</a>' % obj.id
+        res = '%d %s' % (obj.interactions.count(), alllink)
+        return res
+        
+    def myname(self, obj):
+        return obj.name
+    def mycreated(self, obj):
+        return obj.created.strftime(DATE)
+    adminify(myname, mycreated, mycount)
+
+admin.site.register(InteractionMeasurement, InteractionMeasurementAdmin)
+admin.site.register(InteractionScale, InteractionScaleAdmin)
+admin.site.register(Interaction, InteractionAdmin)
+admin.site.register(InteractionType, InteractionTypeAdmin)
+admin.site.register(InteractionFormat, InteractionFormatAdmin)
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Domain, DomainAdmin)

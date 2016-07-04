@@ -111,6 +111,9 @@ class Day(DayModel):
 
     def show_day(self):
         return datetime.datetime.strftime(self.date, '%A')
+    
+    def show_date(self):
+        return datetime.datetime.strftime(self.date, DATE)
 
     def show_notekinds(self):
         return ', '.join(['%s%s'%(nk[0],nk[1] and nk[1]!=1 and '(%d)'%(nk[1]) or '') for nk in self.get_notekinds()])
@@ -325,7 +328,75 @@ class ExWeight(DayModel):
     def adm(self):
         return lnk('exweight',self.id, self)
     
-class Measurement(DayModel):
+
+class InteractionFormat(DayModel):  #inperson, phone etc.
+    name=models.CharField(max_length=100, unique=True)
+    created=models.DateField(auto_now_add=True)
+    class Meta:
+        db_table='interaction_format'
+    def __unicode__(self):
+        return self.name
+    
+    def adm(self):
+        return lnk('interactionformat',self.id, self)
+
+class InteractionType(DayModel):  #social/cultural description
+    name=models.CharField(max_length=100, unique=True)
+    created=models.DateField(auto_now_add=True)
+    class Meta:
+        db_table='interaction_type'
+    def __unicode__(self):
+        return self.name
+    
+    def adm(self):
+        return lnk('interactiontype',self.id, self)
+
+class Interaction(DayModel):
+    people = models.ManyToManyField('Person', related_name='interactions', blank = True, null = True)
+    #measurements = models.ManyToManyField('InteractionMeasurement', related_name = 'interactions', blank = True, null = True)
+    source = models.ForeignKey('Source', related_name = 'interactions')
+    type = models.ForeignKey('InteractionType', related_name = 'interactions')
+    format = models.ForeignKey('InteractionFormat', related_name = 'interactions')
+    day = models.ForeignKey('Day',related_name='interactions')
+    created = models.DateField(auto_now_add=True)
+    
+    class Meta:
+        db_table='interaction'
+    
+    @debu
+    def __unicode__(self):
+        res = '%s %s at %s on %s with %d ppl' % (self.format.name, self.type.name, self.source.name, self.day.show_date(), self.people.count())
+        return res
+
+    def adm(self):
+        return lnk('interaction',self.id, self)
+    
+class InteractionScale(DayModel):  #a characteristic that can be expressed in an interaction
+    name = models.CharField(max_length=100, unique=True)
+    created = models.DateField(auto_now_add=True)
+    class Meta:
+        db_table='interaction_scale'
+    def __unicode__(self):
+        return self.name
+    
+    def adm(self):
+        return lnk('interactionscale',self.id, self)
+    
+class InteractionMeasurement(DayModel):  #measurement of a certain interactionscale in a certain interaction
+    interaction = models.ForeignKey('Interaction', related_name = 'measurements')
+    interaction_scale = models.ForeignKey('InteractionScale', related_name = 'measurements')
+    value = models.IntegerField()  #free
+    created=models.DateField() #bit weird these are not datetime...
+    class Meta:
+        db_table='interaction_measurement'
+        
+    def __unicode__(self):
+        return '%s:%d' % (self.interaction_scale.name, self.value)
+    
+    def adm(self):
+        return lnk('interactionmeasurement',self.id, self)
+
+class Measurement(DayModel):  #measurement of a certain spot, in a certain amount, on a certain day.
     spot=models.ForeignKey('MeasuringSpot', related_name='measurements')
     amount=models.FloatField()
     created=models.DateField() #bit weird these are not datetime...
@@ -518,8 +589,6 @@ class Person(DayModel):
         ordering=['first_name','last_name',]
         
     def update_purchase_count(self):
-        #self.rough_purchase_count = self.purchases.count()
-        #import ipdb;ipdb.set_trace()
         queryset = self.purchases.all()
         object_date_field = 'day__date'
         interval_size_days = 90
