@@ -537,7 +537,6 @@ class Photo(DayModel):
         return True
     
     def done(self):
-        import ipdb;ipdb.set_trace()
         if self.file_exists():
             fn=self.filename()
             donefp=get_nonexisting_fp(settings.DONE_PHOTO_DIR,fn)
