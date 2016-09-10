@@ -54,12 +54,40 @@ class Photo(DayModel):
     myphoto=models.BooleanField(default=False)
     thumb_ok=models.BooleanField(default=False)
     
-    
-        
     class Meta:
         db_table='photo'
 
+    def check_local(self):
+        """check if the fp actually exists locally and if so redirect it."""
+        if settings.LOCAL:
+            try:
+                res=os.path.exists(self.fp)
+            except:
+                res=os.path.exists(self.fp.encode('utf8'))
+            if not res:
+                #switch around the prefix
+                #BASES=['/home/ernop/tracker','d:/proj/tracker','f:/proj/tracker',]
+                # u'/home/ernop/done_photo/p1227123237120.jpg'
+                #=> F:\proj\tracker\static\done_photo
+                for base in settings.BASES:
+                    if ':' in base:continue
+                    fbase = base.replace('/tracker', '', 1)
+                    if self.fp.startswith(fbase):
+                        try_new_suffix = self.fp.replace(fbase, '', 1)
+                        for otherbase in settings.BASES:
+                            if ':' not in otherbase:continue
+                            try_new_fp = otherbase + '/static' + try_new_suffix
+                            try:
+                                res=os.path.exists(try_new_fp)
+                            except:
+                                res=os.path.exists(try_new_fp.encode('utf8'))
+                            if res:
+                                self.fp = try_new_fp
+                                self.save()
+                                return
+
     def file_exists(self):
+        self.check_local()
         if not self.fp:
             log.error('image missing fp, hard deleting obj. %s',fp)
             self.kill_thumb()
@@ -215,7 +243,25 @@ class Photo(DayModel):
             return True
         else:
             return self._create_thumb()
-            
+    
+    def rotate(self, n):
+        if not self.file_exists():
+            log.error('file does not exist.')
+            return
+        if n not in [90, 180, 270]:
+            log.error('illegal rotation amount.')
+            return
+        cmd = 'mogrify -rotate %d "%s"' % (n, self.fp)
+        log.info('doing rotate cmd: "%s"' % cmd)
+        try:
+            res = os.system(cmd)
+        except Exception, ex:
+            log.error('failure in rotate cmd. exception: %s' % ex)
+            return False
+        self.initialize()
+        self.create_thumb(force = True)
+        return True
+    
     def _create_thumb(self):
         '''really create it'''
         if self.thumbfp:
@@ -253,7 +299,6 @@ class Photo(DayModel):
         self.thumb_ok=True
         self.save()
         return True
-            
             
     def get_thumbfp(self):
         thumbfp=get_nonexisting_fp(settings.THUMB_PHOTO_DIR, self.filename())
@@ -348,7 +393,6 @@ class Photo(DayModel):
             except IOError:
                 return False
         return get_exif(im)
-    
     
     def rehash(self):
         '''hash the first few K of data'''

@@ -365,7 +365,7 @@ class Interaction(DayModel):
     
     @debu
     def __unicode__(self):
-        res = '%s %s at %s on %s with %d ppl' % (self.format.name, self.type.name, self.source.name, self.day.show_date(), self.people.count())
+        res = '%s %s at %s on %s with %d ppl' % (self.format.name, self.type.name, self.source.name, self.day.show_date(), self.people.count() + 1)
         return res
 
     def adm(self):

@@ -45,10 +45,6 @@ from django.contrib import admin
 class OverriddenModelAdmin(admin.ModelAdmin):
     """normal, except overrides some widgets."""
     formfield_overrides = {
-        #models.DateTimeField: {'widget': admin.widgets.AdminDateWidget,},
-        #models.DateField: { 'widget': admin.widgets.AdminDateWidget,},
-        #models.DateTimeField: {'widget': BetterDateWidget,},
-        #models.DateField: { 'widget': BetterDateWidget,},
     }
 
     def _media(self):

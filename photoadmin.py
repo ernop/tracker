@@ -31,7 +31,7 @@ class PhotoAdmin(OverriddenModelAdmin):
     actions=['undoable_delete','not_myphoto','delete_file',
              'undelete','reinitialize','force_recreate_thumbs',
              'autoorient','redo_classification','kill_entry',
-             'unlink_from_day','rename_name','remove_photospot','set_day',]
+             'unlink_from_day','rename_name','remove_photospot','set_day', 'rotate', ]
     actions.extend(['remove_photospot','remove_day','rehash','merge_photos_lowest_id','check_thumbs',])
     actions.extend(['set_founding','set_done',])
     actions.sort()
@@ -127,10 +127,12 @@ class PhotoAdmin(OverriddenModelAdmin):
     def kill_entry(self,request,queryset):
         for photo in queryset:
             photo.kill_this()
+            
     def rehash(self,request,queryset):
         for pic in queryset:
             pic.rehash()
             pic.save()
+            
     def delete_file(self,request,queryset):    
         for photo in queryset:
             photo.delete_file()
@@ -178,6 +180,10 @@ class PhotoAdmin(OverriddenModelAdmin):
         else:
             queryset=queryset.exclude(tags__tag__name__in=settings.EXCLUDED_TAGS)
         return queryset
+    
+    def rotate(self, request, queryset):
+        for ph in queryset:
+            ph.rotate(90)
     
     adminify(myday,myinfo,myexif,myname)
 
