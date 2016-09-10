@@ -479,7 +479,10 @@ class Photo(DayModel):
             delfp=get_nonexisting_fp(settings.DELETED_PHOTO_DIR,fn)
             self.tags.filter(tag__name='undelete').delete()
             log.info("deleting; moving from %s to %s",self.fp,delfp)
-            shutil.move(self.fp,delfp)
+            try:
+                shutil.move(self.fp,delfp)
+            except:
+                shutil.move(self.fp.encode('utf8'),delfp)
             self.fp=delfp
         else:
             #if file not exist, its been deleted in the file exist check.
