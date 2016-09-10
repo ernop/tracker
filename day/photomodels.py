@@ -478,7 +478,7 @@ class Photo(DayModel):
             fn=self.filename()
             delfp=get_nonexisting_fp(settings.DELETED_PHOTO_DIR,fn)
             self.tags.filter(tag__name='undelete').delete()
-            log.info("deleting; moving from %s 5o %s",self.fp,delfp)
+            log.info("deleting; moving from %s to %s",self.fp,delfp)
             shutil.move(self.fp,delfp)
             self.fp=delfp
         else:
@@ -537,6 +537,7 @@ class Photo(DayModel):
         return True
     
     def done(self):
+        import ipdb;ipdb.set_trace()
         if self.file_exists():
             fn=self.filename()
             donefp=get_nonexisting_fp(settings.DONE_PHOTO_DIR,fn)
@@ -546,12 +547,13 @@ class Photo(DayModel):
                 tt=PhotoHasTag(photo=self,tag=PhotoTag.objects.get(name='done'))
                 log.info('added done tag. %s', self)
                 tt.save()
-            log.info("moving from %s 5o %s", self.fp, donefp)
-            shutil.move(self.fp,donefp)
-            self.fp=donefp
+            if not self.deleted:  #move to done folder if not already deleted
+                log.info("moving from %s to %s", self.fp, donefp)
+                shutil.move(self.fp,donefp)
+                self.fp=donefp
+                log.info('moved photo %s to done folder %s',self,donefp)
             self.incoming=False
             self.save()
-            log.info('moved photo %s to done folder %s',self,donefp)
             return True
         else:
             log.error('couldn\'t move photo to done folder cause file not exist. %s %s',self,self.fp)
