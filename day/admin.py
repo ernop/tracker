@@ -206,38 +206,38 @@ class PurchaseAdmin(OverriddenModelAdmin):
     def set_keep(self, obj, queryset):
         keep = Disposition.objects.get(name = 'kept')
         for purch in queryset:
-            self.disposition = keep
-            self.save()
+            purch.disposition = keep
+            purch.save()
             
     def set_lost(self, obj, queryset):
         lost= Disposition.objects.get(name = 'lost')
         for purch in queryset:
-            self.disposition = lost
-            self.save()
+            purch.disposition = lost
+            purch.save()
             
     def set_consumed(self, obj, queryset):
         consumed= Disposition.objects.get(name = 'consumed')
         for purch in queryset:
-            self.disposition = consumed
-            self.save()
+            purch.disposition = consumed
+            purch.save()
             
     def set_sold(self, obj, queryset):
         sold = Disposition.objects.get(name = 'sold')
         for purch in queryset:
-            self.disposition = sold
-            self.save()
+            purch.disposition = sold
+            purch.save()
             
     def set_tossed(self, obj, queryset):
         tossed= Disposition.objects.get(name = 'tossed')
         for purch in queryset:
-            self.disposition = tossed
-            self.save()
+            purch.disposition = tossed
+            purch.save()
             
     def set_unknown(self, obj, queryset):
         unknown = Disposition.objects.get(name = 'unknown')
         for purch in queryset:
-            self.disposition = unknown
-            self.save()
+            purch.disposition = unknown
+            purch.save()
     
     def mysource(self, obj):
         return obj.source.clink()
