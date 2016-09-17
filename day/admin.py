@@ -204,7 +204,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
                 innerpurch.save()
         
     def set_keep(self, obj, queryset):
-        keep = Disposition.objects.get(name = 'keep')
+        keep = Disposition.objects.get(name = 'kept')
         for purch in queryset:
             self.disposition = keep
             self.save()
