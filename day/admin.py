@@ -186,7 +186,8 @@ class StorageAdmin(OverriddenModelAdmin):
     list_display = 'id name mystuff'.split()
     def mystuff(self, obj):
         items = obj.items.all()
-        itemslink = '<a href="../purchases/?storage__id=%d">all %d items</a>' % (obj.id, obj.items.count())
+        itemslink = '<a href="../purchase/?storage__id=%d">all %d items</a>' % (obj.id, obj.items.count())
+        items.sort(key = lambda x:x.name)
         links = [item.clink(text = item.product.name) for item in items]
         names = ', '.join(links)
         res = '%s<br>%s' % (itemslink, names)

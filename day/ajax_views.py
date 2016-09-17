@@ -219,7 +219,6 @@ def ajax_get_common_measurements(request):
 
 @user_passes_test(staff_test)
 def ajax_make_purchase(request):
-    import ipdb;ipdb.set_trace()
     try:
         dat=request.POST
         today=dat['today']
