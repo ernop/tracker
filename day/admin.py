@@ -148,10 +148,7 @@ class ProductAdmin(OverriddenModelAdmin):
         res.append(ageline)
         tbl = mktable(res)
         return tbl
-        #res = ', '.join(['%s%s'%(th[0], (th[1]!=1 and '(%d)'%th[1]) or '') for th in sorted(res.items(), key=lambda x:(-1*x[1], x[0]))])
-        #return res
 
-    @debu
     def mysources(self, obj):
         purch=Purchase.objects.filter(product=obj)
         sources=Source.objects.filter(purchases__product=obj).distinct()

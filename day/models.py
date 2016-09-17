@@ -775,6 +775,7 @@ class Disposition(DayModel):  #owned, sold, lost, consumed etc.
     
     class Meta:
         db_table = 'disposition'
+        ordering = ['name', ]
         
     def __unicode__(self):
         res = '%s' % self.name
@@ -786,6 +787,7 @@ class Storage(DayModel):  #storage location; car work house personal misc closet
     
     class Meta:
         db_table = 'storage'
+        ordering = ['name', ]
         
     def __unicode__(self):
         return self.name
