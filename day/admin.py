@@ -182,15 +182,28 @@ class ProductAdmin(OverriddenModelAdmin):
 
     adminify(mysources, mypurchases, mydomain, myspark, mywith)
 
+class StorageAdmin(OverriddenModelAdmin):
+    list_display = 'id name mystuff'.split()
+    def mystuff(self, obj):
+        items = obj.items.all()
+        itemslink = '<a href="../purchases/?storage__id=%d">all %d items</a>' % (obj.id, obj.items.count())
+        links = [item.clink(text = item.product.name) for item in items]
+        names = ', '.join(links)
+        res = '%s<br>%s' % (itemslink, names)
+        return res
+    
+    adminify(mystuff)
+    
+
 class PurchaseAdmin(OverriddenModelAdmin):
-    list_display='id myproduct mydomain mydisposition mycost mysource size mywho_with mycreated note'.split()
-    list_filter='product__domain source__region disposition product__consumable currency source who_with'.split()
+    list_display='id myproduct mydomain mydisposition mystorage mycost mysource size mywho_with mycreated note'.split()
+    list_filter='product__domain source__region disposition product__consumable storage currency source who_with'.split()
     list_filter.insert(0, LastWeekPurchaseFilter)
     date_hierarchy='created'
     search_fields= ['product__name']
     form=PurchaseForm
     list_per_page = 20
-    actions = ['set_keep', 'set_unknown', 'set_lost', 'set_consumed', 'set_sold', 'set_tossed', 'set_given_away', 
+    actions = ['set_kept', 'set_unknown', 'set_lost', 'set_consumed', 'set_sold', 'set_tossed', 'set_given_away', 
                'set_consumed_and_all_similar_purchases_consumed',
                'set_unconsumed_and_all_similar_purchases_kept', ]
     actions.sort()
@@ -200,7 +213,6 @@ class PurchaseAdmin(OverriddenModelAdmin):
         for purch in queryset:
             prod = purch.product
             for innerpurch in prod.purchases.all():
-                innerpurch.consumed = True
                 innerpurch.disposition = consumed
                 innerpurch.save()
                 
@@ -209,14 +221,13 @@ class PurchaseAdmin(OverriddenModelAdmin):
         for purch in queryset:
             prod = purch.product
             for innerpurch in prod.purchases.all():
-                innerpurch.consumed = False
                 innerpurch.disposition = kept
                 innerpurch.save()
         
-    def set_keep(self, obj, queryset):
-        keep = Disposition.objects.get(name = 'kept')
+    def set_kept(self, obj, queryset):
+        kept = Disposition.objects.get(name = 'kept')
         for purch in queryset:
-            purch.disposition = keep
+            purch.disposition = kept
             purch.save()
             
     def set_lost(self, obj, queryset):
@@ -286,17 +297,26 @@ class PurchaseAdmin(OverriddenModelAdmin):
     def myproduct(self, obj):
         return obj.product.clink()
 
+    def mystorage(self, obj):
+        if obj.storage:
+            link = obj.storage.clink() or 'none'
+            alllink = '<a href="./?storage__id=%d">all</a>' % obj.storage.id
+            res = '%s (%s)' % (link, alllink)
+        else:
+            return '-'
+        return res
+
     def mywho_with(self, obj):
         return ', '.join([per.clink() for per in obj.who_with.all()])
 
     def mydomain(self, obj):
         return '<a href=/admin/day/domain/?id=%d>%s</a>'%(obj.product.domain.id, obj.product.domain)
 
-    adminify(mycost, myproduct, mydisposition, mywho_with, mydomain, mycreated, mysource)
+    adminify(mystorage, mycost, myproduct, mydisposition, mywho_with, mydomain, mycreated, mysource)
     mywho_with.display_name='Who With'
     formfield_for_dbfield=mk_default_field({ 'quantity':1,'created':datetime.datetime.now, 'currency':1}) #'hour':get_named_hour
     formfield_form_foreignkey=mk_default_fkfield({'currency':1,'hour':gethour,})
-    fields='product cost source size quantity created hour who_with note currency disposition'.split()
+    fields='product cost source size quantity created hour who_with note currency disposition storage'.split()
 
 class DomainAdmin(OverriddenModelAdmin):
     list_display='id myproducts mypie myspots mysource'.split()
@@ -638,7 +658,7 @@ class DispositionAdmin(OverriddenModelAdmin):
     search_fields = ['name', ]
     def myitems(self, obj):
         count = obj.items.count()
-        dispositionlink = '<a href="/admin/day/product/?disposition__id__exact=%d">all</a>' % (obj.id)
+        dispositionlink = '<a href="/admin/day/purchase/?disposition__id__exact=%d">all</a>' % (obj.id)
         res = '%s<br>%s' % (count, dispositionlink)
         
         return res
@@ -1172,5 +1192,6 @@ admin.site.register(NoteKind, NoteKindAdmin)
 
 admin.site.register(MeasurementSet, MeasurementSetAdmin)
 admin.site.register(Disposition, DispositionAdmin)
+admin.site.register(Storage, StorageAdmin)
 
 from photoadmin import *

@@ -780,7 +780,20 @@ class Disposition(DayModel):  #owned, sold, lost, consumed etc.
         res = '%s' % self.name
         return res
     
+
+class Storage(DayModel):  #storage location; car work house personal misc closet etc.
+    name = models.CharField(max_length = 100)
+    
+    class Meta:
+        db_table = 'storage'
+        
+    def __unicode__(self):
+        return self.name
+
 class Purchase(DayModel):
+    """purchases have a kind of dual purpose now.
+    1. for a transaction - buy (or sell) or acquire something
+    2. but also for an owned item.  which makes it somewhat messy."""
     product=models.ForeignKey('Product', related_name='purchases')
     created=models.DateField()
     quantity=models.FloatField()
@@ -794,6 +807,7 @@ class Purchase(DayModel):
     object_created=models.DateTimeField(auto_now_add=True)
     day=models.ForeignKey('Day',related_name='purchases')
     disposition = models.ForeignKey('Disposition', related_name = 'items', blank = True, null = True)
+    storage = models.ForeignKey('Storage', related_name = 'items', blank = True, null = True)
 
     class Meta:
         db_table='purchase'
