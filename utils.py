@@ -469,6 +469,7 @@ def insert_defaults():
     for name,dname in settings.DEFAULT_PRODUCTS:
         #print name,dname
         pp=Product(name=name, domain=Domain.objects.get(name=dname))
+        pp.consumable = domain.defaults_consumable
         pp.save()
     for name in settings.DEFAULT_PHOTOTAGS:
         pt=PhotoTag(name=name)
@@ -477,31 +478,33 @@ def insert_defaults():
 def line_sparkline(labelresults,width,height):
     return sparkline(labelresults, width, height, kind = 'line')
     
-def sparkline(labelresults, width, height, kind = 'bar', barwidth = 4):
+def sparkline(labelresults, width = None, height = None, kind = 'bar', barwidth = 4):
     ii=0
     num_results=[]
     labels={}
-    #import ipdb;ipdb.set_trace()
     for total,label in labelresults:
         label+=' %d'%two_sig(total)
-        labels[ii]=label
+        labels[ii]= str(label)
         ii+=1
         num_results.append(total)
     data=','.join([str(s) for s in num_results])
     rnd=str(int(random.random()*100000))
     res = '<div id="spk%s"></div>'%(rnd)
-    #width:%s,
-    #barWidth: %d,
-    scriptpart = '''<script>$(document).ready(function(){$("#spk%s").sparkline([%s], {tooltipFormat: "{{offset:offset}}", \
+    heightstr = ''
+    widthstr = ''
+    if height:heightstr = 'height:%s,' % height
+    if width:widthstr = 'width:%s,' % width
+    scriptpart = '''<script>$(document).ready(function(){$("#spk%s").sparkline([%s],
+    {tooltipFormat: "{{offset:offset}}",
     type:"%s",
-    height:%s,
-    
+    %s
+    %s
     chartRangeMin:0,
-    
-    tooltipValueLookups: {offset:%s}})});</script>'''%(rnd, data, kind,
-                                                       height,
-                                                     #width,
-                                                     #barwidth,
+    tooltipValueLookups: {offset:%s}})});</script>'''%(rnd,
+                                                       data,
+                                                       kind,
+                                                     heightstr,
+                                                     widthstr, 
                                                      labels)
     res += scriptpart
     return res

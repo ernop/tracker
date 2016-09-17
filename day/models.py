@@ -228,6 +228,7 @@ class Domain(DayModel):
     body, house, experiences, food, stuff, clothes, etc.
     """
     name=models.CharField(max_length=100)
+    defaults_consumable = models.BooleanField(default = True)
     created=models.DateField(auto_now_add=True)
 
     class Meta:
@@ -697,7 +698,6 @@ class Person(DayModel):
             #setting up the related tag for this person.
         except:
             pass
-        
     
 class PersonDay(DayModel):
     #not used
@@ -710,10 +710,13 @@ class PersonDay(DayModel):
 
     def __unicode__(self):
         return '%s%s'%(self.person, str(self.day))
+    
 class Product(DayModel):
     name=models.CharField(max_length=100, unique=True)
     created=models.DateField(auto_now_add=True)
     domain=models.ForeignKey('Domain', related_name='products')
+    consumable = models.BooleanField()  #whether a purchase of this product is instantly consumed
+    
     class Meta:
         db_table='product'
         ordering=['name',]
@@ -761,9 +764,24 @@ class Product(DayModel):
         cost=sum([pur.get_cost() for pur in valid] or [0])
         return cost
     
+    def save(self, *args, **kwargs):
+        if self.consumable is None:
+            if self.domain is not None:
+                self.consumable = self.domain.defaults_consumable
+        super(Product, self).save(*args, **kwargs)
+    
+class Disposition(DayModel):  #owned, sold, lost, consumed etc.
+    name = models.CharField(max_length = 100, null = True, blank = True)
+    
+    class Meta:
+        db_table = 'disposition'
+        
+    def __unicode__(self):
+        res = '%s' % self.name
+        return res
+    
 class Purchase(DayModel):
     product=models.ForeignKey('Product', related_name='purchases')
-    #domain=models.ForeignKey(Domain, related_name='purchases')
     created=models.DateField()
     quantity=models.FloatField()
     size=models.CharField(max_length=100, null=True, blank=True)
@@ -775,6 +793,7 @@ class Purchase(DayModel):
     note=models.CharField(max_length=2000, blank=True, null=True)
     object_created=models.DateTimeField(auto_now_add=True)
     day=models.ForeignKey('Day',related_name='purchases')
+    disposition = models.ForeignKey('Disposition', related_name = 'items', blank = True, null = True)
 
     class Meta:
         db_table='purchase'
@@ -802,6 +821,12 @@ class Purchase(DayModel):
             self.day=dd
         if not self.created:
             self.created=datetime.datetime.now()
+        if self.disposition is None:
+            if self.product is not None:
+                if self.product.consumable:
+                    self.disposition = Disposition.objects.get(name = 'consumed')
+                else:
+                    self.disposition = Disposition.objects.get(name = 'unknown')
         super(Purchase, self).save(*args, **kwargs)
 
     def get_cost(self):

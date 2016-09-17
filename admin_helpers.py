@@ -28,6 +28,7 @@ def make_null_filter(field, title=None, param_name=None, include_empty_string=Tr
         title= bb
         parameter_name= param_name
         args={field:None}
+        
     return InnerFilter
 
 
@@ -176,17 +177,17 @@ class BaseNullEmptyFilter(SimpleListFilter):
     '''an easy way to construct filters that are like __isnull'''
     def lookups(self, request, model_admin):
         return (
-            ('yes', 'yes'),
-            ('no', 'no'),
+            ('null', 'null'),
+            ('not null', 'not null'),
         )
     def queryset(self, request, queryset):
         sargs=self.args
-        if self.value()=='yes':
+        if self.value()=='not null':
             for k in self.args.keys():
                 queryset = queryset.exclude(**{k: '',})
                 queryset = queryset.exclude(**{k: None,})
             return queryset
-        if self.value()=='no':
+        if self.value()=='null':
             for k in self.args.keys():
                 queryset = queryset.filter(**{k: '',}) | queryset.filter(**{k: None,})
             return queryset
@@ -195,15 +196,15 @@ class BaseNullFilter(SimpleListFilter):
     '''an easy way to construct filters that are like __isnull'''
     def lookups(self, request, model_admin):
         return (
-            ('yes', 'yes'),
-            ('no', 'no'),
+            ('null', 'null'),
+            ('not null', 'not null'),
         )
     def queryset(self, request, queryset):
         sargs=self.args
-        if self.value()=='yes':
-            return queryset.exclude(**self.args)
-        if self.value()=='no':
+        if self.value()=='null':
             return queryset.filter(**self.args)
+        if self.value()=='not null':
+            return queryset.exclude(**self.args)
 
 PHOTO_SIZES=(
             (3*1024,'3k',),

@@ -36,16 +36,6 @@ class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
 
-def chart_url(dat, size=None, text=None):
-    if text is None:
-        text = 'Sources'
-    dat=[d for d in dat if d[0] > 0]
-    dat.sort(key=lambda x:x[0])
-    values = ','.join([str(round(s[0],1)) for s in dat])
-    offsets= ','.join(['%s (%s)'%(s[1], str(round(s[0]))) for s in dat])
-    res = '<h3>%s</h3><div class="piespark" values="%s" labels="%s"></div>' % (text, values, offsets)
-    return res
-
 class BetterDateWidget(admin.widgets.AdminDateWidget):
     def render(self, name, value, attrs=None):
         return super(BetterDateWidget, self).render(name, value)
@@ -55,10 +45,37 @@ class BetterDateWidget(admin.widgets.AdminDateWidget):
 
 class ProductAdmin(OverriddenModelAdmin):
     search_fields = ['name', ]
-    list_display='name mypurchases mysources mywith myspark'.split()
-    #list_editable = ['domain', ]
+    list_display='name consumable mypurchases mysources mywith myspark'.split()
+    list_editable = ['consumable', ]
     list_per_page = 10
-    list_filter = ['domain', ]
+    list_filter = ['domain', make_null_filter('consumable', title = 'consumable', include_empty_string = False), 'consumable', ]
+    actions = ['set_consumable', 'set_unconsumable', 'set_all_purchases_consumed',
+               'set_consumable_and_all_purchases_consumed', ]
+    actions.sort()
+    fields=(('name','domain', ),)
+
+    def set_consumable_and_all_purchases_consumed(self, request, queryset):
+        self.set_consumable(request, queryset)
+        self.set_all_purchases_consumed(request, queryset)
+
+    def set_consumable(self, request, queryset):
+        for product in queryset:
+            product.consumable = True
+            product.save()
+            
+    def set_unconsumable(self, request, queryset):
+        for product in queryset:
+            product.consumable = False
+            product.save()
+
+    def set_all_purchases_consumed(self, request, queryset):
+        consumed = Disposition.objects.get(name = 'consumed')
+        for product in queryset:
+            purchases = product.purchases.all()
+            for purch in purchases:
+                purch.consumed = True
+                purch.disposition = consumed
+                purch.save()
 
     def mydomain(self, obj):
         return obj.domain.clink()
@@ -139,11 +156,16 @@ class ProductAdmin(OverriddenModelAdmin):
         purch=Purchase.objects.filter(product=obj)
         sources=Source.objects.filter(purchases__product=obj).distinct()
         dat=[(ss.total_spent(product=obj), ss, ss.purchases.filter(product=obj).count()) for ss in sources]
-        #dat is amount spent, source, count of purchases
         dat.sort(key=lambda x:-1*x[0])
-        lifevalues = ','.join([str(s[0]) for s in dat])
-        lifeoffsets = ','.join(['%s (%s)'%(s[1].name, '%0.1f'%s[0]) for s in dat])
-        lifepie = '<h3>Sources</h3><div class="piespark" values="%s" labels="%s"></div>' % (lifevalues, lifeoffsets)
+        labelresults = [(d[0], (d[1].name)) for d in dat]
+       
+        if sources.count() < 3:
+            height = 100
+        else:
+            height = 200
+        from utils import sparkline
+        pie = sparkline(labelresults = labelresults, height = height, kind = 'pie')
+        res = '<h3>Sources</h3>%s' % pie
 
         res=[]
         countsum=0
@@ -156,23 +178,73 @@ class ProductAdmin(OverriddenModelAdmin):
         lastrow=['all','%0.1f'%alltotal,countsum,'',]
         res.append(lastrow)
         tbl = mktable(res)
-        return lifepie + '<br>' + tbl
+        return pie + '<br>' + tbl
 
     adminify(mysources, mypurchases, mydomain, myspark, mywith)
 
 class PurchaseAdmin(OverriddenModelAdmin):
-    list_display='id myproduct mydomain mycost mysource size mywho_with mycreated note'.split()
-    list_filter='product__domain source__region currency source who_with'.split()
-    list_filter.insert(0,LastWeekPurchaseFilter)
+    list_display='id myproduct mydomain mydisposition mycost mysource size mywho_with mycreated note'.split()
+    list_filter='product__domain source__region disposition product__consumable currency source who_with'.split()
+    list_filter.insert(0, LastWeekPurchaseFilter)
     date_hierarchy='created'
-    #list_editable=['note',]
     search_fields= ['product__name']
     form=PurchaseForm
     list_per_page = 20
+    actions = ['set_keep', 'set_unknown', 'set_lost', 'set_consumed', 'set_sold', 'set_tossed', 
+               'set_consumed_and_all_similar_purchases_consumed', ]
+    actions.sort()
+    
+    def set_consumed_and_all_similar_purchases_consumed(self, request, queryset):
+        consumed = Disposition.objects.get(name = 'consumed')
+        for purch in queryset:
+            prod = purch.product
+            for innerpurch in prod.purchases.all():
+                innerpurch.consumed = True
+                innerpurch.disposition = consumed
+                innerpurch.save()
+        
+    def set_keep(self, obj, queryset):
+        keep = Disposition.objects.get(name = 'keep')
+        for purch in queryset:
+            self.disposition = keep
+            self.save()
+            
+    def set_lost(self, obj, queryset):
+        lost= Disposition.objects.get(name = 'lost')
+        for purch in queryset:
+            self.disposition = lost
+            self.save()
+            
+    def set_consumed(self, obj, queryset):
+        consumed= Disposition.objects.get(name = 'consumed')
+        for purch in queryset:
+            self.disposition = consumed
+            self.save()
+            
+    def set_sold(self, obj, queryset):
+        sold = Disposition.objects.get(name = 'sold')
+        for purch in queryset:
+            self.disposition = sold
+            self.save()
+            
+    def set_tossed(self, obj, queryset):
+        tossed= Disposition.objects.get(name = 'tossed')
+        for purch in queryset:
+            self.disposition = tossed
+            self.save()
+            
+    def set_unknown(self, obj, queryset):
+        unknown = Disposition.objects.get(name = 'unknown')
+        for purch in queryset:
+            self.disposition = unknown
+            self.save()
+    
     def mysource(self, obj):
         return obj.source.clink()
+    
+    def mydisposition(self, obj):
+        return obj.disposition and obj.disposition.clink() or 'none'
 
-    @debu
     def mycreated(self, obj):
         ct='<a href="/admin/day/purchase/?created__day=%d&created__month=%d&created__year=%d">all day purch</a>'%(obj.created.day, obj.created.month, obj.created.year, )
         try:
@@ -187,7 +259,6 @@ class PurchaseAdmin(OverriddenModelAdmin):
                         (vday, cday,  ),
                         ], skip_false=True)
 
-    @debu
     def mycost(self, obj):
         costper=''
         if obj.quantity>1:
@@ -205,11 +276,11 @@ class PurchaseAdmin(OverriddenModelAdmin):
     def mydomain(self, obj):
         return '<a href=/admin/day/domain/?id=%d>%s</a>'%(obj.product.domain.id, obj.product.domain)
 
-    adminify(mycost, myproduct, mywho_with, mydomain, mycreated, mysource)
+    adminify(mycost, myproduct, mydisposition, mywho_with, mydomain, mycreated, mysource)
     mywho_with.display_name='Who With'
     formfield_for_dbfield=mk_default_field({ 'quantity':1,'created':datetime.datetime.now, 'currency':1}) #'hour':get_named_hour
     formfield_form_foreignkey=mk_default_fkfield({'currency':1,'hour':gethour,})
-    fields='product cost source size quantity created hour who_with note currency '.split()
+    fields='product cost source size quantity created hour who_with note currency disposition'.split()
 
 class DomainAdmin(OverriddenModelAdmin):
     list_display='id myproducts mypie myspots mysource'.split()
@@ -546,6 +617,18 @@ class RegionAdmin(OverriddenModelAdmin):
 
     adminify(mysources, mypurchases)
 
+class DispositionAdmin(OverriddenModelAdmin):
+    list_display = 'id name myitems'.split()
+    search_fields = ['name', ]
+    def myitems(self, obj):
+        count = obj.items.count()
+        dispositionlink = '<a href="/admin/day/product/?disposition__id__exact=%d">all</a>' % (obj.id)
+        res = '%s<br>%s' % (count, dispositionlink)
+        
+        return res
+        
+    adminify(myitems)
+
 class SourceAdmin(OverriddenModelAdmin):
     list_display='name mytotal myproducts mywith mysummary mydomains myinteractions myregion'.split()
     list_per_page = 10
@@ -583,8 +666,10 @@ class SourceAdmin(OverriddenModelAdmin):
 
     def myproducts(self, obj):
         products=Product.objects.filter(purchases__source=obj).distinct()
-        dat=[(oo.total_spent(source=obj), str(oo)) for oo in products]
-        return chart_url(dat, text='')
+        labelresults = [(oo.total_spent(source=obj), str(oo)) for oo in products]
+        height = products.count < 4 and 100 or 200
+        pie = sparkline(labelresults = labelresults, height = height, kind = 'pie')
+        return pie
 
     def mydomains(self, obj):
         res = obj.domain_summary_data()
@@ -1070,5 +1155,6 @@ admin.site.register(NoteKind, NoteKindAdmin)
 #admin.site.register(TagDay, TagDayAdmin)
 
 admin.site.register(MeasurementSet, MeasurementSetAdmin)
+admin.site.register(Disposition, DispositionAdmin)
 
 from photoadmin import *
