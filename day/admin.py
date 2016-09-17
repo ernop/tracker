@@ -206,7 +206,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     actions = ['set_kept', 'set_unknown', 'set_lost', 'set_consumed', 'set_sold', 'set_tossed', 'set_given_away', 
                'set_consumed_and_all_similar_purchases_consumed',
                'set_unconsumed_and_all_similar_purchases_kept', ]
-    actions.sort()
+    
     
     def make_assign_storage(name):
         def inner_action(self, request, queryset):
@@ -217,8 +217,22 @@ class PurchaseAdmin(OverriddenModelAdmin):
         inner_action.__name__ = str('set_storage_%s' % name)
         return inner_action
     
+    def make_disposition(name):
+        def inner_action(self, request, queryset):
+            disposition = Disposition.objects.get(name = name)
+            for purch in queryset:
+                purch.disposition = disposition
+                purch.save()
+        inner_action.__name__ = str('set_disposition_%s' % name)
+        return inner_action
+    
     for storage in Storage.objects.all():
         actions.append(make_assign_storage(storage.name))
+    
+    for disposition in Disposition.objects.all():
+        actions.append(make_disposition(disposition.name))
+    
+    actions.sort()
     
     def set_consumed_and_all_similar_purchases_consumed(self, request, queryset):
         consumed = Disposition.objects.get(name = 'consumed')
@@ -235,49 +249,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
             for innerpurch in prod.purchases.all():
                 innerpurch.disposition = kept
                 innerpurch.save()
-        
-    def set_kept(self, obj, queryset):
-        kept = Disposition.objects.get(name = 'kept')
-        for purch in queryset:
-            purch.disposition = kept
-            purch.save()
-            
-    def set_lost(self, obj, queryset):
-        lost= Disposition.objects.get(name = 'lost')
-        for purch in queryset:
-            purch.disposition = lost
-            purch.save()
-            
-    def set_consumed(self, obj, queryset):
-        consumed= Disposition.objects.get(name = 'consumed')
-        for purch in queryset:
-            purch.disposition = consumed
-            purch.save()
-            
-    def set_sold(self, obj, queryset):
-        sold = Disposition.objects.get(name = 'sold')
-        for purch in queryset:
-            purch.disposition = sold
-            purch.save()
-            
-    def set_tossed(self, obj, queryset):
-        tossed= Disposition.objects.get(name = 'tossed')
-        for purch in queryset:
-            purch.disposition = tossed
-            purch.save()
-            
-    def set_given_away(self, obj, queryset):
-        given = Disposition.objects.get(name = 'given away')
-        for purch in queryset:
-            purch.disposition = given
-            purch.save()
-            
-    def set_unknown(self, obj, queryset):
-        unknown = Disposition.objects.get(name = 'unknown')
-        for purch in queryset:
-            purch.disposition = unknown
-            purch.save()
-    
+
     def mysource(self, obj):
         return obj.source.clink()
     
