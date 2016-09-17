@@ -191,7 +191,8 @@ class PurchaseAdmin(OverriddenModelAdmin):
     form=PurchaseForm
     list_per_page = 20
     actions = ['set_keep', 'set_unknown', 'set_lost', 'set_consumed', 'set_sold', 'set_tossed', 
-               'set_consumed_and_all_similar_purchases_consumed', ]
+               'set_consumed_and_all_similar_purchases_consumed',
+               'set_unconsumed_and_all_similar_purchases_unconsumed']
     actions.sort()
     
     def set_consumed_and_all_similar_purchases_consumed(self, request, queryset):
@@ -201,6 +202,15 @@ class PurchaseAdmin(OverriddenModelAdmin):
             for innerpurch in prod.purchases.all():
                 innerpurch.consumed = True
                 innerpurch.disposition = consumed
+                innerpurch.save()
+                
+    def set_unconsumed_and_all_similar_purchases_kept(self, request, queryset):
+        kept = Disposition.objects.get(name = 'kept')
+        for purch in queryset:
+            prod = purch.product
+            for innerpurch in prod.purchases.all():
+                innerpurch.consumed = False
+                innerpurch.disposition = kept
                 innerpurch.save()
         
     def set_keep(self, obj, queryset):
