@@ -840,7 +840,7 @@ class Purchase(DayModel):
                 if self.product.consumable:
                     self.disposition = Disposition.objects.get(name = 'consumed')
                 else:
-                    self.disposition = Disposition.objects.get(name = 'unknown')
+                    self.disposition = Disposition.objects.get(name = 'kept')
         super(Purchase, self).save(*args, **kwargs)
 
     def get_cost(self):
