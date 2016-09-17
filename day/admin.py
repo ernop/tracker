@@ -190,7 +190,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
     search_fields= ['product__name']
     form=PurchaseForm
     list_per_page = 20
-    actions = ['set_keep', 'set_unknown', 'set_lost', 'set_consumed', 'set_sold', 'set_tossed', 
+    actions = ['set_keep', 'set_unknown', 'set_lost', 'set_consumed', 'set_sold', 'set_tossed', 'set_given_away', 
                'set_consumed_and_all_similar_purchases_consumed',
                'set_unconsumed_and_all_similar_purchases_kept', ]
     actions.sort()
@@ -241,6 +241,12 @@ class PurchaseAdmin(OverriddenModelAdmin):
         tossed= Disposition.objects.get(name = 'tossed')
         for purch in queryset:
             purch.disposition = tossed
+            purch.save()
+            
+    def set_given_away(self, obj, queryset):
+        given = Disposition.objects.get(name = 'given away')
+        for purch in queryset:
+            purch.disposition = given
             purch.save()
             
     def set_unknown(self, obj, queryset):
