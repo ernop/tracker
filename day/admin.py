@@ -208,6 +208,18 @@ class PurchaseAdmin(OverriddenModelAdmin):
                'set_unconsumed_and_all_similar_purchases_kept', ]
     actions.sort()
     
+    def make_assign_storage(name):
+        def inner_action(self, request, queryset):
+            storage = Storage.objects.get(name = name)
+            for purch in queryset:
+                purch.storage = storage
+                purch.save()
+        inner_action.__name__ = str('set_storage_%s' % name)
+        return inner_action
+    
+    for storage in Storage.objects.all():
+        actions.append(make_assign_storage(storage.name))
+    
     def set_consumed_and_all_similar_purchases_consumed(self, request, queryset):
         consumed = Disposition.objects.get(name = 'consumed')
         for purch in queryset:
