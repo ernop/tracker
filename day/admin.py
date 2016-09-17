@@ -231,8 +231,8 @@ class PurchaseAdmin(OverriddenModelAdmin):
     
     for disposition in Disposition.objects.all():
         actions.append(make_disposition(disposition.name))
-    
-    actions.sort()
+        
+    actions.sort(key = lambda x:type(x) == str and x or x.__name__)
     
     def set_consumed_and_all_similar_purchases_consumed(self, request, queryset):
         consumed = Disposition.objects.get(name = 'consumed')
