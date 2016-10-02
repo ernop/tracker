@@ -263,6 +263,7 @@ class Domain(DayModel):
         res['total_quantity'] = total_quantity
         res['total_cost'] = total_cost
         res['purchase_count'] = purchase_count
+        res['purchases'] = ps
         tops = costs.items()
         tops.sort(key=lambda x:-1*x[1])
         res['top_purchases_html'] = '<div class="top-purchases">'+', '.join(['%s (%d)'%(Product.objects.get(id=top[0]).name, top[1]) for top in tops[:top_purchases_count]])+'</div>'
@@ -716,6 +717,7 @@ class Product(DayModel):
     created=models.DateField(auto_now_add=True)
     domain=models.ForeignKey('Domain', related_name='products')
     consumable = models.BooleanField()  #whether a purchase of this product is instantly consumed
+    essentiality = models.ForeignKey('Essentiality', related_name = 'products', blank = True, null = True)  #how life-wise essential this product is.
     
     class Meta:
         db_table='product'
@@ -792,6 +794,18 @@ class Storage(DayModel):  #storage location; car work house personal misc closet
     def __unicode__(self):
         return self.name
 
+class Essentiality(DayModel):
+    name=models.CharField(max_length=100)
+    created=models.DateField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'essentiality'
+        ordering = ['name', ]
+        
+    def __unicode__(self):
+        return self.name
+    
+
 class Purchase(DayModel):
     """purchases have a kind of dual purpose now.
     1. for a transaction - buy (or sell) or acquire something
@@ -810,6 +824,8 @@ class Purchase(DayModel):
     day=models.ForeignKey('Day',related_name='purchases')
     disposition = models.ForeignKey('Disposition', related_name = 'items', blank = True, null = True)
     storage = models.ForeignKey('Storage', related_name = 'items', blank = True, null = True)
+    essentiality = models.ForeignKey('Essentiality', related_name = 'purchases', blank = True, null = True)  #how life-wise essential this product is.
+    #inherited from the product's essentiality.
 
     class Meta:
         db_table='purchase'
@@ -843,6 +859,12 @@ class Purchase(DayModel):
                     self.disposition = Disposition.objects.get(name = 'consumed')
                 else:
                     self.disposition = Disposition.objects.get(name = 'kept')
+        
+        #purchases inherit essentiality from their product
+        if self.essentiality is None:
+            if self.product is not None:
+                if self.product.essentiality is not None:
+                    self.essentiality = self.product.essentiality
         super(Purchase, self).save(*args, **kwargs)
 
     def get_cost(self):

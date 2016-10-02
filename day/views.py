@@ -296,6 +296,10 @@ def summary_timespan(start,end,request,
     monthtotalreal = 0
     FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()
     income=0
+    expenses_by_essentiality = {'none': 0,}
+    for ess in Essentiality.objects.all():
+        expenses_by_essentiality[ess.name] = 0
+    expenses_unknown_count = 0
     for dd in Domain.objects.all():
         if include_start:
             use_start = add_days(start, -1)
@@ -317,6 +321,12 @@ def summary_timespan(start,end,request,
         bits.append(guy)
         if dd.name!='money':
             monthtotal += dinfo['total_cost']
+            for purch in dinfo['purchases']:
+                if purch.essentiality is not None:
+                    expenses_by_essentiality[purch.essentiality.name] = expenses_by_essentiality[purch.essentiality.name] + purch.get_cost()
+                else:
+                    expenses_by_essentiality['none'] = expenses_by_essentiality['none'] + purch.get_cost()
+                    expenses_unknown_count += 1
             if dd.name not in ['tax','recurring',]:
                 monthtotalreal += dinfo['total_cost']
     domaintable = mktable(bits, rights=[1, 2], bigs=[1, 2])
@@ -350,6 +360,17 @@ def summary_timespan(start,end,request,
     vals['realexpensesshow']='%0.1f'%(round(monthtotalreal/100)/10.0)
     vals['savedshow']='%0.1f'%(round(saved/100)/10.0)
     vals['projected_saving'] = monthtotal
+    
+    #calculating amounts.
+    vals['expenses_vital'] = expenses_by_essentiality['0 - vital']
+    vals['expenses_important'] = expenses_by_essentiality['1 - important'] +  vals['expenses_vital']
+    vals['expenses_major'] = expenses_by_essentiality['2 - major'] +  vals['expenses_important']
+    vals['expenses_fun'] = expenses_by_essentiality['3 - fun'] +  vals['expenses_major']
+    vals['expenses_waste'] = expenses_by_essentiality['4 - waste'] +  vals['expenses_fun']
+    vals['expenses_unknown'] = expenses_by_essentiality['none']
+    for k in 'expenses_vital expenses_important expenses_major expenses_fun expenses_waste expenses_unknown'.split():
+        vals[k] = '%0.0f' % (vals[k])
+    vals['expenses_unknown_link'] = '<a href="../../admin/day/purchase/?created__month=%d&created__year=%d&essentiality__isnull=True">%d</a>' % (vals['day'].date.month, vals['day'].date.year, expenses_unknown_count)
     
     vals['met_with_age_count']=None
     vals['metagerageage']=None

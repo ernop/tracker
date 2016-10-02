@@ -48,11 +48,26 @@ class ProductAdmin(OverriddenModelAdmin):
     list_display='name consumable mypurchases mysources mywith myspark'.split()
     list_editable = ['consumable', ]
     list_per_page = 10
-    list_filter = ['domain', make_null_filter('consumable', title = 'consumable', include_empty_string = False), 'consumable', ]
+    list_filter = ['domain', 'essentiality', make_null_filter('consumable', title = 'consumable', include_empty_string = False), 'consumable', ]
     actions = ['set_consumable', 'set_unconsumable', 'set_all_purchases_consumed',
                'set_consumable_and_all_purchases_consumed', ]
     actions.sort()
     fields=(('name','domain', ),)
+    
+    def make_assign_essentiality(name):
+        def inner_action(self, request, queryset):
+            essentiality = Essentiality.objects.get(name = name)
+            for prod in queryset:
+                prod.essentiality = essentiality
+                prod.save()
+        inner_action.__name__ = str('set_essentiality_%s' % name)
+        return inner_action
+
+    
+    for ess in Essentiality.objects.all():
+        actions.append(make_assign_essentiality(ess))
+        
+    actions.sort()
 
     def set_consumable_and_all_purchases_consumed(self, request, queryset):
         self.set_consumable(request, queryset)
@@ -191,10 +206,20 @@ class StorageAdmin(OverriddenModelAdmin):
     
     adminify(mystuff)
     
+class EssentialityAdmin(OverriddenModelAdmin):
+    list_display = 'id name myproducts mypurchases'.split()
+    
+    def myproducts(self, obj):
+        return obj.products.count()
+    
+    def mypurchases(self, obj):
+        return obj.purchases.count()
+    
+    adminify(myproducts, mypurchases)
 
 class PurchaseAdmin(OverriddenModelAdmin):
     list_display='id myproduct mydomain mydisposition mystorage mycost mysource size mywho_with mycreated note'.split()
-    list_filter='product__domain source__region disposition product__consumable storage currency source who_with'.split()
+    list_filter='product__domain source__region essentiality disposition product__consumable storage currency source who_with'.split()
     list_filter.insert(0, LastWeekPurchaseFilter)
     date_hierarchy='created'
     search_fields= ['product__name']
@@ -204,6 +229,38 @@ class PurchaseAdmin(OverriddenModelAdmin):
                'set_consumed_and_all_similar_purchases_consumed',
                'set_unconsumed_and_all_similar_purchases_kept', ]
     
+    def make_assign_essentiality(name):
+        def inner_action(self, request, queryset):
+            essentiality = Essentiality.objects.get(name = name)
+            for purch in queryset:
+                purch.essentiality = essentiality
+                purch.save()
+        inner_action.__name__ = str('set_essentiality_%s' % name)
+        return inner_action
+    
+        
+    def make_assign_essentiality_and_product(name):
+        def inner_action(self, request, queryset):
+            essentiality = Essentiality.objects.get(name = name)
+            for purch in queryset:
+                purch.essentiality = essentiality
+                purch.save()
+                prod = purch.product
+                prod.essentiality = essentiality
+                prod.save()
+                exi = prod.purchases.filter(essentiality = None)
+                for exipurch in exi:
+                    exipurch.essentiality = essentiality
+                    exipurch.save()
+            
+        inner_action.__name__ = str('set_essentiality_product_%s' % name)
+        return inner_action
+    
+    for ess in Essentiality.objects.all():
+        actions.append(make_assign_essentiality(ess))
+        actions.append(make_assign_essentiality_and_product(ess))
+        
+    actions.sort()
     
     def make_assign_storage(name):
         def inner_action(self, request, queryset):
@@ -1174,5 +1231,6 @@ admin.site.register(NoteKind, NoteKindAdmin)
 admin.site.register(MeasurementSet, MeasurementSetAdmin)
 admin.site.register(Disposition, DispositionAdmin)
 admin.site.register(Storage, StorageAdmin)
+admin.site.register(Essentiality, EssentialityAdmin)
 
 from photoadmin import *
