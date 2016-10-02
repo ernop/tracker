@@ -278,7 +278,6 @@ def summary_timespan(start,end,request,
                      include_start = False  #whether to include first day.
                      ):
     vals = {}
-    import ipdb;ipdb.set_trace()
     vals['start'] = start
     vals['end'] = end
     vals['startshow'] = start.strftime(DATE_DASH_REV_DAY)
