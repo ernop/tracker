@@ -242,10 +242,10 @@ def themonth(request, dt = None):
         return HttpResponseRedirect('/themonth/%s'%str(today))
     else:
         mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
-    start = add_days(datetime.datetime(year=mm.year, month=mm.month, day=1), -1)
+    start = datetime.datetime(year=mm.year, month=mm.month, day=1)
     #"starts" the last day of the previous month
     end = add_days(add_months(start, months=1), days = -1)
-    return summary_timespan(start,end,request)
+    return summary_timespan(start,end,request, include_start = True)
 
 @login_required
 def theyear(request,dt = None):
@@ -274,8 +274,11 @@ def summary_timespan(start,end,request,
                      include_permonth=False,
                      include_d3_people=True,
                      include_ages=True,
-                     include_origins=False):
+                     include_origins=False,
+                     include_start = False  #whether to include first day.
+                     ):
     vals = {}
+    import ipdb;ipdb.set_trace()
     vals['start'] = start
     vals['end'] = end
     vals['startshow'] = start.strftime(DATE_DASH_REV_DAY)
@@ -295,7 +298,11 @@ def summary_timespan(start,end,request,
     FORCE_DOMAINS = 'alcohol life money transportation food drink recurring house life body clothes'.split()
     income=0
     for dd in Domain.objects.all():
-        dinfo = dd.spent_history(start=start, end=end, top_purchases_count=top_purchases_count)
+        if include_start:
+            use_start = add_days(start, -1)
+        else:
+            use_start = start
+        dinfo = dd.spent_history(start = use_start, end=end, top_purchases_count=top_purchases_count)
         if dd.name=='money':
             income=-1*dinfo['total_cost']
         if dd.name not in FORCE_DOMAINS and not dinfo['counts']:
@@ -317,14 +324,14 @@ def summary_timespan(start,end,request,
     vals['domaintable'] = domaintable
     #purchases summary by domain
     if include_measurements:
-        measurements = Measurement.objects.filter(created__gt=start, created__lte=end).exclude(amount=None)
+        measurements = Measurement.objects.filter(created__gt=use_start, created__lte=end).exclude(amount=None)
         spots = [MeasuringSpot.objects.get(id=ms) for ms in list(set([ms[0] for ms in measurements.values_list('spot__id').distinct()]))]
         vals['spots'] = sorted(spots, key=lambda x:(x.domain.name, x.name))
     else:
         vals['spots']=[]
     # if d.notes.exists() or d.getmeasurements().exclude(amount=None).exists()
     if include_days:
-        vals['days'] = [d for d in Day.objects.filter(date__gte=start, date__lte=end).order_by('-date')]
+        vals['days'] = [d for d in Day.objects.filter(date__gt = use_start, date__lte=end).order_by('-date')]
     else:
         vals['days']=[]
     vals['month'] = start
