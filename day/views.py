@@ -174,6 +174,7 @@ def aday(request, day):
     day=Day.objects.get_or_create(date=dtday)[0]
     dtoday=gettoday()
     vals['day']=day
+    vals['daytitle'] = day.date.strftime('%A %B %d %Y')
     vals['recenttags']=Tag.objects.filter(created__gte=(dtoday-datetime.timedelta(days=30)))
     vals['exitags']=day.tags.all()
     vals['alltags']=Tag.objects.all()
@@ -241,7 +242,8 @@ def themonth(request, dt = None):
         return HttpResponseRedirect('/themonth/%s'%str(today))
     else:
         mm = datetime.datetime.strptime(dt, DATE_DASH_REV)
-    start = datetime.datetime(year=mm.year, month=mm.month, day=1)
+    start = add_days(datetime.datetime(year=mm.year, month=mm.month, day=1), -1)
+    #"starts" the last day of the previous month
     end = add_days(add_months(start, months=1), days = -1)
     return summary_timespan(start,end,request)
 
