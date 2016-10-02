@@ -363,10 +363,10 @@ def summary_timespan(start,end,request,
     
     #calculating amounts.
     vals['expenses_vital'] = expenses_by_essentiality['0 - vital']
-    vals['expenses_important'] = expenses_by_essentiality['1 - important'] +  vals['expenses_vital']
-    vals['expenses_major'] = expenses_by_essentiality['2 - major'] +  vals['expenses_important']
-    vals['expenses_fun'] = expenses_by_essentiality['3 - fun'] +  vals['expenses_major']
-    vals['expenses_waste'] = expenses_by_essentiality['4 - waste'] +  vals['expenses_fun']
+    vals['expenses_important'] = expenses_by_essentiality['1 - important']
+    vals['expenses_major'] = expenses_by_essentiality['2 - major']
+    vals['expenses_fun'] = expenses_by_essentiality['3 - fun'] 
+    vals['expenses_waste'] = expenses_by_essentiality['4 - waste']
     vals['expenses_unknown'] = expenses_by_essentiality['none']
     for k in 'expenses_vital expenses_important expenses_major expenses_fun expenses_waste expenses_unknown'.split():
         vals[k] = '%0.0f' % (vals[k])
