@@ -40,9 +40,6 @@ class BetterDateWidget(admin.widgets.AdminDateWidget):
     def render(self, name, value, attrs=None):
         return super(BetterDateWidget, self).render(name, value)
 
-
-
-
 class ProductAdmin(OverriddenModelAdmin):
     search_fields = ['name', ]
     list_display='name consumable mypurchases mysources mywith myspark'.split()
@@ -53,7 +50,7 @@ class ProductAdmin(OverriddenModelAdmin):
                'set_consumable_and_all_purchases_consumed', ]
     actions.sort()
     fields=(('name','domain', ),)
-    
+
     def make_assign_essentiality(name):
         def inner_action(self, request, queryset):
             essentiality = Essentiality.objects.get(name = name)
@@ -63,10 +60,9 @@ class ProductAdmin(OverriddenModelAdmin):
         inner_action.__name__ = str('set_essentiality_%s' % name)
         return inner_action
 
-    
     for ess in Essentiality.objects.all():
         actions.append(make_assign_essentiality(ess))
-        
+
     actions.sort()
 
     def set_consumable_and_all_purchases_consumed(self, request, queryset):
@@ -77,7 +73,7 @@ class ProductAdmin(OverriddenModelAdmin):
         for product in queryset:
             product.consumable = True
             product.save()
-            
+
     def set_unconsumable(self, request, queryset):
         for product in queryset:
             product.consumable = False
@@ -97,12 +93,12 @@ class ProductAdmin(OverriddenModelAdmin):
 
     def mypurchases(self, obj):
         data= [(p.clink(),p.source.clink(),p.day.vlink()) for p in Purchase.objects.filter(product=obj).order_by('day__date')]
-        
+
         alllink = '<a class="btn btn-default" href="../purchase/?product_id=%d">all</a>' % obj.id
         data.append(alllink)
         domainlink=obj.domain.clink()
         data.insert(0, domainlink)
-        
+
         return mktable(data)
 
     def myspark(self, obj):
@@ -140,7 +136,7 @@ class ProductAdmin(OverriddenModelAdmin):
     def mywith(self, obj):
         res = {}
         ps = Purchase.objects.filter(product=obj)
-        
+
         peopleids=set()
         for p in ps:
             for person in p.who_with.all():
@@ -148,18 +144,18 @@ class ProductAdmin(OverriddenModelAdmin):
                 res[cl] = res.get(cl, 0) + 1
                 if person.id not in peopleids:
                     peopleids.add(person.id)
-                
-        
+
+
         res=sorted(res.items(), key=lambda x:(-1*x[1], x[0]))
         totalrow=['total', len(peopleids)]
         res.append(totalrow)
-        
+
         people=Person.objects.filter(id__in=peopleids)
         today=datetime.date.today()
         agedata=average_age(people=people, asof=today)
         knowndata=average_time_known(people=people, asof=today)
         ageline=['average age: %0.1f (%d)'%(agedata['average_age'] or 0, agedata['people_included_count'] or 0), 'time known: %0.1f'%(knowndata['average_age'] or 0)]
-        
+
         res.append(ageline)
         tbl = mktable(res)
         return tbl
@@ -170,7 +166,7 @@ class ProductAdmin(OverriddenModelAdmin):
         dat=[(ss.total_spent(product=obj), ss, ss.purchases.filter(product=obj).count()) for ss in sources]
         dat.sort(key=lambda x:-1*x[0])
         labelresults = [(d[0], (d[1].name)) for d in dat]
-       
+
         if sources.count() < 3:
             height = 100
         else:
@@ -203,18 +199,18 @@ class StorageAdmin(OverriddenModelAdmin):
         names = ', '.join(links)
         res = '%s<br>%s' % (itemslink, names)
         return res
-    
+
     adminify(mystuff)
-    
+
 class EssentialityAdmin(OverriddenModelAdmin):
     list_display = 'id name myproducts mypurchases'.split()
-    
+
     def myproducts(self, obj):
         return obj.products.count()
-    
+
     def mypurchases(self, obj):
         return obj.purchases.count()
-    
+
     adminify(myproducts, mypurchases)
 
 class PurchaseAdmin(OverriddenModelAdmin):
@@ -225,10 +221,10 @@ class PurchaseAdmin(OverriddenModelAdmin):
     search_fields= ['product__name']
     form=PurchaseForm
     list_per_page = 20
-    actions = ['set_kept', 'set_unknown', 'set_lost', 'set_consumed', 'set_sold', 'set_tossed', 'set_given_away', 
+    actions = ['set_kept', 'set_unknown', 'set_lost', 'set_consumed', 'set_sold', 'set_tossed', 'set_given_away',
                'set_consumed_and_all_similar_purchases_consumed',
                'set_unconsumed_and_all_similar_purchases_kept', ]
-    
+
     def make_assign_essentiality(name):
         def inner_action(self, request, queryset):
             essentiality = Essentiality.objects.get(name = name)
@@ -237,8 +233,8 @@ class PurchaseAdmin(OverriddenModelAdmin):
                 purch.save()
         inner_action.__name__ = str('set_essentiality_%s' % name)
         return inner_action
-    
-        
+
+
     def make_assign_essentiality_and_product(name):
         def inner_action(self, request, queryset):
             essentiality = Essentiality.objects.get(name = name)
@@ -252,16 +248,16 @@ class PurchaseAdmin(OverriddenModelAdmin):
                 for exipurch in exi:
                     exipurch.essentiality = essentiality
                     exipurch.save()
-            
+
         inner_action.__name__ = str('set_essentiality_product_%s' % name)
         return inner_action
-    
+
     for ess in Essentiality.objects.all():
         actions.append(make_assign_essentiality(ess))
         actions.append(make_assign_essentiality_and_product(ess))
-        
+
     actions.sort()
-    
+
     def make_assign_storage(name):
         def inner_action(self, request, queryset):
             storage = Storage.objects.get(name = name)
@@ -270,7 +266,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
                 purch.save()
         inner_action.__name__ = str('set_storage_%s' % name)
         return inner_action
-    
+
     def make_disposition(name):
         def inner_action(self, request, queryset):
             disposition = Disposition.objects.get(name = name)
@@ -279,15 +275,15 @@ class PurchaseAdmin(OverriddenModelAdmin):
                 purch.save()
         inner_action.__name__ = str('set_disposition_%s' % name)
         return inner_action
-    
+
     for storage in Storage.objects.all():
         actions.append(make_assign_storage(storage.name))
-    
+
     for disposition in Disposition.objects.all():
         actions.append(make_disposition(disposition.name))
-        
+
     actions.sort(key = lambda x:type(x) == str and x or x.__name__)
-    
+
     def set_consumed_and_all_similar_purchases_consumed(self, request, queryset):
         consumed = Disposition.objects.get(name = 'consumed')
         for purch in queryset:
@@ -295,7 +291,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
             for innerpurch in prod.purchases.all():
                 innerpurch.disposition = consumed
                 innerpurch.save()
-                
+
     def set_unconsumed_and_all_similar_purchases_kept(self, request, queryset):
         kept = Disposition.objects.get(name = 'kept')
         for purch in queryset:
@@ -306,7 +302,7 @@ class PurchaseAdmin(OverriddenModelAdmin):
 
     def mysource(self, obj):
         return obj.source.clink()
-    
+
     def mydisposition(self, obj):
         return obj.disposition and obj.disposition.clink() or 'none'
 
@@ -423,7 +419,7 @@ class DomainAdmin(OverriddenModelAdmin):
 
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
-    
+
     def myspots(self,obj):
         spots=MeasuringSpot.objects.filter(domain=obj)
         dat=[(sp.clink(),sp.measurements.count()) for sp in spots]
@@ -442,16 +438,16 @@ class PersonAdmin(OverriddenModelAdmin):
 
     def mydescription(self,obj):
         return '<blockquote>%s</>'%(obj.description or '')
-    
+
     def myinteractions(self, obj):
         return ', '.join([i.clink() for i in obj.interactions.all()])
-    
+
     #this is now time decaying.
     def update_rough_purchase_counts(self, request, queryset):
         sixmonths = datetime.datetime.now() - datetime.timedelta(days=180)
         for person in Person.objects.all():
             person.update_purchase_count()
-            
+
     def set_longago(self, request, queryset):
         for person in queryset:
             person.created = settings.LONG_AGO
@@ -483,7 +479,7 @@ class PersonAdmin(OverriddenModelAdmin):
         else:
             known_since= humanize_date(obj.created)
         met_through=', '.join([p.clink() for p in obj.met_through.all()])
-        
+
         if obj.disabled:disabled='%sdisabled'%NO_ICON
         else:disabled=''
         met_at=None
@@ -505,7 +501,7 @@ class PersonAdmin(OverriddenModelAdmin):
             latest_dvlink=latest.day.vlink()
         else:
             latest_dvlink=''
-        
+
         data=[('name',obj.name(),),
               ('origin',obj.origin or ''),
               ('description',obj.description and prespan(obj.description) or ''),
@@ -522,10 +518,10 @@ class PersonAdmin(OverriddenModelAdmin):
               ('taglink', obj.as_tag.exists() and obj.as_tag.get().clink() or ''),
               ('photoset', obj.as_tag.exists() and obj.as_tag.get().clink() or ''),
               ]
-        
+
         tbl=mktable(data,skip_false=True)
         return tbl
-    
+
     def myphotos(self,obj):
         if obj.as_tag.exists():
             try:
@@ -535,7 +531,7 @@ class PersonAdmin(OverriddenModelAdmin):
         else:
             photos=''
         return photos
-    
+
     def myphotos(self,obj):
         dat=[]
         if obj.as_tag.exists():
@@ -561,7 +557,7 @@ class PersonAdmin(OverriddenModelAdmin):
         costs = {}
         res=[]
         res.extend([('Introduced to',p.clink(), get_day_link(p.created)) for p in obj.introduced_to.order_by('created','first_name', 'last_name')])
-        
+
         ps = obj.purchases.all()
         peopleids=set()
         for purch in ps:
@@ -579,10 +575,10 @@ class PersonAdmin(OverriddenModelAdmin):
         agedata=average_age(people=people, asof=today)
         knowndata=average_time_known(people=people, asof=today)
         ageline=['average age: %0.1f (%d)'%(agedata['average_age'] or 0, agedata['people_included_count'] or 0), 'time known: %0.1f'%(knowndata['average_age'] or 0)]
-    
-        res.append(ageline)        
-        
-        
+
+        res.append(ageline)
+
+
         tbl = mktable(res)
         return tbl
 
@@ -698,9 +694,9 @@ class DispositionAdmin(OverriddenModelAdmin):
         count = obj.items.count()
         dispositionlink = '<a href="/admin/day/purchase/?disposition__id__exact=%d">all</a>' % (obj.id)
         res = '%s<br>%s' % (count, dispositionlink)
-        
+
         return res
-        
+
     adminify(myitems)
 
 class SourceAdmin(OverriddenModelAdmin):
@@ -771,7 +767,7 @@ class SourceAdmin(OverriddenModelAdmin):
                 res[cl] = res.get(cl, 0) + 1
                 if p.id not in peopleids:
                     peopleids.add(person.id)
-                
+
         totalrow=['total', len(peopleids)]
         res=sorted(res.items(), key=lambda x:(-1*x[1], x[0]))
         res.append(totalrow)
@@ -780,10 +776,10 @@ class SourceAdmin(OverriddenModelAdmin):
         agedata=average_age(people=people, asof=today)
         knowndata=average_time_known(people=people, asof=today)
         ageline=['average age: %0.1f (%d)'%(agedata['average_age'] or 0, agedata['people_included_count'] or 0), 'time known: %0.1f'%(knowndata['average_age'] or 0)]
-        res.append(ageline)                        
+        res.append(ageline)
         tbl = mktable(res)
         return tbl
-    
+
     @debu
     def mytotal(self, obj):
         #monthago=datetime.datetime.now()-datetime.timedelta(days=30)
@@ -980,7 +976,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
                 else:
                     label2value.append((val, dd))
             trying=datetime.timedelta(days=1)+trying
-            
+
         if obj.interpolate:
             rendered = sparkline(labelresults = label2value, width=600, height= 150, kind = 'line')
         else:
@@ -989,7 +985,7 @@ class MeasuringSpotAdmin(OverriddenModelAdmin):
 
     def mydomain(self, obj):
         return '<a href=/admin/day/domain/?id=%d>%s</a>'%(obj.domain.id, obj.domain)
-    
+
     def mysets(self, obj):
         return ' | '.join([ms.clink() for ms in obj.measurementset_set.all()])
     adminify( myhistory, mydomain, mysets, myname)
@@ -1003,7 +999,7 @@ class MeasurementAdmin(OverriddenModelAdmin):
 
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
-    
+
     def myday(self, obj):
         return obj.day.clink()
 
@@ -1018,7 +1014,7 @@ class TagAdmin(OverriddenModelAdmin):
     @debu
     def mydays(self, obj):
         return ', '.join([day.clink() for day in obj.days.all()])
-    
+
     adminify(mydays)
 
 #class TagDayAdmin(OverriddenModelAdmin):
@@ -1029,13 +1025,13 @@ class DayAdmin(OverriddenModelAdmin):
     search_fields=['text','tag__name','text',]
     list_filter=[HasPurchFilter,HasNoteFilter,]
     date_hierarchy='date'
-    
+
     def mytags(self, obj):
         return ', '.join([t.clink() for t in obj.tags.all()])
 
     def myvday(self, obj):
         return obj.vlink()
-    
+
     def myday(self, obj):
         return obj.clink()
 
@@ -1052,16 +1048,16 @@ class NoteAdmin(OverriddenModelAdmin):
     list_filter=['kinds',NoteHasKinds,NoteHasText]
     list_search=['kinds',]
     date_hierarchy='created'
-    
+
     def myvday(self, obj):
         return obj.day.vlink()
-    
+
     def myday(self,obj):
         return obj.day.clink()
-    
+
     def mynotekinds(self, obj):
         return '<br>'.join([n.clink() for n in obj.kinds.all()])
-    
+
     adminify(myvday, mynotekinds, myday)
 
 class NoteKindAdmin(OverriddenModelAdmin):
@@ -1128,20 +1124,20 @@ class InteractionMeasurementAdmin(OverriddenModelAdmin):
 
     def myinteraction(self, obj):
         return obj.interaction.clink()
-    
+
     def myscale(self, obj):
         return obj.interaction_scale.clink()
 
     def mycreated(self, obj):
         return obj.created.strftime(DATE)
-    
+
     def myvalue(self, obj):
         return obj.value
 
     formfield_for_dbfield=mk_default_field({'created':nowdate,})
     adminify(mycreated, myinteraction, myscale, mycreated, myvalue)
     #fields=(('spot','amount','created', ),)
-    
+
 class InteractionScaleAdmin(OverriddenModelAdmin):
     list_display = 'id myname mycreated myinteractions'.split()
     def mymeasurements(self, obj):
@@ -1153,11 +1149,11 @@ class InteractionScaleAdmin(OverriddenModelAdmin):
     def myinteractions(self, obj):
         return ', '.join(['%s value %d' % (m.interaction.clink(), m.value) for m in obj.measurements.all()])
     adminify(myname, myinteractions, mymeasurements, mycreated)
-    
+
 class InteractionAdmin(OverriddenModelAdmin):
     list_display = 'id myday mypeople mysource mymeasurements mytype myformat mycreated'.split()
     list_filter = 'type format'.split()
-    
+
     def myday(self, obj):
         return obj.day.clink()
     def mypeople(self, obj):
@@ -1194,7 +1190,7 @@ class InteractionFormatAdmin(OverriddenModelAdmin):
         alllink = '<a href="../interaction/?format=%d">all</a>' % obj.id
         res = '%d %s' % (obj.interactions.count(), alllink)
         return res
-        
+
     def myname(self, obj):
         return obj.name
     def mycreated(self, obj):

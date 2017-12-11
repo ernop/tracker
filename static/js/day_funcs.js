@@ -4,7 +4,7 @@ function setup_change_describer(){
 }
 
 function show_popular_from_product(){
-	//for the current selection of the product, 
+	//for the current selection of the product,
 	//show the popular prices, sources, hour etc. for quick selection!
 	var thing=$("#purchase-product").select2('data');
 	if (!thing){return}
@@ -20,7 +20,7 @@ function show_popular_from_product(){
 
 
 function show_popular_from_source(){
-	//for the current selection of the product, show the popular prices, 
+	//for the current selection of the product, show the popular prices,
 	//sources, hour etc. for quick selection!
 	var thing=$("#purchase-source").select2('data');
 	if (!thing){return}
@@ -150,11 +150,11 @@ function setup_new_purch(){
 		var saver=$(this).closest('.person-adder')
 		var fn=saver.find('.first-name').val()
 		var ln=saver.find('.last-name').val() || '?'
-		
+
 		var gender=saver.find('input[name=gender]:checked').val()
 		var met_through=saver.find('#new_person_met_through').select2('val')
 		var text=fn+' '+ln
-		if (!fn || !fn.length){	
+		if (!fn || !fn.length){
 			notify('needs at least a first name',false)
 			return
 		}
@@ -179,28 +179,28 @@ function wrap_callback_with_original_data(dat, inner_callback){
 	function x(return_data){
 		inner_callback(return_data, orig_dat)
 	}
-	
+
 	return x
 }
 
 function new_source_callback(dat, orig_dat){
-	notify(dat['message'],true)	
+	notify(dat['message'],true)
 	if (dat['success']){
 		sources.push({text:orig_dat['text'],name:orig_dat['name'],
 		id:dat['source_id']})
 		setup_new_purch()
 	}
-	
+
 }
 
 function new_person_callback(dat, orig_dat){
-	notify(dat['message'],true)	
+	notify(dat['message'],true)
 	if (dat['success']){
 		people.push({text:orig_dat['text'],first_name:orig_dat['first_name'],
 		last_name:orig_dat['last_name'],id:dat['person_id']})
 		setup_new_purch()
 	}
-	
+
 }
 
 function setup_new_measurement(){
@@ -378,7 +378,7 @@ function obj2measurement(measurement){
 
 function measurement_domain_clink(m){
 	return '<a href="/admin/day/domain/?id='+m.domain_id+'">'+m.domain_name+'</a>'
-}	
+}
 
 function m_clink(m){
 	return '<a href="/admin/day/measurement/?id='+m.id+'">'+m.id+'</a>'

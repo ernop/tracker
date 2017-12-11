@@ -6,6 +6,7 @@
     </script>
     <style>
     .container{width:100%;}
+    .personspan{float:left;height:30px;width:220px;display:inline-block;}
     
     </style>
 {% endblock %}
@@ -31,7 +32,7 @@ Saved {{savedshow}}k</h2>
 
 {% if monthpeople %}
     {% for person in monthpeople %}
-        <span style="float:left;height:30px;width:220px;">{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}}) {% if not person.birthday or not person.origin %}*{% endif %}</span>
+        <span class="personspan">{{person.colored_clink(newperson=person.newperson)|safe}} ({{person.month_purchase_count}}) {% if not person.birthday or not person.origin %}*{% endif %}</span>
     {% endfor %}
     
     <h3>{% if metaverageage %}<br>Met: {{metaverageage}} {% if met_with_age_count %}({{met_with_age_count}}){% endif %}{% endif %}
